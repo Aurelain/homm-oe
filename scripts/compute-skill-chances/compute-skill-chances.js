@@ -1,5 +1,6 @@
 import {unzipSync} from 'fflate';
 import {readFileSync} from 'fs';
+import assume from '../utils/assume.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -14,6 +15,15 @@ const HERO_ANTI_PATTERN = /campaign|tutorial/;
 const MAX_SLOTS = 8;
 const MAX_SKILL_LEVEL = 3;
 const OPTIONS_COUNT = 3; // how many options appear in the Level-up dialog
+const BATCH = 10000;
+const FACTION_TO_PLURAL = {
+    demon: 'demons',
+    dungeon: 'dungeon',
+    human: 'humans',
+    nature: 'nature',
+    undead: 'necros',
+    unfrozen: 'unfrozen',
+};
 const decoder = new TextDecoder();
 
 // =====================================================================================================================
@@ -33,15 +43,12 @@ function computeSkillChances() {
 
     const heroes = collectByPattern(zipHub, HERO_FILE_PATTERN, HERO_ANTI_PATTERN);
 
-    const targetHeroes = [];
-    targetHeroes.push(...generateBlankHeroes(chancesPristine));
-
-    // const [hero] = targetHeroes;
-    const [hero] = heroes;
-    const subclasses = getSubclassesForHero(hero, subclassesPristine);
-    const [subclass] = subclasses;
-    const success = levelUpHeroForSubclass(hero, subclass, chancesCache);
-    console.log('success:', success);
+    let targetHeroes = [];
+    // targetHeroes.push(...generateBlankHeroes(subclassesPristine));
+    targetHeroes.push(...heroes);
+    // targetHeroes = [targetHeroes[1]];
+    // console.log('targetHeroes:', targetHeroes);
+    runBatch(targetHeroes, subclassesPristine, chancesCache);
 }
 
 // =====================================================================================================================
@@ -103,20 +110,41 @@ function resolveChances(chancesPristine) {
 /**
  *
  */
-function generateBlankHeroes(chancesPristine) {
+function generateBlankHeroes(subclassesPristine) {
     const output = [];
-    for (const {id} of chancesPristine) {
-        const [fractions, classType] = id.split('_');
-        const fraction = fractions.replace(/s$/, '');
-        output.push({
-            fraction,
-            classType,
-            id: fraction + '_generic_' + classType,
-            skillsRollVariant: id,
-            startSkills: [],
-        });
+    const used = {};
+    for (const {faction, classType} of subclassesPristine) {
+        const id = faction + '_generic_' + classType;
+        if (!used[id]) {
+            used[id] = true;
+            output.push({
+                fraction: faction,
+                classType,
+                id,
+                skillsRollVariant: `${FACTION_TO_PLURAL[faction]}_${classType}_skills_table`,
+                startSkills: [],
+            });
+        }
     }
     return output;
+}
+
+/**
+ *
+ */
+function runBatch(heroes, subclassesPristine, chancesCache) {
+    for (const hero of heroes) {
+        const subclasses = getSubclassesForHero(hero, subclassesPristine);
+        const percents = [];
+        for (const subclass of subclasses) {
+            let successCount = 0;
+            for (let i = 0; i < BATCH; i++) {
+                levelUpHeroForSubclass(hero, subclass, chancesCache) && successCount++;
+            }
+            percents.push(Math.round((100 * successCount) / BATCH) + '%');
+        }
+        console.log(hero.id + ': ' + percents.join(', '));
+    }
 }
 
 /**
@@ -134,6 +162,7 @@ function getSubclassesForHero(hero, subclassesPristine) {
             output.push(hub);
         }
     }
+    assume(output.length === 2, 'Did not find 2 subclasses!', hero);
     return output;
 }
 
@@ -162,12 +191,12 @@ function levelUpHeroForSubclass(hero, subclass, chancesCache) {
             break;
         }
         level++; // Note: we're starting from 2, not sure if this is ok...
-        console.log('---------------', level);
-        console.log('skills:', skills);
+        // console.log('---------------', level);
+        // console.log('skills:', skills);
 
         const chancesForLevel = chancesCache[skillsRollVariant + '_' + level];
         const options = selectThree(skills, chancesForLevel);
-        console.log('options:', options);
+        // console.log('options:', options);
 
         const choice = chooseOne(options, skills, subclass);
         skills[choice] = (skills[choice] || 0) + 1;
@@ -190,7 +219,7 @@ function checkSubclassAchieved(skills, subclass) {
             achieved++;
         }
     }
-    console.log(achieved, '/', total);
+    // console.log(achieved, '/', total);
     return achieved === total;
 }
 
@@ -234,19 +263,19 @@ function chooseOne(options, skills, subclass) {
 
     if (hasInterestingSkills) {
         const rare = chooseRare(interesting);
-        console.log(`Choosing a subclass skill (${rare})!`);
+        // console.log(`Choosing a subclass skill (${rare})!`);
         return rare;
     }
 
     for (const key in skills) {
         if (key in options) {
-            console.log(`Choosing to upgrade an existing skill (${key})!`);
+            // console.log(`Choosing to upgrade an existing skill (${key})!`);
             return key;
         }
     }
 
     const first = Object.keys(options)[0];
-    console.log(`Choosing the first option (${first})!`);
+    // console.log(`Choosing the first option (${first})!`);
     return first;
 }
 /**
