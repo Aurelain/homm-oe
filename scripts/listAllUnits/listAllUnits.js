@@ -52,7 +52,7 @@ function listAllUnits() {
                 console.warn(`Cannot find name for ${unit.id}!`);
             } else {
                 namedUnits++;
-                lines.push(`        '${unitName}',`);
+                lines.push(`        "${unitName}",`);
             }
         }
         lines.push('    },');
@@ -75,7 +75,7 @@ function getEnglishTranslations(zipHub) {
     const tokens = collectByPattern(zipHub, /english\/.*?unitsAbility\.json/);
     const output = {};
     for (const {sid, text} of tokens) {
-        output[sid] = text;
+        output[sid] = text.replaceAll('’', "'");
     }
     return output;
 }
