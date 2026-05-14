@@ -1,6 +1,5 @@
-import {unzipSync} from 'fflate';
-import {readFileSync} from 'fs';
 import assume from '../utils/assume.js';
+import unzipCore from '../helpers/unzipCore.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -33,8 +32,7 @@ const decoder = new TextDecoder();
  *
  */
 function computeSkillChances() {
-    const zipBuffer = readFileSync(OE_ZIP_PATH);
-    const zipHub = unzipSync(zipBuffer);
+    const zipHub = unzipCore();
 
     const chancesPristine = collectByPattern(zipHub, CHANCES_FILE_PATTERN);
     const chancesCache = resolveChances(chancesPristine);

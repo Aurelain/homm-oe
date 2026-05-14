@@ -4,7 +4,8 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "compute": "node scripts/compute-skill-chances/compute-skill-chances"
+        "compute": "node scripts/compute-skill-chances/compute-skill-chances",
+        "listAllUnits": "node scripts/listAllUnits/listAllUnits"
     },
     "dependencies": {
         "fflate": "^0.8.2",
