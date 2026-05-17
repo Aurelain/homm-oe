@@ -39,6 +39,13 @@ local RESOURCE_ICONS = {
     gemstone_cost = 'Gemstones'
 }
 local ROMAN = { 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII' }
+local STICKY_STYLE = {
+    ['position'] = 'sticky',
+    ['top'] = '65px',
+    ['z-index'] = '10',
+    ['background-color'] = '#21252a',
+    ['box-shadow'] = 'inset 0 -2px 0 0 #45494e'
+}
 
 ------------------------------------------------------------------------------------------------------------------------
 -- Detects the current language from the URL
@@ -96,7 +103,7 @@ local function computeCost(row)
     for key, icon in pairs(RESOURCE_ICONS) do
         local val = row[key]
         if val and val ~= '' and val ~= 0 then
-            cost = cost .. ' ' .. val .. '[[File:Icon_Resource_'.. icon .. '.png|24px|link=]]'
+            cost = cost .. ' ' .. val .. '[[File:Icon_Resource_' .. icon .. '.png|24px|link=]]'
         end
     end
     return cost
@@ -237,6 +244,7 @@ end
 local function dump(target)
     return '<pre>' .. mw.dumpObject(target) .. '</pre>'
 end
+
 ------------------------------------------------------------------------------------------------------------------------
 -- Builds an icon+text combo for the unit's name
 ------------------------------------------------------------------------------------------------------------------------
@@ -244,7 +252,14 @@ local function renderUnitName(u, suffix)
     local page = u.nameEn .. suffix
     local img = '[[File:' .. u.nameEn .. ' icon.png|40px|link=' .. page .. ']]'
     local text = '[[' .. page .. '|' .. u.nameX .. ']]'
-    return '<span style="white-space: nowrap;">' .. img .. ' ' .. text .. '</span>'
+    return img .. ' ' .. text
+end
+
+------------------------------------------------------------------------------------------------------------------------
+-- Builds an icon+text combo for the unit's name
+------------------------------------------------------------------------------------------------------------------------
+local function addHeaderCell(tr, text)
+    tr:tag('th'):css(STICKY_STYLE):wikitext(text):done()
 end
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -266,22 +281,23 @@ function p.display()
     -- Table
     local htmlTable = mw.html.create('table')
     htmlTable:addClass('wikitable sortable')
+    htmlTable:css('white-space', 'nowrap')
 
     -- Header
     local header = htmlTable:tag('tr')
-    header:tag('th'):wikitext(wordsX['unit']):done()
-    header:tag('th'):wikitext(wordsX['faction']):done()
-    header:tag('th'):wikitext(wordsX['tier']):done()
-    header:tag('th'):wikitext(wordsX['cost']):done()
+    addHeaderCell(header, wordsX['unit'])
+    addHeaderCell(header, wordsX['faction'])
+    addHeaderCell(header, wordsX['tier'])
+    addHeaderCell(header, wordsX['cost'])
     -- main stats
-    header:tag('th'):wikitext('[[File:Health Icon.png|24px|' .. wordsX['hp'] .. ']]'):done()
-    header:tag('th'):wikitext('[[File:Icon_Stats_Attack.png|24px|' .. wordsX['offence'] .. ']]'):done()
-    header:tag('th'):wikitext('[[File:Icon_Stats_Defence.png|24px|' .. wordsX['defence'] .. ']]'):done()
-    header:tag('th'):wikitext('[[File:Icon_Stats_Damage.png|24px|' .. wordsX['damage'] .. ']]'):done()
-    header:tag('th'):wikitext('[[File:Icon_Stats_Initiative.png|24px|' .. wordsX['initiative'] .. ']]'):done()
-    header:tag('th'):wikitext('[[File:Icon_Stats_Speed.png|24px|' .. wordsX['speed'] .. ']]'):done()
+    addHeaderCell(header, '[[File:Health Icon.png|24px|' .. wordsX['hp'] .. ']]')
+    addHeaderCell(header, '[[File:Icon_Stats_Attack.png|24px|' .. wordsX['offence'] .. ']]')
+    addHeaderCell(header, '[[File:Icon_Stats_Defence.png|24px|' .. wordsX['defence'] .. ']]')
+    addHeaderCell(header, '[[File:Icon_Stats_Damage.png|24px|' .. wordsX['damage'] .. ']]')
+    addHeaderCell(header, '[[File:Icon_Stats_Initiative.png|24px|' .. wordsX['initiative'] .. ']]')
+    addHeaderCell(header, '[[File:Icon_Stats_Speed.png|24px|' .. wordsX['speed'] .. ']]')
     -- others
-    header:tag('th'):wikitext('[[File:Base_passive_ranged_attack.png|24px|' .. wordsX['ranged'] .. ']]'):done()
+    addHeaderCell(header, '[[File:Base_passive_ranged_attack.png|24px|' .. wordsX['ranged'] .. ']]')
 
     -- Body
     for _, u in ipairs(units) do
@@ -291,10 +307,7 @@ function p.display()
         tr:tag('td'):wikitext('[[' .. factionPage .. '|' .. factionX[u.faction] .. ']]'):done()
         tr:tag('td'):wikitext(ROMAN[tonumber(u.tier)]):done()
         -- cost
-        tr:tag('td')
-            :attr('data-sort-value', string.match(u.cost, "^%d+"))
-            :wikitext(u.cost)
-            :done()
+        tr:tag('td'):attr('data-sort-value', string.match(u.cost, "^%d+")):wikitext(u.cost):done()
         -- main stats
         tr:tag('td'):wikitext(u.hp):done()
         tr:tag('td'):wikitext(u.offence):done()
