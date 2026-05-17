@@ -1,4 +1,4 @@
-import {PASSWORD, USERNAME} from '../SECRET.js';
+import {PASSWORD, USERNAME} from '../volatile/SECRET.js';
 import requestFromApi from './requestFromApi.js';
 
 // =====================================================================================================================
@@ -29,7 +29,7 @@ async function getCsrfToken() {
         }
 
         console.log('3. Fetching CSRF edit token...');
-        const csrfRes = await apiRequest({action: 'query', meta: 'tokens'});
+        const csrfRes = await requestFromApi({action: 'query', meta: 'tokens'});
         const csrfToken = csrfRes.query.tokens.csrftoken;
         return csrfToken;
     } catch (error) {

@@ -1,9 +1,10 @@
 import {API_URL} from '../SETTINGS.js';
+import {CF_CLEARANCE, USER_AGENT} from '../volatile/CF.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
-let cookies = '';
+let cookies = `cf_clearance=${CF_CLEARANCE}`;
 
 // =====================================================================================================================
 //  P U B L I C
@@ -17,7 +18,7 @@ async function requestFromApi(params, method = 'GET') {
         method,
         headers: {
             Cookie: cookies,
-            'User-Agent': 'LocalWikiUploader/1.0 (Node.js)',
+            'User-Agent': USER_AGENT,
         },
     };
 
@@ -29,6 +30,7 @@ async function requestFromApi(params, method = 'GET') {
         options.body = new URLSearchParams(requestParams);
     }
 
+    console.log(`Contacting API for ${JSON.stringify(params)}`);
     const response = await fetch(url, options);
 
     // Parse and store Set-Cookie headers for the session
@@ -38,7 +40,10 @@ async function requestFromApi(params, method = 'GET') {
         cookies = cookies ? `${cookies}; ${newCookies}` : newCookies;
     }
 
-    return response.json();
+    const text = await response.text();
+    console.log(`    Response was: ${text.substring(0, 100).replaceAll(/\s/, ' ')}`);
+
+    return JSON.parse(text);
 }
 
 // =====================================================================================================================
