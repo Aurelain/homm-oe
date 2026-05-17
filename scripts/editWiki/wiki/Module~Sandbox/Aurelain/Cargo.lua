@@ -38,6 +38,7 @@ local RESOURCE_ICONS = {
     crystal_cost  = 'Crystal',
     gemstone_cost = 'Gemstones'
 }
+local ROMAN = { 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII' }
 
 ------------------------------------------------------------------------------------------------------------------------
 -- Detects the current language from the URL
@@ -256,6 +257,7 @@ function p.displayOverview()
     local factionEn = translateIds(FACTION_IDS_IN_TRANSLATION, 'en', ' AND type="faction"')
     local factionX = lang == 'en' and factionEn or translateIds(FACTION_IDS_IN_TRANSLATION, 'en', ' AND type="faction"')
 
+    -- Cargo
     local results = query(lang)
     local units = consolidateResults(results, lang)
     table.sort(units, sortUnits)
@@ -286,23 +288,24 @@ function p.displayOverview()
         local tr = htmlTable:tag('tr')
         tr:tag('td'):wikitext(renderUnitName(u, suffix)):done()
         tr:tag('td'):wikitext('[[' .. factionPage .. '|' .. factionX[u.faction] .. ']]'):done()
-        tr:tag('td'):wikitext(u.tier):done()
+        tr:tag('td'):wikitext(ROMAN[tonumber(u.tier)]):done()
         -- cost
         tr:tag('td')
             :attr('data-sort-value', string.match(u.cost, "^%d+"))
             :wikitext(u.cost)
             :done()
-        -- stats
+        -- main stats
         tr:tag('td'):wikitext(u.hp):done()
         tr:tag('td'):wikitext(u.offence):done()
         tr:tag('td'):wikitext(u.defence):done()
         tr:tag('td'):wikitext(u.damage_min .. '-' .. u.damage_max):done()
         tr:tag('td'):wikitext(u.initiative):done()
         tr:tag('td'):wikitext(u.speed):done()
+        -- others
         tr:tag('td'):wikitext(u.ranged):done()
     end
 
-    return debug(wordsX) .. tostring(htmlTable)
+    return tostring(htmlTable)
 end
 
 return p
