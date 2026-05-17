@@ -39,13 +39,6 @@ local RESOURCE_ICONS = {
     gemstone_cost = 'Gemstones'
 }
 local ROMAN = { 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII' }
-local STICKY_STYLE = {
-    ['position'] = 'sticky',
-    ['top'] = '65px',
-    ['z-index'] = '10',
-    ['background-color'] = '#21252a',
-    ['box-shadow'] = 'inset 0 -2px 0 0 #45494e'
-}
 
 ------------------------------------------------------------------------------------------------------------------------
 -- Detects the current language from the URL
@@ -259,7 +252,7 @@ end
 -- Builds an icon+text combo for the unit's name
 ------------------------------------------------------------------------------------------------------------------------
 local function addHeaderCell(tr, text)
-    tr:tag('th'):css(STICKY_STYLE):wikitext(text):done()
+    tr:tag('th'):wikitext(text):done()
 end
 
 ------------------------------------------------------------------------------------------------------------------------
