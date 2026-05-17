@@ -1,5 +1,7 @@
 import fs from 'node:fs';
 import requestFromApi from './helpers/requestFromApi.js';
+import inferPageTitle from './helpers/inferPageTitle.js';
+import {TARGET} from './volatile/TARGET.js';
 
 // =====================================================================================================================
 //  P U B L I C
@@ -9,13 +11,13 @@ import requestFromApi from './helpers/requestFromApi.js';
  */
 async function getWiki() {
     try {
-        const PAGE_TITLE = 'Module:Sandbox/Aurelain/Cargo';
-        console.log(`Fetching current content for: ${PAGE_TITLE}...`);
+        const pageTitle = inferPageTitle();
+        console.log(`Fetching current content for: ${pageTitle}...`);
         const readRes = await requestFromApi(
             {
                 action: 'query',
                 prop: 'revisions',
-                titles: PAGE_TITLE,
+                titles: pageTitle,
                 rvprop: 'content',
                 rvslots: 'main',
                 formatversion: 2, // Returns a clean JSON array instead of dynamic page ID keys
@@ -31,11 +33,8 @@ async function getWiki() {
         } else {
             // Navigate the JSON tree to get the raw text
             const remoteContent = page.revisions[0].slots.main.content;
-            console.log('remoteContent:', remoteContent);
             console.log('✅ Content downloaded successfully!');
-
-            // Optional: Save it locally
-            // fs.writeFileSync(FILE_PATH, remoteContent, 'utf-8');
+            fs.writeFileSync(TARGET, remoteContent, 'utf-8');
         }
     } catch (error) {
         console.error('Script failed:', error.message);

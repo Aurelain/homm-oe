@@ -41,7 +41,7 @@ async function requestFromApi(params, method = 'GET') {
     }
 
     const text = await response.text();
-    console.log(`    Response was: ${text.substring(0, 100).replaceAll(/\s/, ' ')}`);
+    console.log(`    Response was: ${text.substring(0, 100).replaceAll(/\s/g, ' ')}`);
 
     return JSON.parse(text);
 }
