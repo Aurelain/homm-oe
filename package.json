@@ -5,7 +5,10 @@
     "type": "module",
     "scripts": {
         "compute": "node scripts/compute-skill-chances/compute-skill-chances",
-        "listAllUnits": "node scripts/listAllUnits/listAllUnits"
+        "listAllUnits": "node scripts/listAllUnits/listAllUnits",
+        "target": "node scripts/editWiki/targetWiki",
+        "build": "node scripts/editWiki/getWiki",
+        "refresh": "node scripts/editWiki/setWiki"
     },
     "dependencies": {
         "fflate": "^0.8.2",
