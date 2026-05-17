@@ -30,7 +30,7 @@ async function requestFromApi(params, method = 'GET') {
         options.body = new URLSearchParams(requestParams);
     }
 
-    console.log(`Contacting API for ${JSON.stringify(params)}`);
+    console.log(`Contacting API for ${previewText(JSON.stringify(params))}`);
     const response = await fetch(url, options);
 
     // Parse and store Set-Cookie headers for the session
@@ -41,9 +41,19 @@ async function requestFromApi(params, method = 'GET') {
     }
 
     const text = await response.text();
-    console.log(`    Response was: ${text.substring(0, 100).replaceAll(/\s/g, ' ')}`);
+    console.log(`    Response was: ${previewText(text)}`);
 
     return JSON.parse(text);
+}
+
+// =====================================================================================================================
+//  P U B L I C
+// =====================================================================================================================
+/**
+ *
+ */
+function previewText(text) {
+    return text.substring(0, 100).replaceAll(/\s/g, ' ');
 }
 
 // =====================================================================================================================
