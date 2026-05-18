@@ -18,9 +18,9 @@ local FACTION_IDS_IN_TRANSLATION = {
     'neutral', -- missing
 }
 local OTHER_IDS_IN_TRANSLATION = {
-    'unit', -- missing
+    'creature',
     'faction',
-    'tier', -- missing
+    'tier',
     'cost', -- missing
     'hp',
     'offence',
@@ -278,7 +278,7 @@ function p.display()
 
     -- Header
     local header = htmlTable:tag('tr')
-    addHeaderCell(header, wordsX['unit'])
+    addHeaderCell(header, wordsX['creature'])
     addHeaderCell(header, wordsX['faction'])
     addHeaderCell(header, wordsX['tier'])
     addHeaderCell(header, wordsX['cost'])
