@@ -38,6 +38,14 @@ local RESOURCE_ICONS = {
     crystal_cost  = 'Crystal',
     gemstone_cost = 'Gemstones'
 }
+local STAT_ICONS = {
+    hp          = 'Icon_Stats_Health',
+    offence     = 'Icon_Stats_Attack',
+    defence     = 'Icon_Stats_Defence',
+    damage      = 'Icon_Stats_Damage',
+    initiative  = 'Icon_Stats_Initiative',
+    speed       = 'Icon_Stats_Speed',
+}
 local ROMAN = { 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII' }
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -80,7 +88,7 @@ local function computeRange(row)
     local v = row['ai_archetype']
     if v == 'reach_type' then
         return 1
-    elseif v == 'range_type' or v == 'range_type_melee_shooters' then
+    elseif v == 'range_type' or v == 'range_type_melee_shooters' or v == 'range_type_eater' then
         return 2
     else
         return 0
@@ -249,16 +257,23 @@ local function renderUnitName(u, suffix)
 end
 
 ------------------------------------------------------------------------------------------------------------------------
--- Builds an icon+text combo for the unit's name
+-- Boilerplate for the header cells
 ------------------------------------------------------------------------------------------------------------------------
-local function addHeaderCell(tr, text)
+local function createTh(tr, text)
     tr:tag('th'):wikitext(text):done()
+end
+
+------------------------------------------------------------------------------------------------------------------------
+-- Boilerplate for stat tds
+------------------------------------------------------------------------------------------------------------------------
+local function createStat(tr, value, pngName)
+    tr:tag('td'):wikitext(value .. '[[File:' .. pngName .. '.png|16px|link=]]'):done()
 end
 
 ------------------------------------------------------------------------------------------------------------------------
 -- Main public function
 ------------------------------------------------------------------------------------------------------------------------
-function p.display()
+function p.display(frame)
     local lang = getCurrentLang()
     local suffix = lang ~= 'en' and '/' .. lang or ''
     local wordsEn = translateIds(OTHER_IDS_IN_TRANSLATION, 'en')
@@ -278,19 +293,19 @@ function p.display()
 
     -- Header
     local header = htmlTable:tag('tr')
-    addHeaderCell(header, wordsX['creature'])
-    addHeaderCell(header, wordsX['faction'])
-    addHeaderCell(header, wordsX['tier'])
-    addHeaderCell(header, wordsX['cost'])
+    createTh(header, wordsX.creature)
+    createTh(header, wordsX.faction)
+    createTh(header, wordsX.tier)
+    createTh(header, wordsX.cost)
     -- main stats
-    addHeaderCell(header, '[[File:Health Icon.png|24px|' .. wordsX['hp'] .. ']]')
-    addHeaderCell(header, '[[File:Icon_Stats_Attack.png|24px|' .. wordsX['offence'] .. ']]')
-    addHeaderCell(header, '[[File:Icon_Stats_Defence.png|24px|' .. wordsX['defence'] .. ']]')
-    addHeaderCell(header, '[[File:Icon_Stats_Damage.png|24px|' .. wordsX['damage'] .. ']]')
-    addHeaderCell(header, '[[File:Icon_Stats_Initiative.png|24px|' .. wordsX['initiative'] .. ']]')
-    addHeaderCell(header, '[[File:Icon_Stats_Speed.png|24px|' .. wordsX['speed'] .. ']]')
+    createTh(header, '[[File:' .. STAT_ICONS.hp .. '.png|24px|' .. wordsX.hp .. ']]')
+    createTh(header, '[[File:' .. STAT_ICONS.offence .. '.png|24px|' .. wordsX.offence .. ']]')
+    createTh(header, '[[File:' .. STAT_ICONS.defence .. '.png|24px|' .. wordsX.defence .. ']]')
+    createTh(header, '[[File:' .. STAT_ICONS.damage .. '.png|24px|' .. wordsX.damage .. ']]')
+    createTh(header, '[[File:' .. STAT_ICONS.initiative .. '.png|24px|' .. wordsX.initiative .. ']]')
+    createTh(header, '[[File:' .. STAT_ICONS.speed .. '.png|24px|' .. wordsX.speed .. ']]')
     -- others
-    addHeaderCell(header, '[[File:Base_passive_ranged_attack.png|24px|' .. wordsX['ranged'] .. ']]')
+    createTh(header, '[[File:Base_passive_ranged_attack.png|24px|' .. wordsX.ranged .. ']]')
 
     -- Body
     for _, u in ipairs(units) do
@@ -302,17 +317,18 @@ function p.display()
         -- cost
         tr:tag('td'):attr('data-sort-value', string.match(u.cost, "^%d+")):wikitext(u.cost):done()
         -- main stats
-        tr:tag('td'):wikitext(u.hp):done()
-        tr:tag('td'):wikitext(u.offence):done()
-        tr:tag('td'):wikitext(u.defence):done()
-        tr:tag('td'):wikitext(u.damage_min .. '-' .. u.damage_max):done()
-        tr:tag('td'):wikitext(u.initiative):done()
-        tr:tag('td'):wikitext(u.speed):done()
+        createStat(tr, u.hp, STAT_ICONS.hp)
+        createStat(tr, u.offence, STAT_ICONS.offence)
+        createStat(tr, u.defence, STAT_ICONS.defence)
+        createStat(tr, u.damage_min .. '-' .. u.damage_max, STAT_ICONS.damage)
+        createStat(tr, u.initiative, STAT_ICONS.initiative)
+        createStat(tr, u.speed, STAT_ICONS.speed)
         -- others
         tr:tag('td'):wikitext(u.ranged):done()
     end
 
-    return tostring(htmlTable)
+    local styleTag = frame:extensionTag('templatestyles', '', { src = frame:getTitle() .. '/styles.css' })
+    return styleTag .. tostring(htmlTable)
 end
 
 return p
