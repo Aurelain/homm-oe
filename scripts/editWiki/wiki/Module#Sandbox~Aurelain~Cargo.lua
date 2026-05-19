@@ -46,6 +46,24 @@ local STAT_ICONS = {
     initiative  = 'Icon_Stats_Initiative',
     speed       = 'Icon_Stats_Speed',
 }
+local ATTACK_RANKS = {
+    base_passive_melee_attack_name = 1,                 -- Swordsman     100,   0,   0,   0,   0,   0,   0,   0,   0
+    base_passive_melee_attack_no_counter_name = 2,      -- Vampire Lord  101,   0,   0,   0,   0,   0,   0,   0,   0
+    base_passive_remote_attack_name = 3,                -- Graverobber     0, 100,   0,   0,   0,   0,   0,   0,   0
+    base_passive_ranged_attack_name = 4,                -- Onyx Dancer    50, 100, 100,  90,  80,  70,  60,  50,  50
+    base_passive_ranged_attack_no_close_name = 5,       -- Faun          100, 100, 100,  90,  80,  70,  60,  50,  50
+    base_passive_ranged_attack_no_range_name = 6,       -- Marksman       50, 100, 100, 100, 100, 100, 100, 100, 100
+    base_passive_ranged_attack_no_range_close_name = 7, -- Archangel     100, 100, 100, 100, 100, 100, 100, 100, 100
+}
+local ATTACK_ICONS = {
+    base_passive_melee_attack_name = 'Base_passive_melee_attack',
+    base_passive_melee_attack_no_counter_name = 'Base_passive_noncounter',
+    base_passive_remote_attack_name = 'Base_passive_remote_attack',
+    base_passive_ranged_attack_name = 'Base_passive_ranged_attack',
+    base_passive_ranged_attack_no_close_name = 'Base_passive_ranged_attack', -- duplicate, needs a better icon
+    base_passive_ranged_attack_no_range_name = 'Base_passive_sharpshooter',
+    base_passive_ranged_attack_no_range_close_name = 'Base_passive_sharpshooter', -- duplicate, needs a better icon
+}
 local ROMAN = { 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII' }
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -82,17 +100,20 @@ local function computeUpgradeRank(row)
 end
 
 ------------------------------------------------------------------------------------------------------------------------
--- Returns 0, 1 or 2 depending on the ai_archetype value
+-- Returns one of the ATTACK_RANKS keys (e.g. 'base_passive_melee_attack_name') or an empty string
 ------------------------------------------------------------------------------------------------------------------------
-local function computeRange(row)
-    local v = row['ai_archetype']
-    if v == 'reach_type' then
-        return 1
-    elseif v == 'range_type' or v == 'range_type_melee_shooters' or v == 'range_type_eater' then
-        return 2
-    else
-        return 0
+local function computeAttackType(row)
+    local abilities = row['shared_abilities']
+    if type(abilities) ~= "string" then
+        return ""
     end
+    for key, _ in pairs(ATTACK_RANKS) do
+        local pattern = "%f[%w]" .. key .. "%f[%W]"
+        if string.match(abilities, pattern) then
+            return key
+        end
+    end
+    return ""
 end
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -126,7 +147,7 @@ local function query(lang)
         'Unit.damage_max=damage_max, ' ..
         'Unit.initiative=initiative, ' ..
         'Unit.speed=speed, ' ..
-        'Unit.ai_archetype=ai_archetype, ' .. -- we use it for range detection
+        'Unit.shared_abilities=shared_abilities, ' .. -- we use it for range detection
         -- costs
         'Unit.gold_cost=gold_cost, ' ..
         'Unit.wood_cost=wood_cost, ' ..
@@ -165,7 +186,7 @@ local function consolidateResults(results, lang)
         if not units[id] then
             units[id] = mw.clone(row)
             units[id].upgradeRank = computeUpgradeRank(row)
-            units[id].ranged = computeRange(row)
+            units[id].attackType = computeAttackType(row)
             units[id].cost = computeCost(row)
         end
 
@@ -324,7 +345,8 @@ function p.display(frame)
         createStat(tr, u.initiative, STAT_ICONS.initiative)
         createStat(tr, u.speed, STAT_ICONS.speed)
         -- others
-        tr:tag('td'):wikitext(u.ranged):done()
+        local icon =  '[[File:' .. ATTACK_ICONS[u.attackType] .. '.png|32px' .. ']]'
+        tr:tag('td'):attr('data-sort-value', ATTACK_RANKS[u.attackType]):wikitext(icon):done()
     end
 
     local styleTag = frame:extensionTag('templatestyles', '', { src = frame:getTitle() .. '/styles.css' })
