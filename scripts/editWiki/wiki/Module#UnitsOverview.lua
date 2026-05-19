@@ -329,7 +329,15 @@ function p.display(frame)
     createTh(header, '[[File:Base_passive_ranged_attack.png|24px|' .. wordsX.ranged .. ']]')
 
     -- Body
+    local prevFaction = units[1].faction
     for _, u in ipairs(units) do
+        -- separator
+        if u.faction ~= prevFaction then
+            prevFaction = u.faction
+            local separator = htmlTable:tag('tr'):addClass('separator')
+            separator:tag('td'):attr('colspan', 11):done()
+        end
+
         local factionPage = factionEn[u.faction] .. '_Units' .. suffix
         local tr = htmlTable:tag('tr')
         tr:tag('td'):wikitext(renderUnitName(u, suffix)):done()
