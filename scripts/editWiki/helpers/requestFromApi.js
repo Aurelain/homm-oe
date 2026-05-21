@@ -4,6 +4,7 @@ import {CF_CLEARANCE, USER_AGENT} from '../volatile/CF.js';
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
+const DEBUG = false;
 let cookies = `cf_clearance=${CF_CLEARANCE}`;
 
 // =====================================================================================================================
@@ -30,7 +31,7 @@ async function requestFromApi(params, method = 'GET') {
         options.body = new URLSearchParams(requestParams);
     }
 
-    console.log(`Contacting API for ${previewText(JSON.stringify(params))}`);
+    DEBUG && console.log(`Contacting API for ${previewText(JSON.stringify(params))}`);
     const response = await fetch(url, options);
 
     // Parse and store Set-Cookie headers for the session
@@ -41,7 +42,7 @@ async function requestFromApi(params, method = 'GET') {
     }
 
     const text = await response.text();
-    console.log(`    Response was: ${previewText(text)}`);
+    DEBUG && console.log(`    Response was: ${previewText(text)}`);
 
     return JSON.parse(text);
 }
