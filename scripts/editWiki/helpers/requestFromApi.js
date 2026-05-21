@@ -14,7 +14,7 @@ let cookies = `cf_clearance=${CF_CLEARANCE}`;
 /**
  * Helps handle API requests and manage session cookies
  */
-async function requestFromApi(params, method = 'GET') {
+async function requestFromApi(params, method = 'GET', formData = null) {
     const url = new URL(API_URL);
     const options = {
         method,
@@ -29,7 +29,7 @@ async function requestFromApi(params, method = 'GET') {
     if (method === 'GET') {
         url.search = new URLSearchParams(requestParams);
     } else if (method === 'POST') {
-        options.body = new URLSearchParams(requestParams);
+        options.body = formData || new URLSearchParams(requestParams);
     }
 
     DEBUG && console.log(`Contacting API for ${previewText(JSON.stringify(params))}`);

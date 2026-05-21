@@ -52,7 +52,6 @@ async function fetchAllFileUrls() {
             ...apiContinue,
         };
 
-        // Adapting to your existing requestFromApi helper
         const response = await requestFromApi(queryParams, 'GET');
 
         if (response?.query?.pages) {

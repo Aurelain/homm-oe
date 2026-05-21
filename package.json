@@ -9,7 +9,8 @@
         "target": "node scripts/editWiki/targetWiki",
         "build": "node scripts/editWiki/getWiki",
         "refresh": "node scripts/editWiki/setWiki",
-        "downloadFiles": "node scripts/editWiki/downloadFiles"
+        "downloadFiles": "node scripts/editWiki/downloadFiles",
+        "uploadFiles": "node scripts/editWiki/uploadFiles"
     },
     "dependencies": {
         "fflate": "^0.8.2",

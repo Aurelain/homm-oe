@@ -11,29 +11,25 @@ import {TARGET} from './volatile/TARGET.js';
  *
  */
 async function setWiki() {
-    try {
-        const csrfToken = await getCsrfToken();
+    const csrfToken = await getCsrfToken();
 
-        const pageTitle = inferPageTitle();
-        console.log(`Uploading content for: ${pageTitle}...`);
-        const editRes = await requestFromApi(
-            {
-                action: 'edit',
-                title: pageTitle,
-                text: fs.readFileSync(TARGET, 'utf8'),
-                token: csrfToken,
-                bot: true, // Flags the edit as a bot to avoid clogging recent changes
-            },
-            'POST',
-        );
+    const pageTitle = inferPageTitle();
+    console.log(`Uploading content for: ${pageTitle}...`);
+    const editRes = await requestFromApi(
+        {
+            action: 'edit',
+            title: pageTitle,
+            text: fs.readFileSync(TARGET, 'utf8'),
+            token: csrfToken,
+            bot: true, // Flags the edit as a bot to avoid clogging recent changes
+        },
+        'POST',
+    );
 
-        if (editRes.edit && editRes.edit.result === 'Success') {
-            console.log('✅ Upload complete!');
-        } else {
-            console.error('❌ Edit failed:', editRes);
-        }
-    } catch (error) {
-        console.error('Script failed:', error.message);
+    if (editRes.edit && editRes.edit.result === 'Success') {
+        console.log('✅ Upload complete!');
+    } else {
+        console.error('❌ Edit failed:', editRes);
     }
 }
 
