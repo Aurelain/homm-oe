@@ -2,3 +2,4 @@ node_modules/
 .idea/
 Core/
 **/volatile/*.js
+scripts/editWiki/wiki/Files
