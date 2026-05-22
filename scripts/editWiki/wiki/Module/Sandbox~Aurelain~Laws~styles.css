@@ -1,0 +1,13 @@
+tr:hover {
+    background:#13161a;
+}
+.separator {
+    height:8px;
+    background:#c8b36c !important;
+}
+.separator td {
+	padding:0;
+}
+.separator:nth-child(-n+8), .separator:nth-last-child(-n+8) {
+    display:none;
+}
