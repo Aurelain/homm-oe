@@ -155,7 +155,7 @@ end
 local function findNextNonDigit(text, index)
     for i = index + 1, #text do
         local char = string.sub(text, i, i)
-        if string.match(char, "%D") then
+        if string.match(char, "[^%d%%]") then
             return i
         end
     end
@@ -169,7 +169,7 @@ local function advanceActors(actors)
     local output = {};
     for _, actor in pairs(actors) do
         local cursor = actor.cursor
-        local next = findNextNonDigit(actor.text, cursor)
+        local next = findNextNonDigit(actor.text, cursor) - 1
         local skipped = string.sub(actor.text, cursor, next)
         actor.cursor = next
         table.insert(output, '<span>' .. skipped .. '</span>')
