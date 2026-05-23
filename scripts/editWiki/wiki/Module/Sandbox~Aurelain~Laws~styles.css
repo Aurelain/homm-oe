@@ -2,21 +2,21 @@ td {
     color: #cbced1;
 }
 
-td:nth-child(3),td:nth-child(4) {
-    text-align: center;
-}
-
-td:first-child {
+td:nth-child(1), td:nth-child(4), td:nth-child(6) {
     white-space: nowrap;
 }
 
-td + td:last-child {
-    white-space: nowrap;
+td:nth-child(6) {
     text-align: right;
 }
 
-td + td:last-child img {
-    width:24px;
+td:nth-child(1) img {
+    width: 64px;
+    height: 64px;
+}
+
+td:nth-child(4) img, td:nth-child(6) img {
+    width: 24px;
     height: 24px;
 }
 

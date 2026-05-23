@@ -1,21 +1,36 @@
 -- Usage: {{#invoke:LawsOverview|display}}
 local p = {}
 local FACTION_ORDER = {
-    human = 1,
-    undead = 2,
-    nature = 3,
-    demon = 4,
-    unfrozen = 5,
-    dungeon = 6,
+    human =     1,
+    undead =    2,
+    nature =    3,
+    demon =     4,
+    unfrozen =  5,
+    dungeon =   6,
 }
 local SIDE_RANK = {
-    faction = 1,
-    army = 2,
+    faction =  1,
+    army =     2,
 }
 local SIDE_ICONS = {
     faction = 'Sub_skill_economy_1_icon',
-    army = 'Sub_skill_battlemage_4_icon',
+    army =    'Sub_skill_battlemage_4_icon',
 }
+local SIDE_LABELS = {
+    faction = 'faction_laws',
+    army =    'army_laws',
+}
+local TRANSLATION_IDS = {
+    law =               'Law',           -- missing
+    faction =           'Faction',
+    faction_laws =      'Faction',       -- missing
+    army_laws =         'Army',          -- missing
+    tier =              'Tier',
+    wiki_laws_side =    'Side',          -- manually translated in Data:WikiTranslations/xx
+    description =       'Description',   -- missing
+    cost =              'Cost',          -- missing
+}
+local ROMAN = { 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII' }
 
 ------------------------------------------------------------------------------------------------------------------------
 -- Displays a variable
@@ -76,7 +91,7 @@ local function consolidateMain(results)
         if not entry then
             entry = {}
             entry.faction = row.faction or ''
-            entry.tier = row.tier
+            entry.tier = tonumber(row.tier)
             entry.icon = row.icon
             entry.costs = nil -- added later on by `addCosts()`
             entry.side = ''  -- added later on by `addPositions()`
@@ -271,47 +286,91 @@ local function addTd(tr, text)
 end
 
 ------------------------------------------------------------------------------------------------------------------------
---
+-- Boilerplate for the body cells
 ------------------------------------------------------------------------------------------------------------------------
-local function createHeader(htmlTable)
-    local tr = htmlTable:tag('tr')
-    addTh(tr, 'Name')
-    addTh(tr, 'Faction')
-    addTh(tr, 'Tier')
-    addTh(tr, 'Side')
-    addTh(tr, 'Description')
-    addTh(tr, 'Cost')
+local function addSeparator(htmlTable, className, content)
+    htmlTable:tag('tr')
+        :addClass('separator')
+        :addClass(className)
+        :tag('td'):attr('colspan', 6):wikitext(content):done()
 end
 
 ------------------------------------------------------------------------------------------------------------------------
 --
 ------------------------------------------------------------------------------------------------------------------------
-local function createBody(htmlTable, laws, frame)
+local function createHeader(htmlTable, words)
+    local tr = htmlTable:tag('tr')
+    addTh(tr, words.law)
+    addTh(tr, words.faction)
+    addTh(tr, words.tier)
+    addTh(tr, words.wiki_laws_side)
+    addTh(tr, words.description)
+    addTh(tr, words.cost)
+end
+
+------------------------------------------------------------------------------------------------------------------------
+--
+------------------------------------------------------------------------------------------------------------------------
+local function createBody(htmlTable, laws, words)
     local currentTier = laws[1].tier
     local currentFaction = laws[1].faction
     for _, u in ipairs(laws) do
-        local factionName = frame:preprocess('{{F|' .. u.faction .. '}}')
 
         -- separators
         if u.faction ~= currentFaction then
             currentFaction = u.faction
             currentTier = u.tier
-            local separator = htmlTable:tag('tr'):addClass('separator'):addClass('separator-large')
-            separator:tag('td'):attr('colspan', 6):wikitext(factionName):done()
+            addSeparator(htmlTable, 'separator-large', words[currentFaction])
         elseif u.tier ~= currentTier then
             currentTier = u.tier
-            local separator = htmlTable:tag('tr'):addClass('separator'):addClass('separator-tiny')
-            separator:tag('td'):attr('colspan', 6):done()
+            addSeparator(htmlTable, 'separator-tiny', '')
         end
 
         local sideIcon = SIDE_ICONS[u.side]
+        local sideLabel = words[SIDE_LABELS[u.side]]
         local tr = htmlTable:tag('tr')
-        addTd(tr, '[[File:' .. u.icon .. '.png|64px|link=]] ' .. u.name)
-        addTd(tr, factionName)
-        addTd(tr, u.tier)
-        addTd(tr, sideIcon and '[[File:' .. sideIcon .. '.png|24px|' .. u.side .. '|link=]]')
+        addTd(tr, '[[File:' .. u.icon .. '.png|link=]] ' .. u.name)
+        addTd(tr, words[currentFaction])
+        addTd(tr, ROMAN[u.tier])
+        addTd(tr, sideIcon and '[[File:' .. sideIcon .. '.png|' .. u.side .. '|link=]] ' .. sideLabel)
         addTd(tr, u.description)
         addTd(tr, u.costsText .. '[[File:Icon_LawsPoint.png|link=]]')
+    end
+end
+
+------------------------------------------------------------------------------------------------------------------------
+-- Retrieves the text for some specific ids from Cargo Translations.
+------------------------------------------------------------------------------------------------------------------------
+local function translateIds(ids, lang)
+    -- Key list
+    local list = {}
+    for key, _ in pairs(ids) do
+        list[#list + 1] = key
+    end
+    local idListString = '"' .. table.concat(list, '", "') .. '"'
+
+    -- Cargo
+    local results = mw.ext.cargo.query('Translation', 'target_id, name', {
+         where = 'target_id IN (' .. idListString .. ') AND language = "' .. lang .. '"',
+         limit = 100
+     })
+
+    -- Dictionary
+    local dictionary = mw.clone(ids)
+    if results then
+        for _, row in ipairs(results) do
+            dictionary[row['target_id']] = row['name']
+        end
+    end
+    return dictionary
+end
+
+------------------------------------------------------------------------------------------------------------------------
+--
+------------------------------------------------------------------------------------------------------------------------
+local function addFactionWords(words, lang, frame)
+    for key, _ in pairs(FACTION_ORDER) do
+        words[key] = frame:preprocess('{{F|' .. key .. '|' .. lang .. '}}')
     end
 end
 
@@ -320,7 +379,8 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 function p.display(frame)
     local lang = getCurrentLang()
-    local suffix = lang ~= 'en' and '/' .. lang or ''
+    local words = translateIds(TRANSLATION_IDS, lang)
+    addFactionWords(words, lang, frame)
 
     -- Cargo
     local main = queryMain(lang)
@@ -336,12 +396,12 @@ function p.display(frame)
     -- Table
     local htmlTable = mw.html.create('table')
     htmlTable:addClass('wikitable sortable')
-    createHeader(htmlTable)
-    createBody(htmlTable, laws, frame)
+    createHeader(htmlTable, words)
+    createBody(htmlTable, laws, words)
 
     -- Output
     local styleTag = frame:extensionTag('templatestyles', '', { src = frame:getTitle() .. '/styles.css' })
-    --return dump(htmlTable)
+    --return dump(words)
     return styleTag .. tostring(htmlTable)
 end
 
