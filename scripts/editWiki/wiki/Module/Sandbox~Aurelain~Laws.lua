@@ -21,14 +21,22 @@ local SIDE_LABELS = {
     army =    'army_laws',
 }
 local TRANSLATION_IDS = {
-    law =               'Law',           -- missing
+    wiki_laws_law =     'Law',           -- manually translated in Data:WikiTranslations/xx
     faction =           'Faction',
-    faction_laws =      'Faction',       -- missing
-    army_laws =         'Army',          -- missing
+    faction_laws =      'Faction',       ---- missing, should be taken from `ui.faction_laws`
+    army_laws =         'Army',          ---- missing, should be taken from `ui.army_laws`
     tier =              'Tier',
     wiki_laws_side =    'Side',          -- manually translated in Data:WikiTranslations/xx
-    description =       'Description',   -- missing
-    cost =              'Cost',          -- missing
+    description =       'Description',   ---- missing, should be taken from `ui.unit_window_narrative`
+    wiki_cost =         'Cost',          -- manually translated in Data:WikiTranslations/xx
+}
+local FACTION_MAPPING = {
+    Temple =     'human',
+    Necropolis = 'undead',
+    Grove =      'nature',
+    Hive =       'demon',
+    Schism =     'unfrozen',
+    Dungeon =    'dungeon',
 }
 local ROMAN = { 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII' }
 
@@ -57,7 +65,7 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 -- Retrieves the most important data from Cargo
 ------------------------------------------------------------------------------------------------------------------------
-local function queryMain(lang)
+local function queryMain(lang, forcedFaction)
     local tables = 'Law, Translation'
     local fields = '' ..
         'Law.id=id, ' ..
@@ -69,10 +77,14 @@ local function queryMain(lang)
         'Translation.language=language, ' ..
         'Translation.name=name, ' ..
         'Translation.description=description'
-
+    local where = {}
+    if forcedFaction then
+        table.insert(where, 'Law.faction="' .. forcedFaction .. '"')
+    end
+    table.insert(where, 'Translation.language = "' .. lang .. '"')
     local cargoArgs = {
         join = 'Law.id = Translation.target_id',
-        where = 'Translation.language = "' .. lang .. '"',
+        where = table.concat(where, ' AND '),
         limit = 1000
     }
     return mw.ext.cargo.query(tables, fields, cargoArgs)
@@ -87,22 +99,25 @@ local function consolidateMain(results)
     local hub = {}
     for _, row in ipairs(results) do
         local id = row.id
-        local entry = hub[id]
-        if not entry then
-            entry = {}
-            entry.faction = row.faction or ''
-            entry.tier = tonumber(row.tier)
-            entry.icon = row.icon
-            entry.costs = nil -- added later on by `addCosts()`
-            entry.side = ''  -- added later on by `addPositions()`
-            entry.slot = 0    -- added later on by `addPositions()`
-            hub[id] = entry
-        end
-        if row.name then
-            entry.name = row.name
-        end
-        if row.description then
-            entry['desc' .. row.variant] = row.description
+        -- Note: there are a few Laws that don't seem to be used in the game and have an empty faction:
+        if row.faction then
+            local entry = hub[id]
+            if not entry then
+                entry = {}
+                entry.faction = row.faction
+                entry.tier = tonumber(row.tier)
+                entry.icon = row.icon
+                entry.costs = nil -- added later on by `addCosts()`
+                entry.side = ''  -- added later on by `addPositions()`
+                entry.slot = 0    -- added later on by `addPositions()`
+                hub[id] = entry
+            end
+            if row.name then
+                entry.name = row.name
+            end
+            if row.description then
+                entry['desc' .. row.variant] = row.description
+            end
         end
     end
     return hub
@@ -300,12 +315,12 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 local function createHeader(htmlTable, words)
     local tr = htmlTable:tag('tr')
-    addTh(tr, words.law)
+    addTh(tr, words.wiki_laws_law)
     addTh(tr, words.faction)
     addTh(tr, words.tier)
     addTh(tr, words.wiki_laws_side)
     addTh(tr, words.description)
-    addTh(tr, words.cost)
+    addTh(tr, words.wiki_cost)
 end
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -378,12 +393,16 @@ end
 -- Main public function
 ------------------------------------------------------------------------------------------------------------------------
 function p.display(frame)
+    local args = frame.args
+    local forcedFaction = mw.text.trim(args[1] or args.faction or '')
+    forcedFaction = FACTION_MAPPING[forcedFaction] or nil
+
     local lang = getCurrentLang()
     local words = translateIds(TRANSLATION_IDS, lang)
     addFactionWords(words, lang, frame)
 
     -- Cargo
-    local main = queryMain(lang)
+    local main = queryMain(lang, forcedFaction)
     local hub = consolidateMain(main)
     addCosts(hub);
     addPositions(hub);
