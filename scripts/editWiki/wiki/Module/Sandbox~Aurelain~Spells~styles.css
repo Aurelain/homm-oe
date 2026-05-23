@@ -1,3 +1,35 @@
 td {
     color: #cbced1;
 }
+
+td:nth-child(1) {
+    white-space: nowrap;
+}
+
+td:nth-child(1) img {
+    width: 64px;
+    height: 64px;
+}
+
+.separator:first-child, .separator:last-child, .separator + .separator {
+    display: none;
+}
+
+.separator-tiny {
+    height: 4px;
+    background: #c8b36c !important;
+}
+
+.separator-tiny td {
+    padding: 0;
+}
+
+.separator-large {
+    background-color: #101622 !important;
+    text-align: center;
+    font-size: 24px;
+}
+
+.separator-large img {
+    width: 54px;
+}

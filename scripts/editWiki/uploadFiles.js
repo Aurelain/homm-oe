@@ -8,14 +8,14 @@ import sleep from '../utils/sleep.js';
 //  D E C L A R A T I O N S
 // =====================================================================================================================
 const UPLOAD_SRC_DIR = import.meta.dirname + '/upload';
-// const FACTIONS = {
-//     human: 'Temple',
-//     undead: 'Necropolis',
-//     nature: 'Grove',
-//     demon: 'Hive',
-//     unfrozen: 'Schism',
-//     dungeon: 'Dungeon',
-// };
+const SCHOOLS = {
+    day: 'Daylight',
+    night: 'Nightshade',
+    space: 'Arcane',
+    primal: 'Primal',
+    neutral: 'Neutral',
+    bonus: 'Neutral',
+};
 
 // =====================================================================================================================
 //  P U B L I C
@@ -57,8 +57,8 @@ async function uploadFiles() {
             formData.append('format', 'json');
 
             // Text
-            const faction = wikiFilename.split(' ')[2];
-            const text = `[[Category:Law Icons]] [[Category:${FACTIONS[faction]} Law Icons]]`;
+            const school = wikiFilename.split(' ')[0];
+            const text = `[[Category:Spell Icons]] [[Category:${SCHOOLS[school]} Spell Icons]]`;
             formData.append('text', text);
             formData.append('comment', text);
 
