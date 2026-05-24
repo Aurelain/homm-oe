@@ -7,12 +7,12 @@ local SCHOOL_ORDER = {
     primal =  4,
     neutral = 5,
 }
-local SCHOOL_NAME_ID = {
-    day =     'skill_magic_day',
-    night =   'skill_magic_night',
-    space =   'skill_magic_space',
-    primal =  'skill_magic_primal',
-    neutral = 'skill_magic_neutral',
+local SCHOOL_ICON = {
+    day =     'Skill_Expert_Daylight_Magic',
+    night =   'Skill_Expert_Nightshade_Magic',
+    space =   'Skill_Expert_Arcane_Magic',
+    primal =  'Skill_Expert_Primal_Magic',
+    neutral = "Dorearth's_Tide",
 }
 local SCHOOL_MAPPING = {
     Daylight =     'day',
@@ -21,19 +21,32 @@ local SCHOOL_MAPPING = {
     Primal =       'primal',
     Neutral =      'neutral',
 }
+-- Note: The right side is just a fallback, it will seldom be used.
 local TRANSLATION_IDS = {
     wiki_name =         '~Name',         -- manually translated in Data:WikiTranslations/xx
     school =            '~School',
     tier =              '~Tier',
     description =       '~Description',   ---- missing, should be taken from `ui.unit_window_narrative`
     mana = '~Mana',                     -- manually translated in Data:WikiTranslations/xx
-    skill_magic_day    = '~Daylight Magic',
-    skill_magic_night    = '~Nightshade Magic',
-    skill_magic_space    = '~Arcane Magic',
-    skill_magic_primal    = '~Primal Magic',
-    skill_magic_neutral    = '~Neutral Magic',
+    used_on_map = '~Used on map',
+    is_special_magic = '~is_special_magic'
 }
+-- Note: The right side is just a fallback, it will seldom be used.
+local TRANSLATION_IDS_SCHOOL = {
+    skill_magic_day =            '~Daylight Magic',
+    skill_magic_night =          '~Nightshade Magic',
+    skill_magic_space =          '~Arcane Magic',
+    skill_magic_primal =         '~Primal Magic',
+    battle_spellbook_neutral =   '~Neutral Magic',
+}
+local MAP_ICONS = {
+    '[[File:Base_class_construct.png|32px|link=]]',
+    '[[File:Base_passive_strike_rumble_1.png|32px|link=]]'
+}
+
 local ROMAN = { 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII' }
+local CHECK = '✔️'
+
 ------------------------------------------------------------------------------------------------------------------------
 -- Displays a variable
 ------------------------------------------------------------------------------------------------------------------------
@@ -59,7 +72,7 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 -- Retrieves the text for some specific ids from Cargo Translations.
 ------------------------------------------------------------------------------------------------------------------------
-local function translateIds(ids, lang)
+local function translateIds(ids, lang, extra)
     -- Key list
     local list = {}
     for key, _ in pairs(ids) do
@@ -68,8 +81,14 @@ local function translateIds(ids, lang)
     local idListString = '"' .. table.concat(list, '", "') .. '"'
 
     -- Cargo
+    local where = {}
+    table.insert(where, 'target_id IN (' .. idListString .. ')')
+    table.insert(where, 'language = "' .. lang .. '"')
+    if extra then
+        table.insert(where, extra)
+    end
     local results = mw.ext.cargo.query('Translation', 'target_id, name', {
-         where = 'target_id IN (' .. idListString .. ') AND language = "' .. lang .. '"',
+         where = table.concat(where, ' AND '),
          limit = 100
      })
 
@@ -132,29 +151,32 @@ local function consolidateMain(results)
     for _, row in ipairs(results) do
         local id = row.id
         local entry = hub[id]
-        if not entry then
-            entry = {}
-            entry.id = row.id
-            entry.school = row.school
-            entry.rank = tonumber(row.rank)
-            entry.used_on_map = row.used_on_map
-            entry.icon = row.icon
-            entry.is_special_magic = row.is_special_magic
-            entry.mana_cost = 0  -- added later by `addManaCost()`
-            entry.name = '' -- see below
-            entry.bonus2 = '' -- see below
-            entry.bonus3 = '' -- see below
-            entry.bonus4 = '' -- see below
-            hub[id] = entry
-        end
-        if row.name then
-            entry.name = row.name
-        end
-        if row.description then
-            entry['desc' .. row.variant] = row.description
-        end
-        if row.bonus_description then
-            entry['bonus' .. row.variant] = row.bonus_description
+        if not string.match(id, 'astral_summon_%D') then
+            if not entry then
+                local usedOnMap = row.used_on_map == '1' and 2 or 1
+                entry = {}
+                entry.id = row.id
+                entry.school = row.school
+                entry.rank = tonumber(row.rank)
+                entry.used_on_map = MAP_ICONS[usedOnMap]
+                entry.icon = row.icon
+                entry.is_special_magic = row.is_special_magic == '1' and CHECK or ''
+                entry.mana_cost = 0  -- added later by `addManaCost()`
+                entry.name = '' -- see below
+                entry.bonus2 = '' -- see below
+                entry.bonus3 = '' -- see below
+                entry.bonus4 = '' -- see below
+                hub[id] = entry
+            end
+            if row.name then
+                entry.name = row.name
+            end
+            if row.description then
+                entry['desc' .. row.variant] = row.description
+            end
+            if row.bonus_description then
+                entry['bonus' .. row.variant] = row.bonus_description
+            end
         end
     end
     return hub
@@ -193,6 +215,18 @@ local function sortSpells(a, b)
 end
 
 ------------------------------------------------------------------------------------------------------------------------
+--
+------------------------------------------------------------------------------------------------------------------------
+local function addSchoolWords(words, lang, suffix)
+    local wordsSchool = translateIds(TRANSLATION_IDS_SCHOOL, lang, 'type="skill"')
+    for key, value in pairs(wordsSchool) do
+        local school = string.match(key, "[^_]*$")
+        local icon = '[[File:' .. SCHOOL_ICON[school] .. '.png|64px|link=]]'
+        words[school] = icon .. '<br>' .. '[[' .. value .. ']]'
+    end
+end
+
+------------------------------------------------------------------------------------------------------------------------
 -- Boilerplate for the header cells
 ------------------------------------------------------------------------------------------------------------------------
 local function addTh(tr, text)
@@ -225,9 +259,23 @@ local function createHeader(htmlTable, words)
     addTh(tr, words.school)
     addTh(tr, words.tier)
     addTh(tr, words.description)
-    addTh(tr, words.mana)
-    addTh(tr, words.used_on_map)
-    addTh(tr, words.is_special_magic)
+    addTh(tr, '[[File:Mana_icon.png|24px]]')
+    addTh(tr, '[[File:Icon_QuestLog_Main.png|24px]]')
+    addTh(tr, '[[File:Hive_queen_passive_2.png|24px]]')
+end
+
+------------------------------------------------------------------------------------------------------------------------
+--
+------------------------------------------------------------------------------------------------------------------------
+local function buildDescription(spell)
+    if spell.bonus1 then
+        return spell.desc1
+    end
+    local list = {}
+    table.insert(list, spell.bonus2)
+    table.insert(list, spell.bonus3)
+    table.insert(list, spell.bonus4)
+    return spell.desc1 .. '\n<ol start="2"><li>' .. table.concat(list, '</li><li>') .. '</li></ol>'
 end
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -237,24 +285,24 @@ local function createBody(htmlTable, spells, words)
     local currentRank = spells[1].rank
     local currentSchool = spells[1].school
     for _, u in ipairs(spells) do
-        local schoolName = words[SCHOOL_NAME_ID[u.school]]
+        local schoolName = words[u.school]
 
         -- separators
         if u.school ~= currentSchool then
             currentSchool = u.school
             currentRank = u.rank
-            addSeparator(htmlTable, 'separator-large', schoolName)
+            addSeparator(htmlTable, 'separator-large', string.gsub(schoolName, '<br>', ' '))
         elseif u.rank ~= currentRank then
             currentRank = u.rank
             addSeparator(htmlTable, 'separator-tiny', '')
         end
 
         local tr = htmlTable:tag('tr')
-        addTd(tr, '[[File:' .. u.icon .. '.png|link=]] ' .. u.name)
+        addTd(tr, '[[File:' .. u.icon .. '.png|64px|link=]] ' .. u.name)
         addTd(tr, schoolName)
         addTd(tr, ROMAN[u.rank])
-        addTd(tr, u.desc1 .. '<br>- ' .. u.bonus2 .. '<br>- ' .. u.bonus3 .. '<br>- ' .. u.bonus4)
-        addTd(tr, u.mana_cost)
+        addTd(tr, buildDescription(u))
+        addTd(tr, u.mana_cost .. ' [[File:Mana_icon.png|24px|link=]]')
         addTd(tr, u.used_on_map)
         addTd(tr, u.is_special_magic)
     end
@@ -271,7 +319,9 @@ function p.display(frame)
 
     -- Language
     local lang = getCurrentLang()
+    local suffix = lang ~= 'en' and '/' .. lang or ''
     local words = translateIds(TRANSLATION_IDS, lang)
+    addSchoolWords(words, lang, suffix)
 
     -- Cargo
     local main = queryMain(lang, forcedSchool)
@@ -291,7 +341,7 @@ function p.display(frame)
 
     -- Output
     local styleTag = frame:extensionTag('templatestyles', '', { src = frame:getTitle() .. '/styles.css' })
-    --return dump(words)
+    --return dump(main)
     return styleTag .. tostring(htmlTable)
 end
 
