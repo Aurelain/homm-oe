@@ -2,12 +2,16 @@ table {
     white-space: nowrap;
 }
 
+tr:hover {
+    background: #13161a;
+}
+
 td {
     color: #cbced1;
 }
 
 td:nth-child(2), td:nth-child(4) {
-    white-space:normal;
+    white-space: normal;
 }
 
 td:nth-child(2) img {
@@ -23,6 +27,16 @@ td:nth-child(3) {
 /* Mana cost */
 td:nth-child(5) {
     text-align: right;
+}
+
+/* Global Map */
+td:nth-child(6) {
+    text-align: center;
+}
+
+/* Special */
+td:nth-child(7) {
+    text-align: center;
 }
 
 /* ---- SEPARATORS ---- */

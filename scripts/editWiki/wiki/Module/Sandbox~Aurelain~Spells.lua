@@ -1,51 +1,56 @@
 -- Usage: {{#invoke:SpellsOverview|display}}
 local p = {}
 local SCHOOL_ORDER = {
-    day =     1,
-    night =   2,
-    space =   3,
-    primal =  4,
+    day = 1,
+    night = 2,
+    space = 3,
+    primal = 4,
     neutral = 5,
 }
 local SCHOOL_ICON = {
-    day =     'Skill_Expert_Daylight_Magic',
-    night =   'Skill_Expert_Nightshade_Magic',
-    space =   'Skill_Expert_Arcane_Magic',
-    primal =  'Skill_Expert_Primal_Magic',
+    day = 'Skill_Expert_Daylight_Magic',
+    night = 'Skill_Expert_Nightshade_Magic',
+    space = 'Skill_Expert_Arcane_Magic',
+    primal = 'Skill_Expert_Primal_Magic',
     neutral = "Dorearth's_Tide",
 }
 local SCHOOL_MAPPING = {
-    Daylight =     'day',
-    Nightshade =   'night',
-    Arcane =       'space',
-    Primal =       'primal',
-    Neutral =      'neutral',
+    Daylight = 'day',
+    Nightshade = 'night',
+    Arcane = 'space',
+    Primal = 'primal',
+    Neutral = 'neutral',
 }
 -- Note: The right side is just a fallback, it will seldom be used.
 local TRANSLATION_IDS = {
-    wiki_name =         '~Name',         -- manually translated in Data:WikiTranslations/xx
-    school =            '~School',
-    tier =              '~Tier',
-    description =       '~Description',   ---- missing, should be taken from `ui.unit_window_narrative`
-    mana = '~Mana',                     -- manually translated in Data:WikiTranslations/xx
-    used_on_map = '~Used on map',
-    is_special_magic = '~is_special_magic'
+    wiki_name = '~Name',                            -- Data:WikiTranslations
+    wiki_spells_school = '~School',                 -- Data:WikiTranslations
+    tier = '~Tier',
+    unit_window_narrative = '~Description',
+    battle_spellbook_neutral = '~Neutral Magic',
+    mana_cost = '~Mana Cost',
+    battle_spellbook_world = '~Global Map Spells',
+    battle_spellbook_battle = '~Battle Spells',
+    wiki_spells_masterful = '~Masterful',           -- Data:WikiTranslations
+    wiki_spells_regular = '~Regular'                -- Data:WikiTranslations
 }
 -- Note: The right side is just a fallback, it will seldom be used.
 local TRANSLATION_IDS_SCHOOL = {
-    skill_magic_day =            '~Daylight Magic',
-    skill_magic_night =          '~Nightshade Magic',
-    skill_magic_space =          '~Arcane Magic',
-    skill_magic_primal =         '~Primal Magic',
-    battle_spellbook_neutral =   '~Neutral Magic',
+    skill_magic_day = '~Daylight Magic',
+    skill_magic_night = '~Nightshade Magic',
+    skill_magic_space = '~Arcane Magic',
+    skill_magic_primal = '~Primal Magic',
 }
-local MAP_ICONS = {
-    '[[File:Base_class_construct.png|32px|link=]]',
-    '[[File:Base_passive_strike_rumble_1.png|32px|link=]]'
+local PLACE_ICONS = {
+    'Qilin_ability_5',      -- 1 = Global Map Spell
+    'Battle_icon_Onesword', -- 2 = Combat Spell
+}
+local MASTERFUL_ICONS = {
+    'hive_queen_ability_1', -- 1 = Masterful Spell
+    'Icon_QuestLog_Sub',    -- 2 = Normal Spell
 }
 
 local ROMAN = { 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII' }
-local CHECK = '✔️'
 
 ------------------------------------------------------------------------------------------------------------------------
 -- Displays a variable
@@ -88,9 +93,9 @@ local function translateIds(ids, lang, extra)
         table.insert(where, extra)
     end
     local results = mw.ext.cargo.query('Translation', 'target_id, name', {
-         where = table.concat(where, ' AND '),
-         limit = 100
-     })
+        where = table.concat(where, ' AND '),
+        limit = 100
+    })
 
     -- Dictionary
     local dictionary = mw.clone(ids)
@@ -153,19 +158,18 @@ local function consolidateMain(results)
         local entry = hub[id]
         if not string.match(id, 'astral_summon_%D') then
             if not entry then
-                local usedOnMap = row.used_on_map == '1' and 2 or 1
                 entry = {}
                 entry.id = row.id
                 entry.school = row.school
                 entry.rank = tonumber(row.rank)
-                entry.used_on_map = MAP_ICONS[usedOnMap]
+                entry.used_on_map = 2 - tonumber(row.used_on_map)
                 entry.icon = row.icon
-                entry.is_special_magic = row.is_special_magic == '1' and CHECK or ''
-                entry.mana_cost = 0  -- added later by `addManaCost()`
-                entry.name = '' -- see below
-                entry.bonus2 = '' -- see below
-                entry.bonus3 = '' -- see below
-                entry.bonus4 = '' -- see below
+                entry.is_special_magic = 2 - tonumber(row.is_special_magic)
+                entry.mana_cost = 0 -- added later by `addManaCost()`
+                entry.name = ''     -- see below
+                entry.bonus2 = ''   -- see below
+                entry.bonus3 = ''   -- see below
+                entry.bonus4 = ''   -- see below
                 hub[id] = entry
             end
             if row.name then
@@ -224,6 +228,7 @@ local function addSchoolWords(words, lang, suffix)
         local icon = '[[File:' .. SCHOOL_ICON[school] .. '.png|64px|link=]]'
         words[school] = icon .. '<br>' .. '[[' .. value .. ']]'
     end
+    words.neutral = words.battle_spellbook_neutral -- manual patch, because Neutral Magic is not a Skill
 end
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -256,12 +261,12 @@ end
 local function createHeader(htmlTable, words)
     local tr = htmlTable:tag('tr')
     addTh(tr, words.wiki_name)
-    addTh(tr, words.school)
+    addTh(tr, words.wiki_spells_school)
     addTh(tr, words.tier)
-    addTh(tr, words.description)
-    addTh(tr, '[[File:Mana_icon.png|24px]]')
-    addTh(tr, '[[File:Icon_QuestLog_Main.png|24px]]')
-    addTh(tr, '[[File:Hive_queen_passive_2.png|24px]]')
+    addTh(tr, words.unit_window_narrative)
+    addTh(tr, '[[File:Mana_icon.png|24px|' .. words.mana_cost .. ']]')
+    addTh(tr, '[[File:Qilin_ability_5.png|24px|' .. words.battle_spellbook_world .. ']]')
+    addTh(tr, '[[File:hive_queen_ability_1.png|24px|' .. words.wiki_spells_masterful .. ']]')
 end
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -276,6 +281,27 @@ local function buildDescription(spell)
     table.insert(list, spell.bonus3)
     table.insert(list, spell.bonus4)
     return spell.desc1 .. '\n<ol start="2"><li>' .. table.concat(list, '</li><li>') .. '</li></ol>'
+end
+
+------------------------------------------------------------------------------------------------------------------------
+--
+------------------------------------------------------------------------------------------------------------------------
+local function addUsedOnMap(tr, words, value)
+    local fileName = PLACE_ICONS[value]
+    local title = value == 1 and words.battle_spellbook_world or words.battle_spellbook_battle
+    local text = '[[File:' .. fileName .. '.png|32px|' .. title .. '|link=]]'
+    tr:tag('td'):attr('data-sort-value', value):wikitext(text):done()
+end
+
+
+------------------------------------------------------------------------------------------------------------------------
+--
+------------------------------------------------------------------------------------------------------------------------
+local function addMasterful(tr, words, value)
+    local fileName = MASTERFUL_ICONS[value]
+    local title = value == 1 and words.wiki_spells_masterful or words.wiki_spells_regular
+    local text = '[[File:' .. fileName .. '.png|32px|' .. title .. '|link=]]'
+    tr:tag('td'):attr('data-sort-value', value):wikitext(text):done()
 end
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -303,8 +329,8 @@ local function createBody(htmlTable, spells, words)
         addTd(tr, ROMAN[u.rank])
         addTd(tr, buildDescription(u))
         addTd(tr, u.mana_cost .. ' [[File:Mana_icon.png|24px|link=]]')
-        addTd(tr, u.used_on_map)
-        addTd(tr, u.is_special_magic)
+        addUsedOnMap(tr, words, u.used_on_map)
+        addMasterful(tr, words, u.is_special_magic)
     end
 end
 
@@ -341,7 +367,7 @@ function p.display(frame)
 
     -- Output
     local styleTag = frame:extensionTag('templatestyles', '', { src = frame:getTitle() .. '/styles.css' })
-    --return dump(main)
+    --return dump(words)
     return styleTag .. tostring(htmlTable)
 end
 
