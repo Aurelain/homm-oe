@@ -8,29 +8,22 @@ local FACTION_ORDER = {
     dungeon = 6,
     neutral = 7,
 }
-local FACTION_IDS_IN_TRANSLATION = {
-    'human',
-    'undead',
-    'nature',
-    'demon',
-    'unfrozen',
-    'dungeon',
-    'neutral', -- missing
-}
-local OTHER_IDS_IN_TRANSLATION = {
-    'creature',
-    'faction',
-    'tier',
-    'cost', -- missing
-    'hp',
-    'offence',
-    'defence',
-    'damage',
-    'initiative',
-    'morale',
-    'luck',
-    'speed',
-    'ranged',
+-- Note: the right side is just a fallback, it will most likely never be used!
+local TRANSLATION_IDS = {
+    creature =   'Creature',
+    faction =    'Faction',
+    tier =       'Tier',
+    wiki_cost =  'Cost', -- manually translated in Data:WikiTranslations/xx
+    hp =         'Hp',
+    offence =    'Offence',
+    defence =    'Defence',
+    damage =     'Damage',
+    initiative = 'Initiative',
+    morale =     'Morale',
+    luck =       'Luck',
+    speed =      'Speed',
+    ranged =     'Ranged',
+    neutral =    'Neutral', -- fallback
 }
 local RESOURCE_ICONS = {
     wood_cost     = 'Wood',
@@ -242,25 +235,22 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 -- Retrieves the text for some specific ids from Cargo Translations.
 ------------------------------------------------------------------------------------------------------------------------
-local function translateIds(ids, lang, where)
-    -- Initialize
-    local dictionary = {}
-    for _, id in ipairs(ids) do
-        dictionary[id] = id:gsub("^%l", string.upper)
+local function translateIds(ids, lang)
+    -- Key list
+    local list = {}
+    for key, _ in pairs(ids) do
+        list[#list + 1] = key
     end
+    local idListString = '"' .. table.concat(list, '", "') .. '"'
 
     -- Cargo
-    local idListString = '"' .. table.concat(ids, '", "') .. '"'
-    local tables = 'Translation'
-    local fields = 'target_id, name'
-    where = where or ''
-    local cargoArgs = {
-        where = 'target_id IN (' .. idListString .. ') AND language = "' .. lang .. '"' .. where,
-        limit = 100
-    }
-    local results = mw.ext.cargo.query(tables, fields, cargoArgs)
+    local results = mw.ext.cargo.query('Translation', 'target_id, name', {
+         where = 'target_id IN (' .. idListString .. ') AND language = "' .. lang .. '"',
+         limit = 100
+     })
 
-    -- Update dictionary
+    -- Dictionary
+    local dictionary = mw.clone(ids)
     if results then
         for _, row in ipairs(results) do
             dictionary[row['target_id']] = row['name']
@@ -302,15 +292,37 @@ local function createStat(tr, value, pngName)
 end
 
 ------------------------------------------------------------------------------------------------------------------------
+-- Boilerplate for the separator
+------------------------------------------------------------------------------------------------------------------------
+local function addSeparator(htmlTable, className, content)
+    htmlTable:tag('tr')
+        :addClass('separator')
+        :addClass(className)
+        :tag('td'):attr('colspan', 100):wikitext(content):done()
+end
+
+------------------------------------------------------------------------------------------------------------------------
+--
+------------------------------------------------------------------------------------------------------------------------
+local function addFactionWords(words, lang, suffix, frame)
+    for key, _ in pairs(FACTION_ORDER) do
+        if key == 'neutral' then
+            words[key] = '[[File:Primordial_Chaos.png|24px]] [[Neutral_Units' .. suffix .. '|'.. words.neutral .. ']]'
+        else
+            words[key] = frame:preprocess('{{F|' .. key .. '|' .. lang .. '}}')
+        end
+    end
+end
+
+------------------------------------------------------------------------------------------------------------------------
 -- Main public function
 ------------------------------------------------------------------------------------------------------------------------
 function p.display(frame)
+    -- Language
     local lang = getCurrentLang()
     local suffix = lang ~= 'en' and '/' .. lang or ''
-    local wordsEn = translateIds(OTHER_IDS_IN_TRANSLATION, 'en')
-    local wordsX = lang == 'en' and wordsEn or translateIds(OTHER_IDS_IN_TRANSLATION, lang)
-    local factionEn = translateIds(FACTION_IDS_IN_TRANSLATION, 'en', ' AND type="faction"')
-    local factionX = lang == 'en' and factionEn or translateIds(FACTION_IDS_IN_TRANSLATION, lang, ' AND type="faction"')
+    local words = translateIds(TRANSLATION_IDS, lang)
+    addFactionWords(words, lang, suffix, frame)
 
     -- Cargo
     local results = query(lang)
@@ -324,36 +336,40 @@ function p.display(frame)
 
     -- Header
     local header = htmlTable:tag('tr')
-    createTh(header, wordsX.creature)
-    createTh(header, wordsX.faction)
-    createTh(header, wordsX.tier)
-    createTh(header, wordsX.cost)
+    createTh(header, words.creature)
+    createTh(header, words.faction)
+    createTh(header, words.tier)
+    createTh(header, words.cost)
     -- main stats
-    createTh(header, '[[File:' .. STAT_ICONS.hp .. '.png|24px|' .. wordsX.hp .. ']]')
-    createTh(header, '[[File:' .. STAT_ICONS.offence .. '.png|24px|' .. wordsX.offence .. ']]')
-    createTh(header, '[[File:' .. STAT_ICONS.defence .. '.png|24px|' .. wordsX.defence .. ']]')
-    createTh(header, '[[File:' .. STAT_ICONS.damage .. '.png|24px|' .. wordsX.damage .. ']]')
-    createTh(header, '[[File:' .. STAT_ICONS.morale .. '.png|24px|' .. wordsX.morale .. ']]')
-    createTh(header, '[[File:' .. STAT_ICONS.luck .. '.png|24px|' .. wordsX.luck .. ']]')
-    createTh(header, '[[File:' .. STAT_ICONS.initiative .. '.png|24px|' .. wordsX.initiative .. ']]')
-    createTh(header, '[[File:' .. STAT_ICONS.speed .. '.png|24px|' .. wordsX.speed .. ']]')
+    createTh(header, '[[File:' .. STAT_ICONS.hp .. '.png|24px|' .. words.hp .. ']]')
+    createTh(header, '[[File:' .. STAT_ICONS.offence .. '.png|24px|' .. words.offence .. ']]')
+    createTh(header, '[[File:' .. STAT_ICONS.defence .. '.png|24px|' .. words.defence .. ']]')
+    createTh(header, '[[File:' .. STAT_ICONS.damage .. '.png|24px|' .. words.damage .. ']]')
+    createTh(header, '[[File:' .. STAT_ICONS.morale .. '.png|24px|' .. words.morale .. ']]')
+    createTh(header, '[[File:' .. STAT_ICONS.luck .. '.png|24px|' .. words.luck .. ']]')
+    createTh(header, '[[File:' .. STAT_ICONS.initiative .. '.png|24px|' .. words.initiative .. ']]')
+    createTh(header, '[[File:' .. STAT_ICONS.speed .. '.png|24px|' .. words.speed .. ']]')
     -- others
-    createTh(header, '[[File:Base_passive_ranged_attack.png|24px|' .. wordsX.ranged .. ']]')
+    createTh(header, '[[File:Base_passive_ranged_attack.png|24px|' .. words.ranged .. ']]')
 
     -- Body
-    local prevFaction = units[1].faction
+    local currentTier = units[1].tier
+    local currentFaction = units[1].faction
     for _, u in ipairs(units) do
-        -- separator
-        if u.faction ~= prevFaction then
-            prevFaction = u.faction
-            local separator = htmlTable:tag('tr'):addClass('separator')
-            separator:tag('td'):attr('colspan', 11):done()
+
+        -- separators
+        if u.faction ~= currentFaction then
+            currentFaction = u.faction
+            currentTier = u.tier
+            addSeparator(htmlTable, 'separator-large', words[currentFaction])
+        elseif u.tier ~= currentTier then
+            currentTier = u.tier
+            addSeparator(htmlTable, 'separator-tiny', '')
         end
 
-        local factionPage = factionEn[u.faction] .. '_Units' .. suffix
         local tr = htmlTable:tag('tr')
         tr:tag('td'):wikitext(renderUnitName(u, suffix)):done()
-        tr:tag('td'):wikitext('[[' .. factionPage .. '|' .. factionX[u.faction] .. ']]'):done()
+        tr:tag('td'):wikitext(words[currentFaction]):done()
         tr:tag('td'):wikitext(ROMAN[tonumber(u.tier)]):done()
         -- cost
         tr:tag('td'):attr('data-sort-value', string.match(u.cost, "^%d+")):wikitext(u.cost):done()
@@ -371,6 +387,7 @@ function p.display(frame)
         tr:tag('td'):attr('data-sort-value', ATTACK_RANKS[u.attackType]):wikitext(icon):done()
     end
 
+    -- Output
     local styleTag = frame:extensionTag('templatestyles', '', { src = frame:getTitle() .. '/styles.css' })
     return styleTag .. tostring(htmlTable)
 end

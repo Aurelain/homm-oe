@@ -301,7 +301,7 @@ local function addTd(tr, text)
 end
 
 ------------------------------------------------------------------------------------------------------------------------
--- Boilerplate for the body cells
+-- Boilerplate for the separator
 ------------------------------------------------------------------------------------------------------------------------
 local function addSeparator(htmlTable, className, content)
     htmlTable:tag('tr')
@@ -393,10 +393,12 @@ end
 -- Main public function
 ------------------------------------------------------------------------------------------------------------------------
 function p.display(frame)
+    -- Args
     local args = frame.args
     local forcedFaction = mw.text.trim(args[1] or args.faction or '')
     forcedFaction = FACTION_MAPPING[forcedFaction] or nil
 
+    -- Language
     local lang = getCurrentLang()
     local words = translateIds(TRANSLATION_IDS, lang)
     addFactionWords(words, lang, frame)
