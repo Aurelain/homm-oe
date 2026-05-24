@@ -8,22 +8,22 @@ local FACTION_ORDER = {
     dungeon = 6,
     neutral = 7,
 }
--- Note: the right side is just a fallback, it will most likely never be used!
+-- Note: The right side is just a fallback, it will seldom be used.
 local TRANSLATION_IDS = {
-    creature =   'Creature',
-    faction =    'Faction',
-    tier =       'Tier',
-    wiki_cost =  'Cost', -- manually translated in Data:WikiTranslations/xx
-    hp =         'Hp',
-    offence =    'Offence',
-    defence =    'Defence',
-    damage =     'Damage',
-    initiative = 'Initiative',
-    morale =     'Morale',
-    luck =       'Luck',
-    speed =      'Speed',
-    ranged =     'Ranged',
-    neutral =    'Neutral', -- fallback
+    creature =              'Creature',
+    faction =               'Faction',
+    tier =                  'Tier',
+    wiki_cost =             'Cost', -- manually translated in Data:WikiTranslations/xx
+    hp =                    'Hp',
+    offence =               'Offence',
+    defence =               'Defence',
+    damage =                'Damage',
+    initiative =            'Initiative',
+    morale =                'Morale',
+    luck =                  'Luck',
+    speed =                 'Speed',
+    ranged =                'Ranged',
+    wiki_units_neutral =    'Neutral', -- manually translated in Data:WikiTranslations/xx
 }
 local RESOURCE_ICONS = {
     wood_cost     = 'Wood',
@@ -64,6 +64,11 @@ local ATTACK_ICONS = {
 local ROMAN = { 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII' }
 local PAGES = {
     Stinger = 'Stinger_(unit)',
+}
+local MORALE_AND_LUCK = {
+    '<span class="elevated1">1</span>',
+    '<span class="elevated2">2</span>',
+    '<span class="elevated3">3</span>',
 }
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -272,7 +277,7 @@ end
 local function renderUnitName(u, suffix)
     local stem = PAGES[u.nameEn] or u.nameEn
     local page = stem .. suffix
-    local img = '[[File:' .. u.nameEn .. ' icon.png|40px|link=' .. page .. ']]'
+    local img = '[[File:' .. u.nameEn .. ' icon.png|link=' .. page .. ']]'
     local text = '[[' .. page .. '|' .. u.nameX .. ']]'
     return img .. ' ' .. text
 end
@@ -280,7 +285,7 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 -- Boilerplate for the header cells
 ------------------------------------------------------------------------------------------------------------------------
-local function createTh(tr, text)
+local function addTh(tr, text)
     tr:tag('th'):wikitext(text):done()
 end
 
@@ -288,7 +293,7 @@ end
 -- Boilerplate for stat tds
 ------------------------------------------------------------------------------------------------------------------------
 local function createStat(tr, value, pngName)
-    tr:tag('td'):wikitext(value .. '[[File:' .. pngName .. '.png|16px|link=]]'):done()
+    tr:tag('td'):wikitext(value .. '[[File:' .. pngName .. '.png|link=]]'):done()
 end
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -307,10 +312,73 @@ end
 local function addFactionWords(words, lang, suffix, frame)
     for key, _ in pairs(FACTION_ORDER) do
         if key == 'neutral' then
-            words[key] = '[[File:Primordial_Chaos.png|24px]] [[Neutral_Units' .. suffix .. '|'.. words.neutral .. ']]'
+            local file = '[[File:Primordial_Chaos.png|24px]]'
+            words[key] = file .. ' [[Neutral_Units' .. suffix .. '|'.. words.wiki_units_neutral .. ']]'
         else
             words[key] = frame:preprocess('{{F|' .. key .. '|' .. lang .. '}}')
         end
+    end
+end
+
+------------------------------------------------------------------------------------------------------------------------
+--
+------------------------------------------------------------------------------------------------------------------------
+local function createHeader(htmlTable, words)
+    local header = htmlTable:tag('tr')
+    -- 1 to 4 (general)
+    addTh(header, words.creature)
+    addTh(header, words.faction)
+    addTh(header, words.tier)
+    addTh(header, words.wiki_cost)
+    -- 5 to 12 (main stats)
+    addTh(header, '[[File:' .. STAT_ICONS.hp .. '.png|link=' .. words.hp .. ']]')
+    addTh(header, '[[File:' .. STAT_ICONS.offence .. '.png|link=' .. words.offence .. ']]')
+    addTh(header, '[[File:' .. STAT_ICONS.defence .. '.png|link=' .. words.defence .. ']]')
+    addTh(header, '[[File:' .. STAT_ICONS.damage .. '.png|link=' .. words.damage .. ']]')
+    addTh(header, '[[File:' .. STAT_ICONS.morale .. '.png|link=' .. words.morale .. ']]')
+    addTh(header, '[[File:' .. STAT_ICONS.luck .. '.png|link=' .. words.luck .. ']]')
+    addTh(header, '[[File:' .. STAT_ICONS.initiative .. '.png|link=' .. words.initiative .. ']]')
+    addTh(header, '[[File:' .. STAT_ICONS.speed .. '.png|link=' .. words.speed .. ']]')
+    -- 13 (others)
+    addTh(header, '[[File:Base_passive_ranged_attack.png|link=' .. words.ranged .. ']]')
+end
+
+------------------------------------------------------------------------------------------------------------------------
+--
+------------------------------------------------------------------------------------------------------------------------
+local function createBody(htmlTable, units, words, suffix)
+    local currentTier = units[1].tier
+    local currentFaction = units[1].faction
+    for _, u in ipairs(units) do
+
+        -- separators
+        if u.faction ~= currentFaction then
+            currentFaction = u.faction
+            currentTier = u.tier
+            addSeparator(htmlTable, 'separator-large', words[currentFaction])
+        elseif u.tier ~= currentTier then
+            currentTier = u.tier
+            addSeparator(htmlTable, 'separator-tiny', '')
+        end
+
+        local tr = htmlTable:tag('tr')
+        -- 1 to 4 (general)
+        tr:tag('td'):wikitext(renderUnitName(u, suffix)):done()
+        tr:tag('td'):wikitext(words[currentFaction]):done()
+        tr:tag('td'):wikitext(ROMAN[tonumber(u.tier)]):done()
+        tr:tag('td'):attr('data-sort-value', string.match(u.cost, "^%d+")):wikitext(u.cost):done()
+        -- 5 to 12 (main stats)
+        createStat(tr, u.hp, STAT_ICONS.hp)
+        createStat(tr, u.offence, STAT_ICONS.offence)
+        createStat(tr, u.defence, STAT_ICONS.defence)
+        createStat(tr, u.damage_min .. '-' .. u.damage_max, STAT_ICONS.damage)
+        createStat(tr, MORALE_AND_LUCK[tonumber(u.morale)] or u.morale, STAT_ICONS.morale)
+        createStat(tr, MORALE_AND_LUCK[tonumber(u.luck)] or u.luck, STAT_ICONS.luck)
+        createStat(tr, u.initiative, STAT_ICONS.initiative)
+        createStat(tr, u.speed, STAT_ICONS.speed)
+        -- 13 (others)
+        local icon =  '[[File:' .. ATTACK_ICONS[u.attackType] .. '.png' .. '|link=]]'
+        tr:tag('td'):attr('data-sort-value', ATTACK_RANKS[u.attackType]):wikitext(icon):done()
     end
 end
 
@@ -332,60 +400,8 @@ function p.display(frame)
     -- Table
     local htmlTable = mw.html.create('table')
     htmlTable:addClass('wikitable sortable')
-    htmlTable:css('white-space', 'nowrap')
-
-    -- Header
-    local header = htmlTable:tag('tr')
-    createTh(header, words.creature)
-    createTh(header, words.faction)
-    createTh(header, words.tier)
-    createTh(header, words.cost)
-    -- main stats
-    createTh(header, '[[File:' .. STAT_ICONS.hp .. '.png|24px|' .. words.hp .. ']]')
-    createTh(header, '[[File:' .. STAT_ICONS.offence .. '.png|24px|' .. words.offence .. ']]')
-    createTh(header, '[[File:' .. STAT_ICONS.defence .. '.png|24px|' .. words.defence .. ']]')
-    createTh(header, '[[File:' .. STAT_ICONS.damage .. '.png|24px|' .. words.damage .. ']]')
-    createTh(header, '[[File:' .. STAT_ICONS.morale .. '.png|24px|' .. words.morale .. ']]')
-    createTh(header, '[[File:' .. STAT_ICONS.luck .. '.png|24px|' .. words.luck .. ']]')
-    createTh(header, '[[File:' .. STAT_ICONS.initiative .. '.png|24px|' .. words.initiative .. ']]')
-    createTh(header, '[[File:' .. STAT_ICONS.speed .. '.png|24px|' .. words.speed .. ']]')
-    -- others
-    createTh(header, '[[File:Base_passive_ranged_attack.png|24px|' .. words.ranged .. ']]')
-
-    -- Body
-    local currentTier = units[1].tier
-    local currentFaction = units[1].faction
-    for _, u in ipairs(units) do
-
-        -- separators
-        if u.faction ~= currentFaction then
-            currentFaction = u.faction
-            currentTier = u.tier
-            addSeparator(htmlTable, 'separator-large', words[currentFaction])
-        elseif u.tier ~= currentTier then
-            currentTier = u.tier
-            addSeparator(htmlTable, 'separator-tiny', '')
-        end
-
-        local tr = htmlTable:tag('tr')
-        tr:tag('td'):wikitext(renderUnitName(u, suffix)):done()
-        tr:tag('td'):wikitext(words[currentFaction]):done()
-        tr:tag('td'):wikitext(ROMAN[tonumber(u.tier)]):done()
-        -- cost
-        tr:tag('td'):attr('data-sort-value', string.match(u.cost, "^%d+")):wikitext(u.cost):done()
-        -- main stats
-        createStat(tr, u.hp, STAT_ICONS.hp)
-        createStat(tr, u.offence, STAT_ICONS.offence)
-        createStat(tr, u.defence, STAT_ICONS.defence)
-        createStat(tr, u.damage_min .. '-' .. u.damage_max, STAT_ICONS.damage)
-        createStat(tr, u.morale, STAT_ICONS.morale)
-        createStat(tr, u.luck, STAT_ICONS.luck)
-        createStat(tr, u.initiative, STAT_ICONS.initiative)
-        createStat(tr, u.speed, STAT_ICONS.speed)
-        -- others
-        local icon =  '[[File:' .. ATTACK_ICONS[u.attackType] .. '.png|32px' .. ']]'
-        tr:tag('td'):attr('data-sort-value', ATTACK_RANKS[u.attackType]):wikitext(icon):done()
-    end
+    createHeader(htmlTable, words)
+    createBody(htmlTable, units, words, suffix)
 
     -- Output
     local styleTag = frame:extensionTag('templatestyles', '', { src = frame:getTitle() .. '/styles.css' })
