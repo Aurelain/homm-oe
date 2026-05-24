@@ -277,7 +277,7 @@ end
 local function renderUnitName(u, suffix)
     local stem = PAGES[u.nameEn] or u.nameEn
     local page = stem .. suffix
-    local img = '[[File:' .. u.nameEn .. ' icon.png|link=' .. page .. ']]'
+    local img = '[[File:' .. u.nameEn .. ' icon.png|40px|link=' .. page .. ']]'
     local text = '[[' .. page .. '|' .. u.nameX .. ']]'
     return img .. ' ' .. text
 end
@@ -377,7 +377,7 @@ local function createBody(htmlTable, units, words, suffix)
         createStat(tr, u.initiative, STAT_ICONS.initiative)
         createStat(tr, u.speed, STAT_ICONS.speed)
         -- 13 (others)
-        local icon =  '[[File:' .. ATTACK_ICONS[u.attackType] .. '.png' .. '|link=]]'
+        local icon =  '[[File:' .. ATTACK_ICONS[u.attackType] .. '.png' .. '|32px|link=]]'
         tr:tag('td'):attr('data-sort-value', ATTACK_RANKS[u.attackType]):wikitext(icon):done()
     end
 end

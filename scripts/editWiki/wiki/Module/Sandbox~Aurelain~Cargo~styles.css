@@ -17,16 +17,6 @@ th img {
     height: 24px;
 }
 
-td:first-child img {
-    width: 40px;
-    height: 40px;
-}
-
-td:last-child img {
-    width: 32px;
-    height: 32px;
-}
-
 /* ---- STATS ---- */
 td:nth-child(5) img, td:nth-child(6) img, td:nth-child(7) img, td:nth-child(8) img,
 td:nth-child(9) img, td:nth-child(10) img, td:nth-child(11) img, td:nth-child(12) img {
