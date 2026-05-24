@@ -1,0 +1,75 @@
+table {
+    white-space: nowrap;
+}
+
+tr:hover {
+    background: #13161a;
+}
+
+td {
+    color: #cbced1;
+}
+
+td:nth-child(2), td:nth-child(4) {
+    white-space: normal;
+}
+
+td:nth-child(2) img {
+    width: 24px;
+    height: 24px;
+}
+
+/* Tier */
+td:nth-child(3) {
+    text-align: center;
+}
+
+/* Mana cost */
+td:nth-child(5) {
+    text-align: right;
+}
+
+/* Global Map */
+td:nth-child(6) {
+    text-align: center;
+}
+
+/* Special */
+td:nth-child(7) {
+    text-align: center;
+}
+
+/* ---- SEPARATORS ---- */
+
+.separator:first-child, .separator:last-child, .separator + .separator {
+    display: none;
+}
+
+.separator-tiny {
+    height: 4px;
+    background: #c8b36c !important;
+}
+
+.separator-tiny td {
+    padding: 0;
+}
+
+.separator-large {
+    background-color: #101622 !important;
+    text-align: center;
+    font-size: 24px;
+}
+
+/* ---- LEVELS ---- */
+/*
+ol li:nth-child(1) {
+    color: #c8b36c;
+}
+
+ol li:nth-child(2) {
+    color: #2ea821;
+}
+
+ol li:nth-child(3) {
+    color: #47adf2;
+}*/
