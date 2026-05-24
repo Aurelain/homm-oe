@@ -1,0 +1,39 @@
+td {
+    color: #cbced1;
+}
+
+img[width='16'] {
+    position: relative;
+    top: -1px;
+    margin-left: 1px;
+    opacity: 0.5;
+}
+
+tr:hover {
+    background: #13161a;
+}
+
+/* ---- SEPARATORS ---- */
+
+.separator:first-child, .separator:last-child, .separator + .separator {
+    display: none;
+}
+
+.separator-tiny {
+    height: 2px;
+    background: #c8b36c !important;
+}
+
+.separator-tiny td {
+    padding: 0;
+}
+
+.separator-large {
+    background-color: #101622 !important;
+    text-align: center;
+    font-size: 24px;
+}
+
+.separator-large img {
+    width: 54px;
+}

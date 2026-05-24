@@ -27,6 +27,8 @@ local OTHER_IDS_IN_TRANSLATION = {
     'defence',
     'damage',
     'initiative',
+    'morale',
+    'luck',
     'speed',
     'ranged',
 }
@@ -43,6 +45,8 @@ local STAT_ICONS = {
     offence     = 'Icon_Stats_Attack',
     defence     = 'Icon_Stats_Defence',
     damage      = 'Icon_Stats_Damage',
+    morale      = 'Icon_Stats_Morale',
+    luck        = 'Icon_Stats_Luck',
     initiative  = 'Icon_Stats_Initiative',
     speed       = 'Icon_Stats_Speed',
 }
@@ -65,6 +69,9 @@ local ATTACK_ICONS = {
     base_passive_ranged_attack_no_range_close_name = 'Base_passive_sharpshooter', -- duplicate, needs a better icon
 }
 local ROMAN = { 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII' }
+local PAGES = {
+    Stinger = 'Stinger_(unit)',
+}
 
 ------------------------------------------------------------------------------------------------------------------------
 -- Detects the current language from the URL
@@ -145,6 +152,8 @@ local function query(lang)
         'Unit.defence=defence, ' ..
         'Unit.damage_min=damage_min, ' ..
         'Unit.damage_max=damage_max, ' ..
+        'Unit.morale=morale, ' ..
+        'Unit.luck=luck, ' ..
         'Unit.initiative=initiative, ' ..
         'Unit.speed=speed, ' ..
         'Unit.shared_abilities=shared_abilities, ' .. -- we use it for range detection
@@ -271,7 +280,8 @@ end
 -- Builds an icon+text combo for the unit's name
 ------------------------------------------------------------------------------------------------------------------------
 local function renderUnitName(u, suffix)
-    local page = u.nameEn .. suffix
+    local stem = PAGES[u.nameEn] or u.nameEn
+    local page = stem .. suffix
     local img = '[[File:' .. u.nameEn .. ' icon.png|40px|link=' .. page .. ']]'
     local text = '[[' .. page .. '|' .. u.nameX .. ']]'
     return img .. ' ' .. text
@@ -323,6 +333,8 @@ function p.display(frame)
     createTh(header, '[[File:' .. STAT_ICONS.offence .. '.png|24px|' .. wordsX.offence .. ']]')
     createTh(header, '[[File:' .. STAT_ICONS.defence .. '.png|24px|' .. wordsX.defence .. ']]')
     createTh(header, '[[File:' .. STAT_ICONS.damage .. '.png|24px|' .. wordsX.damage .. ']]')
+    createTh(header, '[[File:' .. STAT_ICONS.morale .. '.png|24px|' .. wordsX.morale .. ']]')
+    createTh(header, '[[File:' .. STAT_ICONS.luck .. '.png|24px|' .. wordsX.luck .. ']]')
     createTh(header, '[[File:' .. STAT_ICONS.initiative .. '.png|24px|' .. wordsX.initiative .. ']]')
     createTh(header, '[[File:' .. STAT_ICONS.speed .. '.png|24px|' .. wordsX.speed .. ']]')
     -- others
@@ -350,6 +362,8 @@ function p.display(frame)
         createStat(tr, u.offence, STAT_ICONS.offence)
         createStat(tr, u.defence, STAT_ICONS.defence)
         createStat(tr, u.damage_min .. '-' .. u.damage_max, STAT_ICONS.damage)
+        createStat(tr, u.morale, STAT_ICONS.morale)
+        createStat(tr, u.luck, STAT_ICONS.luck)
         createStat(tr, u.initiative, STAT_ICONS.initiative)
         createStat(tr, u.speed, STAT_ICONS.speed)
         -- others
