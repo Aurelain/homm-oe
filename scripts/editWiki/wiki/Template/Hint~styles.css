@@ -6,18 +6,22 @@
     cursor: help;
 }
 
+.wiki-hint-no-border {
+    border-bottom: none;
+}
+
 /* The hidden floating text */
 .wiki-hint .wiki-hint-floating {
     visibility: hidden;
     opacity: 0;
-    
+
     /* Positioning */
     position: absolute;
     bottom: 130%; /* Places it right above the text */
     left: 50%;
     transform: translateX(-50%);
     z-index: 100;
-    
+
     /* Styling */
     background-color: #191b2c;
     border: solid 1px #d6bc7c;
@@ -28,10 +32,10 @@
     white-space: nowrap; /* Prevents awkward wrapping */
     font-size: 0.9em;
     line-height: 1.2;
-    
+
     /* Smooth fade-in transition */
     transition: opacity 0.2s ease, visibility 0.2s ease;
-    
+
     /* Box shadow for a clean look */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }

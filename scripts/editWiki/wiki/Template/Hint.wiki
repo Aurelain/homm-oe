@@ -1,15 +1,17 @@
-<includeonly><templatestyles src="Template:Hint/styles.css" /><span class="wiki-hint">{{{1}}}<span class="wiki-hint-floating">{{{2}}}</span></span></includeonly><noinclude>
+<includeonly><templatestyles src="Template:Hint/styles.css" /><span class="wiki-hint {{#if:{{{3|}}}|wiki-hint-no-border}}">{{{1}}}<span class="wiki-hint-floating">{{{2}}}</span></span></includeonly><noinclude>
 
 A minor tooltip for short descriptions. As opposed to the "title" attribute, it has the following advantages:
 * It's instant upon hover (has no delay)
 * It uses a skin customized for Olden Era
 
-== Use ==
+== Usage ==
+1. For texts:
+<pre><nowiki>{{hint | Hello | World}}</nowiki></pre>
+Result: {{hint | Hello | World}}
+----
+2. For icons, pass a third parameter to disable the subtle border:
+<pre><nowiki>{{hint | [[File:Icon_Resource_Wood.png]] | Wood | 0}}</nowiki></pre>
+Result: {{hint | [[File:Icon_Resource_Wood.png]] | Wood | 0}}
 
-<pre><nowiki>{{hint|Hello|World}}.</nowiki></pre>
-
-== Example==
-
-{{hint|Hello|World}}
 
 [[Category:Formatting templates]]</noinclude>
