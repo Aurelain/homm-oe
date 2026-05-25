@@ -67,3 +67,19 @@ td:nth-child(7) {
     text-align: center;
     font-size: 24px;
 }
+
+/* ---- LEVELS ---- */
+.level {
+    margin-left: 2em;
+    margin-bottom: 0;
+    color: #cbced1;
+}
+.level b {
+    color: #c8b36c;
+}
+.masterful {
+    margin-bottom: 0;
+}
+.masterful b {
+    color: peru;
+}

@@ -6,6 +6,14 @@ tr:hover {
     background: #13161a;
 }
 
+.wiki-hint {
+    border-bottom: none !important; /* hide the underline applied by the Hint template */
+}
+
+th .wiki-hint {
+    cursor: pointer;
+}
+
 td {
     color: #cbced1;
 }
@@ -61,15 +69,17 @@ td:nth-child(7) {
 }
 
 /* ---- LEVELS ---- */
-/*
-ol li:nth-child(1) {
+.level {
+    margin-left: 2em;
+    margin-bottom: 0;
+    color: #cbced1;
+}
+.level b {
     color: #c8b36c;
 }
-
-ol li:nth-child(2) {
-    color: #2ea821;
+.masterful {
+    margin-bottom: 0;
 }
-
-ol li:nth-child(3) {
-    color: #47adf2;
-}*/
+.masterful b {
+    color: peru;
+}

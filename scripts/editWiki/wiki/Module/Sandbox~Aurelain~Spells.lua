@@ -23,8 +23,8 @@ local SCHOOL_MAPPING = {
 }
 -- Note: The right side is just a fallback, it will seldom be used.
 local TRANSLATION_IDS = {
-    wiki_name = 'Name',                            -- Data:WikiTranslations
-    wiki_spells_school = 'School',                 -- Data:WikiTranslations
+    wiki_name = 'Name',            -- Data:WikiTranslations
+    wiki_spells_school = 'School', -- Data:WikiTranslations
     tier = 'Tier',
     unit_window_narrative = 'Description',
     battle_spellbook_neutral = 'Neutral Magic',
@@ -32,7 +32,7 @@ local TRANSLATION_IDS = {
     battle_spellbook_world = 'Global Map Spells',
     battle_spellbook_battle = 'Battle Spells',
     wiki_spells_masterful = 'Has Masterful version',           -- Data:WikiTranslations
-    wiki_spells_regular1 = 'No Masterful<br>version available'                -- Data:WikiTranslations
+    wiki_spells_regular1 = 'No Masterful<br>version available' -- Data:WikiTranslations
 }
 -- Note: The right side is just a fallback, it will seldom be used.
 local TRANSLATION_IDS_SCHOOL = {
@@ -42,8 +42,8 @@ local TRANSLATION_IDS_SCHOOL = {
     skill_magic_primal = 'Primal Magic',
 }
 local PLACE_ICONS = {
-    'Global map spells',      -- 1 = Global Map Spell
-    'Battle spells',          -- 2 = Battle Spell
+    'Global map spells', -- 1 = Global Map Spell
+    'Battle spells',     -- 2 = Battle Spell
 }
 local MASTERFUL_ICONS = {
     'Demonic_heart_artifact', -- 1 = Masterful Spell
@@ -119,6 +119,62 @@ local function flatten(hub)
 end
 
 ------------------------------------------------------------------------------------------------------------------------
+-- Gets the second sentence from the speciality of heroes that start with a masterful spell.
+------------------------------------------------------------------------------------------------------------------------
+local function collectMasterfulBlurbs(lang)
+    local results = mw.ext.cargo.query('Translation', 'target_id, description', {
+        where = "language='en' AND description LIKE '%starts with the%'",
+        limit = 100
+    })
+    local nameToBlurb = {}
+    for _, row in ipairs(results) do
+        local id = row.target_id
+        local description = row.description
+        local shortName = mw.ustring.match(description, '“Masterful ([a-zA-Z ’-]+)”')
+        shortName = mw.ustring.gsub(shortName, "’", "'")
+        if lang ~= 'en' then
+            local huntResult = mw.ext.cargo.query('Translation', 'description', {
+                where = "language='" .. lang .. "' AND target_id='" .. id .. "'",
+                limit = 1
+            })
+            local huntRow = huntResult[1] or {}
+            description = huntRow.description or ''
+        end
+        local secondSentence = mw.ustring.match(description, "[.,。]%s*([^.。]+[.。])") or ''
+        nameToBlurb[shortName] = secondSentence
+    end
+    return nameToBlurb
+end
+
+------------------------------------------------------------------------------------------------------------------------
+--
+------------------------------------------------------------------------------------------------------------------------
+local function mapMasterfulEnglishNameToId()
+    local results = mw.ext.cargo.query('Translation', 'target_id, name', {
+        where = "language='en' AND name LIKE 'Masterful %'",
+        limit = 100
+    })
+    local nameToId = {}
+    for _, row in ipairs(results) do
+        local cleanName = string.gsub(row.name, 'Masterful ', '')
+        local cleanId = string.gsub(row.target_id, '_special$', '')
+        nameToId[cleanName] = cleanId
+    end
+    return nameToId
+end
+
+------------------------------------------------------------------------------------------------------------------------
+--
+------------------------------------------------------------------------------------------------------------------------
+local function joinMasterfuls(nameToBlurb, nameToId)
+    local idToBlurb = {}
+    for name, id in pairs(nameToId) do
+        idToBlurb[id] = nameToBlurb[name] or ''
+    end
+    return idToBlurb
+end
+
+------------------------------------------------------------------------------------------------------------------------
 -- Retrieves the most important data from Cargo
 ------------------------------------------------------------------------------------------------------------------------
 local function queryMain(lang, forcedSchool)
@@ -129,7 +185,6 @@ local function queryMain(lang, forcedSchool)
         'Spell.rank = rank, ' ..
         'Spell.used_on_map = used_on_map, ' ..
         'Spell.icon = icon, ' ..
-        'Spell.is_special_magic = is_special_magic, ' ..
         -- Translation
         'Translation.variant = variant, ' ..
         'Translation.name = name, ' ..
@@ -140,6 +195,7 @@ local function queryMain(lang, forcedSchool)
         table.insert(where, 'Spell.school="' .. forcedSchool .. '"')
     end
     table.insert(where, 'Translation.language = "' .. lang .. '"')
+    table.insert(where, 'Spell.is_special_magic !="1"')
     local cargoArgs = {
         join = 'Spell.id = Translation.target_id',
         where = table.concat(where, ' AND '),
@@ -151,7 +207,7 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 -- Scans the Cargo results and folds the all rows belonging to a Spell into a single dictionary:
 ------------------------------------------------------------------------------------------------------------------------
-local function consolidateMain(results)
+local function consolidateMain(results, masterfulIdToBlurb)
     local hub = {}
     for _, row in ipairs(results) do
         local id = row.id
@@ -159,17 +215,17 @@ local function consolidateMain(results)
         if not string.match(id, 'astral_summon_%D') then
             if not entry then
                 entry = {}
-                entry.id = row.id
+                entry.id = id
                 entry.school = row.school
                 entry.rank = tonumber(row.rank)
                 entry.used_on_map = 2 - tonumber(row.used_on_map)
                 entry.icon = row.icon
-                entry.is_special_magic = 2 - tonumber(row.is_special_magic)
                 entry.mana_cost = 0 -- added later by `addManaCost()`
                 entry.name = ''     -- see below
                 entry.bonus2 = ''   -- see below
                 entry.bonus3 = ''   -- see below
                 entry.bonus4 = ''   -- see below
+                entry.masterfulBlurb = masterfulIdToBlurb[id]
                 hub[id] = entry
             end
             if row.name then
@@ -279,14 +335,21 @@ end
 --
 ------------------------------------------------------------------------------------------------------------------------
 local function buildDescription(spell)
-    if spell.bonus1 then
-        return spell.desc1
+    local output = {}
+    table.insert(output, spell.desc1)
+    if spell.bonus2 and spell.bonus2 ~= ''  then
+        table.insert(output, '<p class="level"><b>Level 2:</b> ' .. spell.bonus2 .. '</p>')
     end
-    local list = {}
-    table.insert(list, spell.bonus2)
-    table.insert(list, spell.bonus3)
-    table.insert(list, spell.bonus4)
-    return spell.desc1 .. '\n<ol start="2"><li>' .. table.concat(list, '</li><li>') .. '</li></ol>'
+    if spell.bonus3 and spell.bonus3 ~= '' then
+        table.insert(output, '<p class="level"><b>Level 3:</b> ' .. spell.bonus3 .. '</p>')
+    end
+    if spell.bonus4 and spell.bonus4 ~= ''  then
+        table.insert(output, '<p class="level"><b>Level 4:</b> ' .. spell.bonus4 .. '</p>')
+    end
+    if spell.masterfulBlurb then
+        table.insert(output, '<p class="masterful"><b>Masterful:</b> ' .. spell.masterfulBlurb .. '</p>')
+    end
+    return table.concat(output, '\n')
 end
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -305,8 +368,9 @@ end
 --
 ------------------------------------------------------------------------------------------------------------------------
 local function addMasterful(tr, words, value, frame)
-    local fileName = MASTERFUL_ICONS[value]
-    local title = value == 1 and words.wiki_spells_masterful or words.wiki_spells_regular1
+    local nr = value and 1 or 2
+    local fileName = MASTERFUL_ICONS[nr]
+    local title = value and words.wiki_spells_masterful or words.wiki_spells_regular1
     local file = '[[File:' .. fileName .. '.png|40px|link=]]'
     local text = frame:preprocess('{{hint|' .. file .. '|' .. title .. '}}')
     tr:tag('td'):attr('data-sort-value', value):wikitext(text):done()
@@ -338,7 +402,7 @@ local function createBody(htmlTable, spells, words, frame)
         addTd(tr, buildDescription(u))
         addTd(tr, u.mana_cost .. ' [[File:Mana_icon.png|24px|link=]]')
         addUsedOnMap(tr, words, u.used_on_map, frame)
-        addMasterful(tr, words, u.is_special_magic, frame)
+        addMasterful(tr, words, u.masterfulBlurb, frame)
     end
 end
 
@@ -357,9 +421,14 @@ function p.display(frame)
     local words = translateIds(TRANSLATION_IDS, lang)
     addSchoolWords(words, lang, suffix)
 
+    -- Masterful blurbs
+    local masterfulBlurbs = collectMasterfulBlurbs(lang)
+    local masterfulEnglishNameToId = mapMasterfulEnglishNameToId()
+    local masterfulIdToBlurb = joinMasterfuls(masterfulBlurbs, masterfulEnglishNameToId)
+
     -- Cargo
     local main = queryMain(lang, forcedSchool)
-    local hub = consolidateMain(main)
+    local hub = consolidateMain(main, masterfulIdToBlurb)
     addManaCost(hub);
     local spells = flatten(hub);
 
@@ -375,7 +444,7 @@ function p.display(frame)
 
     -- Output
     local styleTag = frame:extensionTag('templatestyles', '', { src = frame:getTitle() .. '/styles.css' })
-    --return dump(words)
+    --return dump(masterfulIdToBlurb)
     return styleTag .. tostring(htmlTable)
 end
 
