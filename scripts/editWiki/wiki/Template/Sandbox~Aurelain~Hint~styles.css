@@ -1,0 +1,54 @@
+/* Container for the hint */
+.wiki-hint {
+    position: relative;
+    display: inline;
+    border-bottom: 1px dotted #555; /* Visual cue that it's hoverable */
+    cursor: help;
+}
+
+/* The hidden floating text */
+.wiki-hint .wiki-hint-floating {
+    visibility: hidden;
+    opacity: 0;
+    
+    /* Positioning */
+    position: absolute;
+    bottom: 130%; /* Places it right above the text */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    
+    /* Styling */
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 6px 10px;
+    border-radius: 4px;
+    white-space: nowrap; /* Prevents awkward wrapping */
+    font-size: 0.9em;
+    line-height: 1.2;
+    
+    /* Smooth fade-in transition */
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    
+    /* Box shadow for a clean look */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Little arrow pointing down at the content */
+.wiki-hint .wiki-hint-floating::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+}
+
+/* Reveal on hover */
+.wiki-hint:hover .wiki-hint-floating {
+    visibility: visible;
+    opacity: 1;
+}
