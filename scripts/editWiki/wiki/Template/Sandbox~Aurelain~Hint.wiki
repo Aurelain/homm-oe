@@ -1,11 +1,15 @@
 <includeonly><templatestyles src="Template:Sandbox/Aurelain/Hint/styles.css" /><span class="wiki-hint">{{{1}}}<span class="wiki-hint-floating">{{{2}}}</span></span></includeonly><noinclude>
 
+A minor tooltip for short descriptions. As opposed to the "title" attribute, it has the following advantages:
+* It's instant upon hover (has no delay)
+* It uses a skin customized for Olden Era
+
 == Use ==
 
 <pre><nowiki>{{Sandbox/Aurelain/Hint|foo|bar}}.</nowiki></pre>
 
 == Example==
 
-{{Sandbox/Aurelain/Hint|foo|bar}}
+{{Sandbox/Aurelain/Hint|Hello|World}}
 
 [[Category:Formatting templates]]</noinclude>
