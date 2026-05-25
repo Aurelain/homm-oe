@@ -23,23 +23,23 @@ local SCHOOL_MAPPING = {
 }
 -- Note: The right side is just a fallback, it will seldom be used.
 local TRANSLATION_IDS = {
-    wiki_name = '~Name',                            -- Data:WikiTranslations
-    wiki_spells_school = '~School',                 -- Data:WikiTranslations
-    tier = '~Tier',
-    unit_window_narrative = '~Description',
-    battle_spellbook_neutral = '~Neutral Magic',
-    mana_cost = '~Mana Cost',
-    battle_spellbook_world = '~Global Map Spells',
-    battle_spellbook_battle = '~Battle Spells',
-    wiki_spells_masterful = '~Masterful',           -- Data:WikiTranslations
-    wiki_spells_regular = '~Regular'                -- Data:WikiTranslations
+    wiki_name = 'Name',                            -- Data:WikiTranslations
+    wiki_spells_school = 'School',                 -- Data:WikiTranslations
+    tier = 'Tier',
+    unit_window_narrative = 'Description',
+    battle_spellbook_neutral = 'Neutral Magic',
+    mana_cost = 'Mana Cost',
+    battle_spellbook_world = 'Global Map Spells',
+    battle_spellbook_battle = 'Battle Spells',
+    wiki_spells_masterful = 'Has Masterful version',           -- Data:WikiTranslations
+    wiki_spells_regular1 = 'No Masterful<br>version available'                -- Data:WikiTranslations
 }
 -- Note: The right side is just a fallback, it will seldom be used.
 local TRANSLATION_IDS_SCHOOL = {
-    skill_magic_day = '~Daylight Magic',
-    skill_magic_night = '~Nightshade Magic',
-    skill_magic_space = '~Arcane Magic',
-    skill_magic_primal = '~Primal Magic',
+    skill_magic_day = 'Daylight Magic',
+    skill_magic_night = 'Nightshade Magic',
+    skill_magic_space = 'Arcane Magic',
+    skill_magic_primal = 'Primal Magic',
 }
 local PLACE_ICONS = {
     'Global map spells',      -- 1 = Global Map Spell
@@ -258,15 +258,21 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 --
 ------------------------------------------------------------------------------------------------------------------------
-local function createHeader(htmlTable, words)
+local function createHeader(htmlTable, words, frame)
     local tr = htmlTable:tag('tr')
     addTh(tr, words.wiki_name)
     addTh(tr, words.wiki_spells_school)
     addTh(tr, words.tier)
     addTh(tr, words.unit_window_narrative)
-    addTh(tr, '[[File:Mana_icon.png|24px|' .. words.mana_cost .. ']]')
-    addTh(tr, '[[File:' .. PLACE_ICONS[1] .. '.png|32px|' .. words.battle_spellbook_world .. ']]')
-    addTh(tr, '[[File:' .. MASTERFUL_ICONS[1] .. '.png|32px|' .. words.wiki_spells_masterful .. ']]')
+
+    local manaIcon = '[[File:Mana_icon.png|24px|link=]]';
+    addTh(tr, frame:preprocess('{{hint|' .. manaIcon .. '|' .. words.mana_cost .. '}}'))
+
+    local compassIcon = '[[File:' .. PLACE_ICONS[1] .. '.png|32px|link=]]';
+    addTh(tr, frame:preprocess('{{hint|' .. compassIcon .. '|' .. words.battle_spellbook_world .. '}}'))
+
+    local masterfulIcon = '[[File:' .. MASTERFUL_ICONS[1] .. '.png|32px|link=]]';
+    addTh(tr, frame:preprocess('{{hint|' .. masterfulIcon .. '|' .. words.wiki_spells_masterful .. '}}'))
 end
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -286,10 +292,11 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 --
 ------------------------------------------------------------------------------------------------------------------------
-local function addUsedOnMap(tr, words, value)
+local function addUsedOnMap(tr, words, value, frame)
     local fileName = PLACE_ICONS[value]
     local title = value == 1 and words.battle_spellbook_world or words.battle_spellbook_battle
-    local text = '[[File:' .. fileName .. '.png|40px|' .. title .. '|link=]]'
+    local file = '[[File:' .. fileName .. '.png|40px|link=]]'
+    local text = frame:preprocess('{{hint|' .. file .. '|' .. title .. '}}')
     tr:tag('td'):attr('data-sort-value', value):wikitext(text):done()
 end
 
@@ -297,17 +304,18 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 --
 ------------------------------------------------------------------------------------------------------------------------
-local function addMasterful(tr, words, value)
+local function addMasterful(tr, words, value, frame)
     local fileName = MASTERFUL_ICONS[value]
-    local title = value == 1 and words.wiki_spells_masterful or words.wiki_spells_regular
-    local text = '[[File:' .. fileName .. '.png|40px|' .. title .. '|link=]]'
+    local title = value == 1 and words.wiki_spells_masterful or words.wiki_spells_regular1
+    local file = '[[File:' .. fileName .. '.png|40px|link=]]'
+    local text = frame:preprocess('{{hint|' .. file .. '|' .. title .. '}}')
     tr:tag('td'):attr('data-sort-value', value):wikitext(text):done()
 end
 
 ------------------------------------------------------------------------------------------------------------------------
 --
 ------------------------------------------------------------------------------------------------------------------------
-local function createBody(htmlTable, spells, words)
+local function createBody(htmlTable, spells, words, frame)
     local currentRank = spells[1].rank
     local currentSchool = spells[1].school
     for _, u in ipairs(spells) do
@@ -329,8 +337,8 @@ local function createBody(htmlTable, spells, words)
         addTd(tr, ROMAN[u.rank])
         addTd(tr, buildDescription(u))
         addTd(tr, u.mana_cost .. ' [[File:Mana_icon.png|24px|link=]]')
-        addUsedOnMap(tr, words, u.used_on_map)
-        addMasterful(tr, words, u.is_special_magic)
+        addUsedOnMap(tr, words, u.used_on_map, frame)
+        addMasterful(tr, words, u.is_special_magic, frame)
     end
 end
 
@@ -362,8 +370,8 @@ function p.display(frame)
     -- Table
     local htmlTable = mw.html.create('table')
     htmlTable:addClass('wikitable sortable')
-    createHeader(htmlTable, words)
-    createBody(htmlTable, spells, words)
+    createHeader(htmlTable, words, frame)
+    createBody(htmlTable, spells, words, frame)
 
     -- Output
     local styleTag = frame:extensionTag('templatestyles', '', { src = frame:getTitle() .. '/styles.css' })
