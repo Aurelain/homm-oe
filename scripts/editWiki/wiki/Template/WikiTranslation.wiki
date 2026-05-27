@@ -1,0 +1,23 @@
+<noinclude>
+A shortcut for [[Template:TranslationDef | <code><nowiki>{{TranslationDef}}</nowiki></code>]] used in [[Data:WikiTranslations]].
+== Usage ==
+<pre><nowiki>
+{{ WikiTranslation
+| subtype = common          <!-- the group this belongs to -->
+| target_id = wiki_might    <!-- the id in the Translation Cargo table -->
+| en = Might                <!-- a comment about what the translation means in English -->
+| name = Force              <!-- the actual translation -->
+}}
+</nowiki></pre>
+<b style='color:#c8b36c'>wiki_might</b>: <b style='color:#2ea821'>Might</b> = <b style='color:#47adf2'>Force</b>
+</noinclude><includeonly>{{#cargo_store:_table=Translation
+| target_id = {{{target_id|}}}
+| type = wiki
+| subtype = {{{subtype|}}}
+| variant = {{{variant|}}}
+| language = {{#titleparts: {{SUBPAGENAME}} | 1 | 2}}
+| name = {{{name|}}}
+| description = {{{description|}}}
+| bonus_description = {{{bonus_description|}}}
+}}<b style='color:#c8b36c'>{{{target_id|}}}</b>: <b style='color:#2ea821'>{{{en|}}}</b> = <b style='color:peru'>{{{name|}}}</b>
+</includeonly>
