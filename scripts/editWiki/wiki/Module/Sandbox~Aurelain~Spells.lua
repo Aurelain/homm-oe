@@ -3,11 +3,13 @@ local p = {}
 -- Currently (2026-05-29), these spells have a WIP icon, so we assume they're not actually in-game
 -- TODO: Revisit this list in the future
 local FORBIDDEN_IDS = {
-    'bonus_magic_kill_summon',
-    'neutral_1_magic_back_to_garrison',
-    'neutral_1_magic_mana_transfer',
-    'night_bonus_magic_1_magic',
-    'primal_bonus_magic_1_magic',
+    bonus_magic_kill_summon = true,
+    neutral_1_magic_back_to_garrison = true,
+    neutral_1_magic_mana_transfer = true,
+    night_bonus_magic_1_magic = true,
+    primal_bonus_magic_1_magic = true,
+    bonus_magic_astral_summon_4 = true, -- how do you get Master Summon Avatar?
+    bonus_magic_astral_summon_5 = true, -- how do you get Grandmaster Summon Avatar?
 }
 local SCHOOL_ORDER = {
     day = 1,
@@ -292,10 +294,10 @@ end
 local function addSchoolWords(words, lang, suffix)
     local backup = mw.clone(TRANSLATION_IDS_SCHOOL)
     local wordsSchool = translateIds(TRANSLATION_IDS_SCHOOL, lang, 'type="skill"')
-    wordsSchool.neutral = words.battle_spellbook_neutral -- manual patch, because Neutral Magic is not a Skill
+    wordsSchool.skill_magic_neutral = words.battle_spellbook_neutral -- manual patch (Neutral Magic is not a Skill)
     for key, value in pairs(wordsSchool) do
         local school = string.match(key, "[^_]*$")
-        local icon = '[[File:' .. SCHOOL_ICON[school] .. '.png|64px|link=]]'
+        local icon = '[[File:' .. SCHOOL_ICON[school] .. '.png|40px|link=]]'
         local link = '[[' .. backup[key] .. suffix .. '|' .. value .. ']]'
         words[school] = icon .. '<br>' .. link
     end
@@ -351,24 +353,35 @@ end
 local function buildDescription(spell, words)
     local output = {}
     table.insert(output, spell.desc1)
-    local level =  words.wiki_spells_level
-    if spell.bonus2 and spell.bonus2 ~= ''  then
+    local level = words.wiki_spells_level
+    if spell.bonus2 and spell.bonus2 ~= '' then
         table.insert(output, '<p class="level"><b>' .. level .. ' 2:</b> ' .. spell.bonus2 .. '</p>')
     end
     if spell.bonus3 and spell.bonus3 ~= '' then
         table.insert(output, '<p class="level"><b>' .. level .. ' 3:</b> ' .. spell.bonus3 .. '</p>')
     end
-    if spell.bonus4 and spell.bonus4 ~= ''  then
+    if spell.bonus4 and spell.bonus4 ~= '' then
         table.insert(output, '<p class="level"><b>' .. level .. ' 4:</b> ' .. spell.bonus4 .. '</p>')
     end
     if spell.masterfulBlurb then
         table.insert(output, '' ..
             '<p class="masterful">' ..
             '<b>' .. words.wiki_spells_masterful .. ':</b> ' ..
-             spell.masterfulBlurb ..
-             '</p>')
+            spell.masterfulBlurb ..
+            '</p>')
     end
     return table.concat(output, '\n')
+end
+
+------------------------------------------------------------------------------------------------------------------------
+--
+------------------------------------------------------------------------------------------------------------------------
+local function addIconAndName(tr, spell)
+    local content = {}
+    table.insert(content, '[[File:Frame_Spell_Top_0.png|144px|link=]]')
+    table.insert(content, '[[File:' .. spell.icon .. '.png|128px|link=|' .. spell.id .. ']]')
+    table.insert(content, ' [[' .. spell.name .. ']]')
+    addTd(tr, table.concat(content, ''))
 end
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -381,7 +394,6 @@ local function addUsedOnMap(tr, words, value, frame)
     local text = frame:preprocess('{{hint|' .. file .. '|' .. title .. '}}')
     tr:tag('td'):attr('data-sort-value', value):wikitext(text):done()
 end
-
 
 ------------------------------------------------------------------------------------------------------------------------
 --
@@ -415,8 +427,8 @@ local function createBody(htmlTable, spells, words, frame)
         end
 
         local tr = htmlTable:tag('tr')
-        tr:addClass(currentSchool)
-        addTd(tr, '[[File:' .. u.icon .. '.png|40px|link=|'.. u.id ..']] ' .. '[[' .. u.name .. ']]')
+        tr:addClass('spell'):addClass(currentSchool)
+        addIconAndName(tr, u)
         addTd(tr, schoolName)
         addTd(tr, ROMAN[u.rank])
         addTd(tr, buildDescription(u, words))
@@ -459,7 +471,7 @@ function p.display(frame)
 
     -- Table
     local htmlTable = mw.html.create('table')
-    htmlTable:addClass('wikitable sortable')
+    htmlTable:addClass('wikitable sortable table-nobands')
     createHeader(htmlTable, words, frame)
     createBody(htmlTable, spells, words, frame)
 

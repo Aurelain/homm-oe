@@ -8,16 +8,49 @@ th .wiki-hint {
 
 td {
     color: #cbced1;
+    text-align: center;
 }
+
+.spell td {
+    padding-bottom: 32px;
+}
+
+.spell td:first-child > span:first-child {
+    position: absolute;
+    z-index: 1;
+    margin-left: -8px;
+    margin-top: -8px;
+}
+
+/* Name */
+td:nth-child(1) {
+    width: 150px;
+}
+
+td:nth-child(1) img {
+    margin-top: 8px; /* todo */
+}
+
 
 /* School */
 td:nth-child(2) {
-    text-align: center;
+    width: 100px;
+}
+
+td:nth-child(2) img {
+    border-radius: 50%;
+    margin-bottom: 4px;
 }
 
 /* Tier */
 td:nth-child(3) {
-    text-align: center;
+
+}
+
+/* Description */
+td:nth-child(4) {
+    text-align: left;
+    min-width: 320px;
 }
 
 /* Mana cost */
@@ -28,12 +61,12 @@ td:nth-child(5) {
 
 /* Global Map */
 td:nth-child(6) {
-    text-align: center;
+
 }
 
 /* Special */
 td:nth-child(7) {
-    text-align: center;
+
 }
 
 /* ---- SEPARATORS ---- */
@@ -68,31 +101,51 @@ td:nth-child(7) {
     color: #c8b36c;
 }
 
-.masterful {
+.masterful, .masterful b {
     margin-bottom: 0;
-}
-
-.masterful b {
     color: peru;
 }
 
 /* ---- SCHOOLS ---- */
 .day {
-    background: linear-gradient(rgba(98, 65, 15, 0.2), rgba(98, 65, 15, 0.1));
+    /*background: rgba(98, 65, 15, 0.05);*/
+}
+
+.day td:nth-child(2) img {
+    width: 40px;
+    height: 40px;
+    padding: 3px 2px;
+    background: rgb(98, 65, 15);
 }
 
 .night {
-    background: linear-gradient(rgba(70, 27, 91, 0.2), rgba(70, 27, 91, 0.1));
+    /*background: rgba(70, 27, 91, 0.05);*/
+}
+
+.night td:nth-child(2) img {
+    background: rgb(70, 27, 91);
 }
 
 .primal {
-    background: linear-gradient(rgba(103, 40, 27, 0.2), rgba(103, 40, 27, 0.1));
+    /*background: rgba(103, 40, 27, 0.05);*/
+}
+
+.primal td:nth-child(2) img {
+    background: rgb(103, 40, 27);
 }
 
 .space {
-    background: linear-gradient(rgba(28, 68, 79, 0.2), rgba(28, 68, 79, 0.1));
+    /*background: rgba(28, 68, 79, 0.05);*/
+}
+
+.space td:nth-child(2) img {
+    background: rgb(28, 68, 79);
 }
 
 .neutral {
-    background: linear-gradient(rgba(56, 55, 101, 0.2), rgba(56, 55, 101, 0.1));
+    /*background: rgba(56, 55, 101, 0.05);*/
+}
+
+.neutral td:nth-child(2) img {
+    background: rgb(56, 55, 101);
 }
