@@ -1,11 +1,3 @@
-table {
-    white-space: nowrap;
-}
-
-tr:hover {
-    background: #13161a;
-}
-
 .wiki-hint {
     border-bottom: none !important; /* hide the underline applied by the Hint template */
 }
@@ -18,13 +10,9 @@ td {
     color: #cbced1;
 }
 
-td:nth-child(2), td:nth-child(4) {
-    white-space: normal;
-}
-
-td:nth-child(2) img {
-    width: 24px;
-    height: 24px;
+/* School */
+td:nth-child(2) {
+    text-align: center;
 }
 
 /* Tier */
@@ -35,6 +23,7 @@ td:nth-child(3) {
 /* Mana cost */
 td:nth-child(5) {
     text-align: right;
+    white-space: nowrap;
 }
 
 /* Global Map */
@@ -74,12 +63,36 @@ td:nth-child(7) {
     margin-bottom: 0;
     color: #cbced1;
 }
+
 .level b {
     color: #c8b36c;
 }
+
 .masterful {
     margin-bottom: 0;
 }
+
 .masterful b {
     color: peru;
+}
+
+/* ---- SCHOOLS ---- */
+.day {
+    background: linear-gradient(rgba(98, 65, 15, 0.2), rgba(98, 65, 15, 0.1));
+}
+
+.night {
+    background: linear-gradient(rgba(70, 27, 91, 0.2), rgba(70, 27, 91, 0.1));
+}
+
+.primal {
+    background: linear-gradient(rgba(103, 40, 27, 0.2), rgba(103, 40, 27, 0.1));
+}
+
+.space {
+    background: linear-gradient(rgba(28, 68, 79, 0.2), rgba(28, 68, 79, 0.1));
+}
+
+.neutral {
+    background: linear-gradient(rgba(56, 55, 101, 0.2), rgba(56, 55, 101, 0.1));
 }
