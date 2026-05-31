@@ -19,11 +19,11 @@ local SCHOOL_ORDER = {
     neutral = 5,
 }
 local SCHOOL_ICON = {
-    day = 'Daylight_icon',
-    night = 'Nightshade_icon',
-    space = 'Arcane_icon',
-    primal = 'Primal_icon',
-    neutral = 'Neutral_school_icon',
+    day = 'Daylight_disk',
+    night = 'Nightshade_disk',
+    space = 'Arcane_disk',
+    primal = 'Primal_disk',
+    neutral = 'Neutral_disk',
 }
 local SCHOOL_MAPPING = {
     Daylight = 'day',
@@ -47,7 +47,7 @@ local TRANSLATION_IDS = {
     wiki_spells_no_masterful = 'No Masterful<br>version available',
     wiki_spells_level = 'Level'
 }
--- Note: The right side is just a fallback, it will seldom be used.
+-- Note: The right side is a fallback, but also used for the page link.
 local TRANSLATION_IDS_SCHOOL = {
     skill_magic_day = 'Daylight Magic',
     skill_magic_night = 'Nightshade Magic',
@@ -450,8 +450,7 @@ function p.display(frame)
     -- Language
     local lang = getCurrentLang()
     local suffix = lang ~= 'en' and '/' .. lang or ''
-    local words = TRANSLATION_IDS
-    --local words = translateIds(TRANSLATION_IDS, lang)
+    local words = translateIds(TRANSLATION_IDS, lang)
     addSchoolWords(words, lang, suffix)
 
     -- Masterful blurbs
@@ -466,7 +465,6 @@ function p.display(frame)
     local spells = flatten(hub);
 
     -- Various manipulations
-    --mergeTexts(laws)
     table.sort(spells, sortSpells)
 
     -- Table

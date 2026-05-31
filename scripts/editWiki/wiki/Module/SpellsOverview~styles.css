@@ -1,11 +1,6 @@
-table {
-    white-space: nowrap;
-}
-
-tr:hover {
-    background: #13161a;
-}
-
+/* ===================================================== */
+/*     G E N E R A L
+/* ===================================================== */
 .wiki-hint {
     border-bottom: none !important; /* hide the underline applied by the Hint template */
 }
@@ -16,39 +11,63 @@ th .wiki-hint {
 
 td {
     color: #cbced1;
+    text-align: center;
 }
 
-td:nth-child(2), td:nth-child(4) {
-    white-space: normal;
+/* ===================================================== */
+/*     C O L U M N S
+/* ===================================================== */
+.spell td:nth-child(1) { /* Name */
+    width: 150px;
 }
 
-td:nth-child(2) img {
-    width: 24px;
-    height: 24px;
+.spell td:nth-child(1) > span:first-child { /* Icon golden ring */
+    position: absolute;
+    z-index: 1;
+    margin-left: -8px;
+    margin-top: -8px;
+}
+
+.spell td:nth-child(1) > a:last-child { /* Name link */
+    display: block;
+    margin-top: 8px;
+}
+
+td:nth-child(2) { /* School */
+    width: 100px;
 }
 
 /* Tier */
 td:nth-child(3) {
-    text-align: center;
+
+}
+
+/* Description */
+td:nth-child(4) {
+    text-align: left;
+    min-width: 320px;
+    padding-bottom: 32px;
 }
 
 /* Mana cost */
 td:nth-child(5) {
     text-align: right;
+    white-space: nowrap;
 }
 
 /* Global Map */
 td:nth-child(6) {
-    text-align: center;
+
 }
 
 /* Special */
 td:nth-child(7) {
-    text-align: center;
+
 }
 
-/* ---- SEPARATORS ---- */
-
+/* ===================================================== */
+/*     S E P A R A T O R S
+/* ===================================================== */
 .separator:first-child, .separator:last-child, .separator + .separator {
     display: none;
 }
@@ -68,18 +87,20 @@ td:nth-child(7) {
     font-size: 24px;
 }
 
-/* ---- LEVELS ---- */
+/* ===================================================== */
+/*     L E V E L S
+/* ===================================================== */
 .level {
     margin-left: 2em;
     margin-bottom: 0;
     color: #cbced1;
 }
+
 .level b {
     color: #c8b36c;
 }
-.masterful {
+
+.masterful, .masterful b {
     margin-bottom: 0;
-}
-.masterful b {
     color: peru;
 }

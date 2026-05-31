@@ -14,10 +14,6 @@ td {
     text-align: center;
 }
 
-.spell td {
-    padding-bottom: 32px;
-}
-
 /* ===================================================== */
 /*     C O L U M N S
 /* ===================================================== */
@@ -41,11 +37,6 @@ td:nth-child(2) { /* School */
     width: 100px;
 }
 
-td:nth-child(2) img { /* School icon */
-    border-radius: 50%;
-    margin-bottom: 4px;
-}
-
 /* Tier */
 td:nth-child(3) {
 
@@ -55,6 +46,7 @@ td:nth-child(3) {
 td:nth-child(4) {
     text-align: left;
     min-width: 320px;
+    padding-bottom: 32px;
 }
 
 /* Mana cost */
@@ -111,30 +103,4 @@ td:nth-child(7) {
 .masterful, .masterful b {
     margin-bottom: 0;
     color: peru;
-}
-
-/* ===================================================== */
-/*     S C H O O L S
-/* ===================================================== */
-.day td:nth-child(2) img {
-    width: 40px;
-    height: 40px;
-    padding: 3px 2px;
-    background: rgb(98, 65, 15);
-}
-
-.night td:nth-child(2) img {
-    background: rgb(70, 27, 91);
-}
-
-.primal td:nth-child(2) img {
-    background: rgb(103, 40, 27);
-}
-
-.space td:nth-child(2) img {
-    background: rgb(28, 68, 79);
-}
-
-.neutral td:nth-child(2) img {
-    background: rgb(56, 55, 101);
 }
