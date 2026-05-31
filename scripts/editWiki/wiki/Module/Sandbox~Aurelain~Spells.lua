@@ -191,7 +191,7 @@ end
 local function joinMasterfuls(nameToBlurb, nameToId)
     local idToBlurb = {}
     for name, id in pairs(nameToId) do
-        idToBlurb[id] = nameToBlurb[name] or ''
+        idToBlurb[id] = nameToBlurb[name] or '-'
     end
     return idToBlurb
 end
@@ -443,7 +443,7 @@ local function addMasterful(tr, words, value, frame)
     local title = value and words.wiki_spells_has_masterful or words.wiki_spells_no_masterful
     local file = '[[File:' .. fileName .. '.png|40px|link=]]'
     local text = frame:preprocess('{{hint|' .. file .. '|' .. title .. '}}')
-    tr:tag('td'):attr('data-sort-value', value):wikitext(text):done()
+    tr:tag('td'):attr('data-sort-value', nr):wikitext(text):done()
 end
 
 ------------------------------------------------------------------------------------------------------------------------

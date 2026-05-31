@@ -1,5 +1,6 @@
 -- Usage: {{#invoke:SpellsOverview|display}}
 local p = {}
+
 -- Currently (2026-05-29), these spells have a WIP icon, so we assume they're not actually in-game
 -- TODO: Revisit this list in the future
 local FORBIDDEN_IDS = {
@@ -11,6 +12,7 @@ local FORBIDDEN_IDS = {
     bonus_magic_astral_summon_4 = true, -- how do you get Master Summon Avatar?
     bonus_magic_astral_summon_5 = true, -- how do you get Grandmaster Summon Avatar?
 }
+
 local SCHOOL_ORDER = {
     day = 1,
     night = 2,
@@ -18,6 +20,7 @@ local SCHOOL_ORDER = {
     primal = 4,
     neutral = 5,
 }
+
 local SCHOOL_ICON = {
     day = 'Daylight_disk',
     night = 'Nightshade_disk',
@@ -25,6 +28,7 @@ local SCHOOL_ICON = {
     primal = 'Primal_disk',
     neutral = 'Neutral_disk',
 }
+
 local SCHOOL_MAPPING = {
     Daylight = 'day',
     Nightshade = 'night',
@@ -32,6 +36,7 @@ local SCHOOL_MAPPING = {
     Primal = 'primal',
     Neutral = 'neutral',
 }
+
 -- Note: The right side is just a fallback, it will seldom be used.
 local TRANSLATION_IDS = {
     wiki_name = 'Name',
@@ -47,6 +52,7 @@ local TRANSLATION_IDS = {
     wiki_spells_no_masterful = 'No Masterful<br>version available',
     wiki_spells_level = 'Level'
 }
+
 -- Note: The right side is a fallback, but also used for the page link.
 local TRANSLATION_IDS_SCHOOL = {
     skill_magic_day = 'Daylight Magic',
@@ -55,10 +61,12 @@ local TRANSLATION_IDS_SCHOOL = {
     skill_magic_primal = 'Primal Magic',
     skill_magic_neutral = 'Neutral Magic',
 }
+
 local PLACE_ICONS = {
-    'Global map spells', -- 1 = Global Map Spell
-    'Battle spells',     -- 2 = Battle Spell
+    'Global_map_spells', -- 1 = Global Map Spell
+    'Battle_spells',     -- 2 = Battle Spell
 }
+
 local MASTERFUL_ICONS = {
     'Demonic_heart_artifact', -- 1 = Masterful Spell
     'Icon_QuestLog_Sub',      -- 2 = Normal Spell
@@ -183,7 +191,7 @@ end
 local function joinMasterfuls(nameToBlurb, nameToId)
     local idToBlurb = {}
     for name, id in pairs(nameToId) do
-        idToBlurb[id] = nameToBlurb[name] or ''
+        idToBlurb[id] = nameToBlurb[name] or '-'
     end
     return idToBlurb
 end
@@ -257,6 +265,32 @@ local function consolidateMain(results, masterfulIdToBlurb)
 end
 
 ------------------------------------------------------------------------------------------------------------------------
+-- Maps each spell id to its English name (for page linking purposes)
+------------------------------------------------------------------------------------------------------------------------
+local function getPages(forcedSchool)
+    local tables = 'Spell, Translation'
+    local fields = '' ..
+        'Spell.id = id, ' ..
+        'Translation.name = name'
+    local where = {}
+    if forcedSchool then
+        table.insert(where, 'Spell.school="' .. forcedSchool .. '"')
+    end
+    table.insert(where, 'Translation.language = "en"')
+    local cargoArgs = {
+        join = 'Spell.id = Translation.target_id',
+        where = table.concat(where, ' AND '),
+        limit = 1000
+    }
+    local results = mw.ext.cargo.query(tables, fields, cargoArgs)
+    local hub = {}
+    for _, row in ipairs(results) do
+        hub[row.id] = row.name
+    end
+    return hub
+end
+
+------------------------------------------------------------------------------------------------------------------------
 -- Mutates the Spells hub to include corresponding mana cost from the SpellRank Cargo table
 ------------------------------------------------------------------------------------------------------------------------
 local function addManaCost(hub)
@@ -297,9 +331,10 @@ local function addSchoolWords(words, lang, suffix)
     wordsSchool.skill_magic_neutral = words.battle_spellbook_neutral -- manual patch (Neutral Magic is not a Skill)
     for key, value in pairs(wordsSchool) do
         local school = string.match(key, "[^_]*$")
-        local icon = '[[File:' .. SCHOOL_ICON[school] .. '.png|40px|link=]]'
-        local link = '[[' .. backup[key] .. suffix .. '|' .. value .. ']]'
-        words[school] = icon .. '<br>' .. link
+        local link = backup[key] .. suffix
+        local icon = '[[File:' .. SCHOOL_ICON[school] .. '.png|40px|link=' .. link .. ']]'
+        local anchor = '[[' .. link .. '|' .. value .. ']]'
+        words[school] = icon .. '<br>' .. anchor
     end
 end
 
@@ -376,11 +411,15 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 --
 ------------------------------------------------------------------------------------------------------------------------
-local function addIconAndName(tr, spell)
+local function addIconAndName(tr, spell, pages, suffix)
     local content = {}
-    table.insert(content, '[[File:Frame_Spell_Top_0.png|144px|link=]]')
-    table.insert(content, '[[File:' .. spell.icon .. '.png|128px|link=|' .. spell.id .. ']]')
-    table.insert(content, '<br>[[' .. spell.name .. ']]')
+    local link = pages[spell.id] or ''
+    link = link .. suffix
+    local ringFile = '[[File:Frame_Spell_Top_0.png|147px|link=]]'
+    local ringDiv = '<div class="ring" style="pointer-events:none">'..ringFile..'</div>'
+    local iconFile = '[[File:' .. spell.icon .. '.png|128px|link=' .. link .. ']]'
+    table.insert(content, '<div class="medallion">' .. ringDiv .. iconFile .. '</div>')
+    table.insert(content, '[[' .. link .. '|' .. spell.name .. ']]')
     addTd(tr, table.concat(content, ''))
 end
 
@@ -404,13 +443,13 @@ local function addMasterful(tr, words, value, frame)
     local title = value and words.wiki_spells_has_masterful or words.wiki_spells_no_masterful
     local file = '[[File:' .. fileName .. '.png|40px|link=]]'
     local text = frame:preprocess('{{hint|' .. file .. '|' .. title .. '}}')
-    tr:tag('td'):attr('data-sort-value', value):wikitext(text):done()
+    tr:tag('td'):attr('data-sort-value', nr):wikitext(text):done()
 end
 
 ------------------------------------------------------------------------------------------------------------------------
 --
 ------------------------------------------------------------------------------------------------------------------------
-local function createBody(htmlTable, spells, words, frame)
+local function createBody(htmlTable, spells, words, pages, suffix, frame)
     local currentRank = spells[1].rank
     local currentSchool = spells[1].school
     for _, u in ipairs(spells) do
@@ -428,7 +467,7 @@ local function createBody(htmlTable, spells, words, frame)
 
         local tr = htmlTable:tag('tr')
         tr:addClass('spell'):addClass(currentSchool)
-        addIconAndName(tr, u)
+        addIconAndName(tr, u, pages, suffix)
         addTd(tr, schoolName)
         addTd(tr, ROMAN[u.rank])
         addTd(tr, buildDescription(u, words))
@@ -463,6 +502,7 @@ function p.display(frame)
     local hub = consolidateMain(main, masterfulIdToBlurb)
     addManaCost(hub);
     local spells = flatten(hub);
+    local pages = getPages(forcedSchool)
 
     -- Various manipulations
     table.sort(spells, sortSpells)
@@ -471,11 +511,11 @@ function p.display(frame)
     local htmlTable = mw.html.create('table')
     htmlTable:addClass('wikitable sortable table-nobands')
     createHeader(htmlTable, words, frame)
-    createBody(htmlTable, spells, words, frame)
+    createBody(htmlTable, spells, words, pages, suffix, frame)
 
     -- Output
     local styleTag = frame:extensionTag('templatestyles', '', { src = frame:getTitle() .. '/styles.css' })
-    --return dump(masterfulIdToBlurb)
+    --return dump(pages)
     return styleTag .. tostring(htmlTable)
 end
 

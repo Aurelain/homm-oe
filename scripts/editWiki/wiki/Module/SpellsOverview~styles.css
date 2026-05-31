@@ -18,19 +18,21 @@ td {
 /*     C O L U M N S
 /* ===================================================== */
 .spell td:nth-child(1) { /* Name */
-    width: 150px;
+    min-width: 154px;
+    max-width: 154px;
 }
 
-.spell td:nth-child(1) > span:first-child { /* Icon golden ring */
+.medallion {
+    position: relative;
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+
+.ring {
     position: absolute;
     z-index: 1;
-    margin-left: -8px;
-    margin-top: -8px;
-}
-
-.spell td:nth-child(1) > a:last-child { /* Name link */
-    display: block;
-    margin-top: 8px;
+    margin-left: -3px;
+    margin-top: -10px;
 }
 
 td:nth-child(2) { /* School */
