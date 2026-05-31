@@ -1,3 +1,6 @@
+/* ===================================================== */
+/*     G E N E R A L
+/* ===================================================== */
 .wiki-hint {
     border-bottom: none !important; /* hide the underline applied by the Hint template */
 }
@@ -15,29 +18,30 @@ td {
     padding-bottom: 32px;
 }
 
-.spell td:first-child > span:first-child {
+/* ===================================================== */
+/*     C O L U M N S
+/* ===================================================== */
+.spell td:nth-child(1) { /* Name */
+    width: 150px;
+}
+
+.spell td:nth-child(1) > span:first-child { /* Icon golden ring */
     position: absolute;
     z-index: 1;
     margin-left: -8px;
     margin-top: -8px;
 }
 
-/* Name */
-td:nth-child(1) {
-    width: 150px;
+.spell td:nth-child(1) > a:last-child { /* Name link */
+    display: block;
+    margin-top: 8px;
 }
 
-td:nth-child(1) img {
-    margin-top: 8px; /* todo */
-}
-
-
-/* School */
-td:nth-child(2) {
+td:nth-child(2) { /* School */
     width: 100px;
 }
 
-td:nth-child(2) img {
+td:nth-child(2) img { /* School icon */
     border-radius: 50%;
     margin-bottom: 4px;
 }
@@ -69,8 +73,9 @@ td:nth-child(7) {
 
 }
 
-/* ---- SEPARATORS ---- */
-
+/* ===================================================== */
+/*     S E P A R A T O R S
+/* ===================================================== */
 .separator:first-child, .separator:last-child, .separator + .separator {
     display: none;
 }
@@ -90,7 +95,9 @@ td:nth-child(7) {
     font-size: 24px;
 }
 
-/* ---- LEVELS ---- */
+/* ===================================================== */
+/*     L E V E L S
+/* ===================================================== */
 .level {
     margin-left: 2em;
     margin-bottom: 0;
@@ -106,11 +113,9 @@ td:nth-child(7) {
     color: peru;
 }
 
-/* ---- SCHOOLS ---- */
-.day {
-    /*background: rgba(98, 65, 15, 0.05);*/
-}
-
+/* ===================================================== */
+/*     S C H O O L S
+/* ===================================================== */
 .day td:nth-child(2) img {
     width: 40px;
     height: 40px;
@@ -118,32 +123,16 @@ td:nth-child(7) {
     background: rgb(98, 65, 15);
 }
 
-.night {
-    /*background: rgba(70, 27, 91, 0.05);*/
-}
-
 .night td:nth-child(2) img {
     background: rgb(70, 27, 91);
-}
-
-.primal {
-    /*background: rgba(103, 40, 27, 0.05);*/
 }
 
 .primal td:nth-child(2) img {
     background: rgb(103, 40, 27);
 }
 
-.space {
-    /*background: rgba(28, 68, 79, 0.05);*/
-}
-
 .space td:nth-child(2) img {
     background: rgb(28, 68, 79);
-}
-
-.neutral {
-    /*background: rgba(56, 55, 101, 0.05);*/
 }
 
 .neutral td:nth-child(2) img {

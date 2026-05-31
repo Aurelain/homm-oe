@@ -324,7 +324,7 @@ local function addSeparator(htmlTable, className, content)
     htmlTable:tag('tr')
         :addClass('separator')
         :addClass(className)
-        :tag('td'):attr('colspan', 7):wikitext(content):done()
+        :tag('td'):attr('data-sort-value', ''):attr('colspan', 7):wikitext(content):done()
 end
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -380,7 +380,7 @@ local function addIconAndName(tr, spell)
     local content = {}
     table.insert(content, '[[File:Frame_Spell_Top_0.png|144px|link=]]')
     table.insert(content, '[[File:' .. spell.icon .. '.png|128px|link=|' .. spell.id .. ']]')
-    table.insert(content, ' [[' .. spell.name .. ']]')
+    table.insert(content, '<br>[[' .. spell.name .. ']]')
     addTd(tr, table.concat(content, ''))
 end
 
