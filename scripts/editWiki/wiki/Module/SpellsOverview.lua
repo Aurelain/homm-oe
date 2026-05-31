@@ -287,6 +287,9 @@ local function getPages(forcedSchool)
     for _, row in ipairs(results) do
         hub[row.id] = row.name
     end
+    hub.bonus_magic_astral_summon_1 = 'Summon_Avatar_(Spell)' -- manual redirect
+    hub.bonus_magic_astral_summon_2 = 'Summon_Avatar_(Spell)' -- manual redirect
+    hub.bonus_magic_astral_summon_3 = 'Summon_Avatar_(Spell)' -- manual redirect
     return hub
 end
 
