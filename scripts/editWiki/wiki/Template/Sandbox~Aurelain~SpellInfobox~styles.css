@@ -1,0 +1,49 @@
+.spell-box {
+    border-collapse: collapse;
+    margin: 0 10px 10px 10px;
+    float: left;
+    border: 1px solid #BCB096;
+    width: 310px; /* force a 70+170+70 layout on every device */
+}
+
+.spell-box td {
+    border: 1px solid #BCB096;
+    padding: 5px;
+    text-align: center;
+    vertical-align: top;
+}
+
+.spell-box .band {
+    background: #62410F;
+    padding: 1px;
+}
+
+.spell-box .title {
+    color: #FFFFFF;
+    font-weight: bold;
+}
+
+.spell-box .prop {
+    border: none;
+    width: 70px;
+}
+
+.spell-box .iconCell {
+    border: none;
+    width: 170px;
+}
+
+.spell-box .value {
+    color: #FFFFFF;
+    text-align: left;
+}
+
+.spell-box .value p {
+    color: #FFFFFF;
+    margin: 0;
+}
+
+.spell-box .level {
+    color: #FFFFFF;
+    background: rgba(196, 151, 20, 0.76);
+}

@@ -1,0 +1,85 @@
+<noinclude>{{stub}}
+{{loc}}
+Heavily WIP!
+Draft for what it should look like, but it still needs:
+*gold rings around round icons
+*links where needed
+*faction colour coding
+Spell School Colors (taken from spellbook icon frames): use Center Color or Swatch Color (decide which?) for the header and main colored cells, and use Ring Color for Level 2/3/4 cells
+{|
+!School || Center Color || Swatch Color || Ring Color
+|-
+|Daylight
+|style="background-color:#62410F;"|#62410F
+|style="background-color:#62410F;"|#62410F
+|style="background-color:#C49714C3;"|#C49714C3
+|-
+|Nightshade
+|style="background-color:#461B5B;"|#461B5B
+|style="background-color:#3F1B52;"|#3F1B52
+|style="background-color:#6B3486C3;"|#6B3486C3
+|-
+|Primal
+|style="background-color:#67281B;"|#67281B
+|style="background-color:#67281B;"|#67281B
+|style="background-color:#c40700;"|#C40700C3
+|-
+|Arcane
+|style="background-color:#1C444F;"|#1C444F
+|style="background-color:#1C444F;"|#1C444F
+|style="background-color:#106278C3;"|#106278C3
+|-
+|Neutral
+|style="background-color:#27273D;"|#27273D
+|style="background-color:#383765;"|#383765
+|style="background-color:#2F4AB7C3;"|#2F4AB7C3
+|}
+{|class=infobox style="border-collapse: collapse; border: 1px solid #BCB096; margin:10px;"
+|-colspan=2, style="text-align:center;vertical-align:center;border:collapse;background-color:#62410F;border: 1px solid #BCB096;"
+| colspan=3|<big><b>Haste</b></big>
+|-style="text-align:center;vertical-align:center;"
+|colspan=2|
+{|style="border-collapse:collapse;width:100%;"
+|style="text-align:center;vertical-align:top;width:70px;padding:5px;"|Tier<br><span style="color:white;">IV</span>
+|rowspan=2, style="width:150px;padding:5px;"| [[File:Haste.png|150px|link=]]
+|style="text-align:center;vertical-align:top;width:70px;padding:5px;"|Mana<br><span style="color:white;white-space:nowrap;">99 {{hint|[[File:Mana_icon.png|20px|link=]]|Mana|0}}</span>
+|-style="text-align:center;vertical-align:center;"
+|style="text-align:center;vertical-align:bottom;width:70px;padding:5px;"|School<br>[[File:Daylight icon.png|50px|link=]]<br><span style="color:white;">Daylight Magic
+|style="text-align:center;vertical-align:bottom;width:70px;padding:5px;"|Type<br>[[File:Battle spells.png|50px|link=]]<br><span style="color:white;">Battle Spell
+|}
+|-style="border: 1px solid #BCB096;text-align:center;border: 1px solid #BCB096;background-color:#62410F;"
+| colspan=2| Effect
+|-style="text-align:center;vertical-align:center;"
+| colspan=2, style="color:white;"| Description of effects
+|-style="text-align:center;vertical-align:center;border: 1px solid #BCB096;background-color:#62410F;"
+| colspan=2| Effects at higher levels
+|-style="text-align:center;vertical-align:center;border: 1px solid #BCB096;"
+| colspan=1, style="border: 1px solid #BCB096;background-color:#C49714C3;color:white;width:auto;"| Level 2
+| colspan=1, style="color:white;"| Effects at level 2
+|-style="text-align:center;vertical-align:center;border: 1px solid #BCB096;"
+| colspan=1, style="border: 1px solid #BCB096;background-color:#C49714C3;color:white;width:auto;"| Level 3
+| colspan=1, style="color:white;"| Effects at level 3
+|-style="text-align:center;vertical-align:center;border: 1px solid #BCB096;"
+| colspan=1, style="border: 1px solid #BCB096;background-color:#C49714C3;color:white;width:auto;"| Level 4
+| colspan=1, style="color:white;"| Effects at level 4
+|-style="text-align:center;vertical-align:center;border: 1px solid #BCB096;background-color:#62410F;"
+| colspan=2| Masterful Version
+|-style="text-align:center;vertical-align:center;"
+| colspan=2, style="color:white;"| Effect of masterful version
+|-style="text-align:center;vertical-align:center;border: 1px solid #BCB096;background-color:#62410F;"
+| colspan=2| Specialist Hero
+|-style="text-align:center;vertical-align:center;"
+| colspan=2| <div style="color: white;display:inline-block;margin:4px 8px 4px 8px;vertical-align:top;text-align:center;white-space:normal; max-width:100px">[[File:Mila.png|60px|link=Mila]]<br>[[Zoran, the Self-Founded]]</div> <div style="color: white;display:inline-block;margin:4px 8px 4px 8px;vertical-align:top;text-align:center;white-space:normal; max-width:100px">[[File:Mila.png|60px|link=Mila]]<br>[[Mila]]</div>
+|}
+==Use==
+ <nowiki>{{Template:SpellInfobox
+|name=
+}}</nowiki>
+==Examples==
+{{clear}}
+ <nowiki>{{Template:SpellInfobox
+ |name=
+ |image=
+ |tier=
+ }}</nowiki>
+[[Category:Infobox templates]][[Category:Stubs]]

@@ -1,0 +1,91 @@
+<noinclude>
+<pre><nowiki>
+{{Sandbox/Aurelain/SpellInfobox
+| lang = en
+| name = Haste
+| icon = Haste.png
+| tier = 1
+| mana = 6
+| school = day
+| type = battle
+| effect = Target friendly creature gains +2 Speed. Duration: [ 1 + 1 per every 4 hero’s Spell Power ] round(s).
+| level2 = Speed bonus: 2 > 4.
+| level3 = Dispels “Web”.
+| level4 = Speed bonus: 4 > 6.
+| masterful = Affects all friendly creatures
+}}
+</nowiki></pre>
+</noinclude><!----------------------------------------------------------------------------------><includeonly>
+<templatestyles src="Template:Sandbox/Aurelain/SpellInfobox/styles.css" />
+{| class='spell-box'
+|-
+| class='band title' colspan=3 | <big>Haste</big>
+|-
+| class='prop' | Tier <div class='value'>{{{tier|}}}</div>
+| class='iconCell' rowspan=2 | [[File:Haste.png|150px|link=]]
+| class='prop' | Mana <div class='value'>{{{mana|}}}</div>
+|-
+| class='prop' | School
+    <div class='school-icon day'>[[File:Daylight_icon.png]]</div>
+    <div class='school-icon night'>[[File:Nightshade_icon.png]]</div>
+    <div class='school-icon space'>[[File:Arcane_icon.png]]</div>
+    <div class='value'>{{{school|}}}</div>
+| class='prop' | Type <div class='value'>{{{type|}}}</div>
+|-
+| class='band' colspan=3 | Effect <!--{{Label|name|{{{lang}}}|nolink}}-->
+|-
+| class='value' colspan=3 | {{{effect|}}}
+|-
+| class='band' colspan=3 | Effects at higher levels
+|-
+| class='level'| Level 2
+| class='value' colspan=2 | {{{level2|}}}
+|-
+| class='level'| Level 3
+| class='value' colspan=2 | {{{level3|}}}
+|-
+| class='level'| Level 4
+| class='value' colspan=2 | {{{level4|}}}
+|-
+| class='band' colspan=3 | Masterful Version
+|-
+| class='value' colspan=3 | {{{masterful|}}}
+|}
+
+{|class=infobox style="border-collapse: collapse; border: 1px solid #BCB096; margin:10px;margin-top:0"
+|-colspan=2, style="text-align:center;vertical-align:center;border:collapse;background-color:#62410F;border: 1px solid #BCB096;"
+| colspan=3|<big><b>Haste</b></big>
+|-style="text-align:center;vertical-align:center;"
+|colspan=2|
+{|style="border-collapse:collapse;width:100%;"
+|style="text-align:center;vertical-align:top;width:70px;padding:5px;"|Tier<br><span style="color:white;">IV</span>
+|rowspan=2, style="width:150px;padding:5px;"| [[File:Haste.png|150px|link=]]
+|style="text-align:center;vertical-align:top;width:70px;padding:5px;"|Mana<br><span style="color:white;white-space:nowrap;">99 {{hint|[[File:Mana_icon.png|20px|link=]]|Mana|0}}</span>
+|-style="text-align:center;vertical-align:center;"
+|style="text-align:center;vertical-align:bottom;width:70px;padding:5px;"|School<br>[[File:Daylight icon.png|50px|link=]]<br><span style="color:white;">Daylight Magic
+|style="text-align:center;vertical-align:bottom;width:70px;padding:5px;"|Type<br>[[File:Battle spells.png|50px|link=]]<br><span style="color:white;">Battle Spell
+|}
+|-style="border: 1px solid #BCB096;text-align:center;border: 1px solid #BCB096;background-color:#62410F;"
+| colspan=2| Effect
+|-style="text-align:center;vertical-align:center;"
+| colspan=2, style="color:white;"| Description of effects
+|-style="text-align:center;vertical-align:center;border: 1px solid #BCB096;background-color:#62410F;"
+| colspan=2| Effects at higher levels
+|-style="text-align:center;vertical-align:center;border: 1px solid #BCB096;"
+| colspan=1, style="border: 1px solid #BCB096;background-color:#C49714C3;color:white;width:auto;"| Level 2
+| colspan=1, style="color:white;"| Effects at level 2
+|-style="text-align:center;vertical-align:center;border: 1px solid #BCB096;"
+| colspan=1, style="border: 1px solid #BCB096;background-color:#C49714C3;color:white;width:auto;"| Level 3
+| colspan=1, style="color:white;"| Effects at level 3
+|-style="text-align:center;vertical-align:center;border: 1px solid #BCB096;"
+| colspan=1, style="border: 1px solid #BCB096;background-color:#C49714C3;color:white;width:auto;"| Level 4
+| colspan=1, style="color:white;"| Effects at level 4
+|-style="text-align:center;vertical-align:center;border: 1px solid #BCB096;background-color:#62410F;"
+| colspan=2| Masterful Version
+|-style="text-align:center;vertical-align:center;"
+| colspan=2, style="color:white;"| Effect of masterful version
+|-style="text-align:center;vertical-align:center;border: 1px solid #BCB096;background-color:#62410F;"
+| colspan=2| Specialist Hero
+|-style="text-align:center;vertical-align:center;"
+| colspan=2| <div style="color: white;display:inline-block;margin:4px 8px 4px 8px;vertical-align:top;text-align:center;white-space:normal; max-width:100px">[[File:Mila.png|60px|link=Mila]]<br>[[Zoran, the Self-Founded]]</div> <div style="color: white;display:inline-block;margin:4px 8px 4px 8px;vertical-align:top;text-align:center;white-space:normal; max-width:100px">[[File:Mila.png|60px|link=Mila]]<br>[[Mila]]</div>
+|}</includeonly>

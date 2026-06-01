@@ -1,0 +1,126 @@
+<noinclude>
+{{loc}}
+
+{{Template:HeroInfoBox/base
+| lang=pl
+| id=demon_hero_4
+| name=Zoran, the Self-Founded
+| portrait=Zoran, the Self-Founded.png
+| faction=demon
+| class=might_demon
+| startattack=4
+| startdefense=0
+| startspellpower=2
+| startknowledge=1
+| motto=Waurmos are complex and intelligent creatures, but few of them stoop to finding personhood. This one did.
+}}
+
+<pre><nowiki>
+{{Template:HeroInfoBox/base
+| lang=en
+| id=demon_hero_4
+| name=Zoran, the Self-Founded
+| portrait=Zoran, the Self-Founded.png
+| faction=demon
+| class=might_demon
+| startattack=4
+| startdefense=0
+| startspellpower=2
+| startknowledge=1
+| motto=Waurmos are complex and intelligent creatures, but few of them stoop to finding personhood. This one did.
+}}</nowiki></pre>
+
+
+</noinclude><includeonly>{|class=infobox style='margin:0em 1em 1em 1em;float:right;text-align: center;vertical-align: center; width:25%; border-collapse: collapse; border: 1px solid #BCB096'
+|-style='border-bottom: 1px solid #BCB096; background-color:#1E3758'
+|colspan=2|
+{|style='width:100%;text-align: center;vertical-align: center; border-collapse: collapse;"
+|<span style="font-size: 150%;">{{{name}}}</span>
+|}
+|-style='border-bottom: 1px solid #BCB096'
+|colspan=2|[[File:{{{portrait}}}|300px]]
+
+|-
+|colspan=2 style="color: white;"|''{{{motto}}}''
+
+|-style='border-bottom: 1px solid #BCB096; background-color:#1E3758'
+|style='border: 1px solid #BCB096;width:50%;'|{{Link|type=ui|id=faction|lang={{{lang}}}}}
+|style='border: 1px solid #BCB096;width:50%;'|{{Label|hero_class|{{{lang}}}}}
+|-
+|style='border: 1px solid #BCB096;padding:4px;width:50%;'|{{LinkIcon|type=faction|id={{{faction}}}|suffix=_icon.png|lang={{{lang}}}}}
+|style='border: 1px solid #BCB096;padding:4px;width:50%;'|{{LinkIcon|type=hero_class|id={{{class}}}|suffix=.png|lang={{{lang}}}}}
+|-style='border-bottom: 1px solid #BCB096; background-color:#1E3758'
+|colspan=2|{{Link|type=ui|id=stats|lang={{{lang}}}}}
+|-style='border-bottom: 1px solid #BCB096'
+|colspan=2|
+{|style="gap:8px; justify-content:space-between; align-items:center; width:100%;"
+|style="color:white;text-align:center; width:25%;"|{{StatDisplay|id=offence|stat={{{startattack}}}|lang={{{lang}}}}}
+|style="color:white;text-align:center; width:25%;"|{{StatDisplay|id=defence|stat={{{startdefense}}}|lang={{{lang}}}}}
+|style="color:white;text-align:center; width:25%;"|{{StatDisplay|id=spellPower|stat={{{startspellpower}}}|lang={{{lang}}}}}
+|style="color:white;text-align:center; width:25%;"|{{StatDisplay|id=intelligence|stat={{{startknowledge}}}|lang={{{lang}}}}}
+|}
+|-style='border-bottom: 1px solid #BCB096; background-color:#1E3758'
+|colspan=2, style="border: 1px solid #BCB096;"|{{Link|type=ui|id=starting_skills|link=Skills|lang={{{lang}}}}}
+|-colspan=2, style='text-align: center;vertical-align: center;'
+|colspan=2|
+{{#cargo_query:tables=Hero=H, Hero__start_skills=S, Hero__start_skill_levels=L
+| join on=H._rowID=S._rowID, S._rowID=L._rowID, S._position=L._position
+| fields= S._value=id, L._value=level, CONCAT('{{{lang|en}}}') = lang
+| where=H.id='{{{id|}}}'
+| order by=S._position
+| format=template
+| template=SkillDisplay
+| named args= yes
+| delimiter=\n\n
+}}
+
+|-style="border-bottom: 1px solid #BCB096;border-top: 1px solid #BCB096; background-color:#1E3758"
+|colspan=2|{{Link|type=ui|id=starting_spells|link=Spells|lang={{{lang}}}}}
+|-style='border-bottom: 1px solid #BCB096'
+|colspan=2, style='color: white;border: 1px solid #BCB096; padding:4px;'|
+{{#cargo_query:tables=Hero=H, Hero__start_magics=S
+| join on=H._rowID=S._rowID
+| fields= S._value=id, CONCAT('{{{lang|en}}}') = lang
+| where=H.id='{{{id|}}}'
+| format=template
+| template=SpellDisplay
+| named args= yes
+| delimiter=\n\n
+}}
+
+|-style='border-bottom: 1px solid #BCB096; background-color:#1E3758'
+|colspan=2|{{Link|type=ui|id=starting_army|lang={{{lang}}}|nolink}}
+|-style='border-bottom: 1px solid #BCB096'
+|colspan=2|
+{|<div style="text-align:center;">
+|style="width:25%;"|
+{{#cargo_query:
+ tables  = Hero=H, HeroStartSquad=HSS, Unit=U,
+           Translation=unit_t, Translation=unit_en
+|join on = H.id         = HSS.hero_id, 
+           HSS.unit_id  = U.id,
+           U.id         = unit_t.target_id,
+           U.id         = unit_en.target_id
+|where   = H.id = '{{{id|}}}'
+           AND HSS.variant     = 'primary'
+           AND unit_t.type     = 'unit'       AND unit_t.language    = '{{{lang|en}}}'
+           AND unit_en.type    = 'unit'       AND unit_en.language   = 'en'
+|fields  = unit_t.name                          = name,
+           unit_en.name                         = pagelink,
+           CONCAT(unit_en.name, '_icon')        = filename,
+           IF(HSS.min = HSS.max, HSS.min, 
+               CONCAT(HSS.min, " - ", HSS.max)) = text
+|order by= HSS.slot
+|format  = template
+|template= MediumIconThumbDisplay
+|named args = yes
+}}
+</div>
+|}
+
+|-style='border-bottom: 1px solid #BCB096; background-color:#1E3758'
+|colspan=2|{{Label|internal_id|{{{lang}}}|nolink}}
+|-
+|colspan=2 |{{{id}}}
+
+|}</includeonly>
