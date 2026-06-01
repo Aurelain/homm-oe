@@ -82,21 +82,6 @@ local function dump(target)
 end
 
 ------------------------------------------------------------------------------------------------------------------------
--- Detects the current language from the URL
-------------------------------------------------------------------------------------------------------------------------
-local function getCurrentLang()
-    local title = mw.title.getCurrentTitle()
-    local segments = mw.text.split(title.text, '/')
-    for i = #segments, 2, -1 do
-        local segment = mw.ustring.lower(segments[i])
-        if mw.language.isSupportedLanguage(segment) then
-            return segment
-        end
-    end
-    return 'en'
-end
-
-------------------------------------------------------------------------------------------------------------------------
 -- Retrieves the text for some specific ids from Cargo Translations.
 ------------------------------------------------------------------------------------------------------------------------
 local function translateIds(ids, lang, extra)
@@ -453,8 +438,8 @@ end
 --
 ------------------------------------------------------------------------------------------------------------------------
 local function createBody(htmlTable, spells, words, pages, suffix, frame)
-    local currentRank = spells[1].rank
-    local currentSchool = spells[1].school
+    local currentRank = #spells > 0 and spells[1].rank
+    local currentSchool = #spells > 0 and spells[1].school
     for _, u in ipairs(spells) do
         local schoolName = words[u.school]
 
@@ -486,11 +471,12 @@ end
 function p.display(frame)
     -- Args
     local args = frame.args
-    local forcedSchool = mw.text.trim(args[1] or args.school or '')
+    local forcedSchool = mw.text.trim(args.school or '')
     forcedSchool = SCHOOL_MAPPING[forcedSchool] or nil
+    local lang = mw.text.trim(args.lang or '')
+    lang = lang ~= '' and lang or 'en'
 
     -- Language
-    local lang = getCurrentLang()
     local suffix = lang ~= 'en' and '/' .. lang or ''
     local words = translateIds(TRANSLATION_IDS, lang)
     addSchoolWords(words, lang, suffix)
