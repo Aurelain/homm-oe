@@ -1,6 +1,10 @@
 -- Usage: {{#invoke:SkillsOverview|display|lang=en}}
 local p = {}
-
+local ICONS = {
+    '',
+    'Advanced_',
+    'Expert_',
+}
 ------------------------------------------------------------------------------------------------------------------------
 -- Debugs a variable
 ------------------------------------------------------------------------------------------------------------------------
@@ -26,7 +30,6 @@ local function queryMain(lang, forcedSkill)
     end
     table.insert(where, 'Skill.variant = "production"')
     table.insert(where, 'Translation.language = "' .. lang .. '"')
-    table.insert(where, 'Translation.variant IS NOT NULL')
 
     -- query:
     return mw.ext.cargo.query('Skill, Translation', table.concat(fields, ','), {
@@ -97,31 +100,36 @@ local function consolidateSkills(main, iconAndOffers, subs)
     local hub = {}
     for _, row in ipairs(main) do
         local id = row.id
-        hub[id] = hub[id] or {}
+        local variant = row.variant
+        hub[id] = hub[id] or { ranks = {} }
         local entry = hub[id]
-        entry[row.variant] = {
-            name = row.name or '',
-            description = row.description or '',
-        }
+        if variant then
+            entry.ranks[tonumber(variant)] = {
+                name = row.name or '',
+                description = row.description or '',
+            }
+        else
+            entry.name = row.name
+        end
     end
     for _, row in ipairs(iconAndOffers) do
         local id = row.id
-        local entry = hub[id] or {}
-        local about = entry[row.level] or {}
-        about.icon = row.icon or ''
+        local entry = hub[id] or { ranks = {} }
+        local rank = entry.ranks[tonumber(row.level)] or {}
+        rank.icon = row.icon or ''
         local csv = row.offered_sub_skills
         local ids = csv and mw.text.split(csv, ',') or {}
-        about.subSkills = {}
+        rank.subSkills = {}
         for _, subId in ipairs(ids) do
-            about.subSkills[subId] = {}
+            rank.subSkills[subId] = {}
         end
     end
     for _, row in ipairs(subs) do
         local id = row.id
         local parentId = row.parent_skill_id
-        local entry = hub[parentId] or {}
-        for _, about in pairs(entry) do
-            local subSkills = about.subSkills or {}
+        local entry = hub[parentId] or { ranks = {} }
+        for _, rank in ipairs(entry.ranks) do
+            local subSkills = rank.subSkills or {}
             if subSkills[id] then
                 subSkills[id].icon = row.icon
                 subSkills[id].name = row.name
@@ -134,16 +142,47 @@ local function consolidateSkills(main, iconAndOffers, subs)
 end
 
 ------------------------------------------------------------------------------------------------------------------------
--- Displays the content
+-- Displays a single skill (icon+name+description)
+------------------------------------------------------------------------------------------------------------------------
+local function wrapQuotes(str)
+    if not str then return nil end
+    --local result = string.gsub(str, '"([^"]+)"', '[[%1]]')
+    local result = string.gsub(str, "“_*(.-)_*”", "[[%1]]")
+    return result
+end
+
+------------------------------------------------------------------------------------------------------------------------
+-- Displays a single skill (icon+name+description)
+------------------------------------------------------------------------------------------------------------------------
+local function createSkill(target, size)
+    local root = mw.html.create('div'):addClass('box')
+    root:tag('div'):addClass('icon-container'):wikitext('[[File:' .. target.icon .. '.png|' .. size .. 'px]]')
+    local textContainer = root:tag('div'):addClass('text-container')
+    textContainer:tag('div'):addClass('box-name'):wikitext('<b>' .. target.name .. '</b>')
+    textContainer:tag('div'):addClass('box-description'):wikitext(wrapQuotes(target.description))
+    return root
+end
+
+------------------------------------------------------------------------------------------------------------------------
+-- Displays the main content
 ------------------------------------------------------------------------------------------------------------------------
 local function renderSkills(skills)
     local root = mw.html.create()
-    for id, groupData in pairs(skills) do
-        local group = mw.html.create('div'):addClass('group'):wikitext(id)
-        root:node(group)
-        for _, skillData in pairs(groupData) do
-            local skill = mw.html.create('div'):addClass('skill'):wikitext(skillData.name)
-            group:node(skill)
+    for id, group in pairs(skills) do
+        --root:tag('h2'):addClass('group'):wikitext(group.name)
+
+        local ranks = group.ranks or {}
+        for n, rank in ipairs(ranks) do
+
+            root:node(createSkill(rank, 64))
+
+            local sub = root:tag('div'):addClass('sub')
+
+            local subSkills = rank.subSkills or {}
+            for _, subSkill in pairs(subSkills) do
+
+                sub:node(createSkill(subSkill, 32))
+            end
         end
     end
     return tostring(root)
@@ -167,6 +206,20 @@ function p.display(frame)
     local subs = querySubs(lang, skill)
     local skills = consolidateSkills(main, iconAndOffers, subs)
 
+    skills.skill_assault.ranks[1].icon = 'Skill_Offence'
+    skills.skill_assault.ranks[2].icon = 'Skill_Advanced_Offence'
+    skills.skill_assault.ranks[2].subSkills.sub_skill_assault_2.icon = 'Offense_sub_archery'
+    skills.skill_assault.ranks[2].subSkills.sub_skill_assault_3.icon = 'Offense_sub_battle_march'
+    skills.skill_assault.ranks[2].subSkills.sub_skill_assault_6.icon = 'Offense_sub_battle_frenzy'
+    skills.skill_assault.ranks[3].icon = 'Skill_Expert_Offence'
+    skills.skill_assault.ranks[3].subSkills.sub_skill_assault_1.icon = 'Offense_sub_shadow_blades'
+    skills.skill_assault.ranks[3].subSkills.sub_skill_assault_4.icon = 'Offense_sub_reality_wardens'
+    skills.skill_assault.ranks[3].subSkills.sub_skill_assault_5.icon = 'Defense_sub_firmness'
+
+    local t = skills.skill_assault.ranks[3].subSkills.sub_skill_assault_4.description
+    skills.skill_assault.ranks[3].subSkills.sub_skill_assault_4.description = string.gsub(t, ".”", "”.")
+    t = skills.skill_assault.ranks[2].subSkills.sub_skill_assault_3.description
+    skills.skill_assault.ranks[2].subSkills.sub_skill_assault_3.description = string.gsub(t, ".”", "”.")
     -- Table
     local markup = renderSkills(skills)
 

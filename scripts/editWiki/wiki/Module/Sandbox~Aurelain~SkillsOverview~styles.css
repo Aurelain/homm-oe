@@ -1,3 +1,37 @@
-.main {
-    color:red;
+.group {
+    background: #101622;
+    padding: 16px;
+    border-top: solid 2px #c8b36c;
+    font-size: x-large;
+    border-bottom: solid 1px #45494e !important;
+}
+
+.group::after {
+    content: none !important;
+}
+
+.rank {
+    margin-top: 16px;
+}
+
+.sub {
+    margin-left: 96px;
+}
+
+.box {
+    display: flex;
+    margin-top: 16px;
+}
+
+.box:first-child {
+    margin-top: 0;
+}
+
+.icon-container {
+    flex-shrink: 0;
+}
+
+.text-container {
+    padding-left: 8px;
+    flex-grow: 1;
 }
