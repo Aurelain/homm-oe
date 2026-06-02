@@ -31,6 +31,7 @@
 .spell-box .iconCell {
     border: none;
     width: 170px;
+    vertical-align: middle;
 }
 
 .spell-box .value {
@@ -46,4 +47,16 @@
 .spell-box .level {
     color: #FFFFFF;
     background: rgba(196, 151, 20, 0.76);
+}
+
+.school-value {
+    display: none;
+}
+
+.school-day .day {
+    display: block;
+}
+
+.school-night .night {
+    display: block;
 }
