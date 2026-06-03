@@ -76,10 +76,10 @@ local ORDER = {
 
 -- Note: The right side is just a fallback, it will seldom be used.
 local TRANSLATION_IDS = {
-    wiki_skills_might = 'Might Skills⚠️',
-    wiki_skills_magic = 'Magic Skills⚠️',
-    wiki_skills_general = 'General Skills⚠️',
-    wiki_skills_faction = 'Faction Skills⚠️',
+    wiki_skills_might = 'Might Skills',
+    wiki_skills_magic = 'Magic Skills',
+    wiki_skills_general = 'General Skills',
+    wiki_skills_faction = 'Faction Skills',
 }
 ------------------------------------------------------------------------------------------------------------------------
 -- Debugs a variable
@@ -125,10 +125,11 @@ local function translateIds(ids, lang, extra)
 
     -- Dictionary
     local dictionary = mw.clone(ids)
-    if results then
-        for _, row in ipairs(results) do
-            dictionary[row['target_id']] = row['name']
-        end
+    for key, value in pairs(dictionary) do
+        dictionary[key] = value .. '[[Data:WikiTranslations/' .. lang .. '#' .. key .. '|💬]]'
+    end
+    for _, row in ipairs(results) do
+        dictionary[row['target_id']] = row['name']
     end
     return dictionary
 end
@@ -392,11 +393,7 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 function p.display(frame)
     --if 1 then
-    --    local text =
-    --    "<i>All who fall in battle do so in the hero’s name!</i> Whenever a friendly creature dies or kills an enemy, the hero’s Attack, Defense, Spell Power and Knowledge increase by {0} for one round. This effect is stackable."
-    --    text = repairPunctuation(text)
-    --    text = replaceQuotesWithLinks(text)
-    --    return text
+    --    return dump(frame)
     --end
 
     -- Args
