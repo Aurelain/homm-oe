@@ -7,15 +7,10 @@ import sleep from '../utils/sleep.js';
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
+// const DRY_RUN = true;
+const DRY_RUN = false;
+
 const UPLOAD_SRC_DIR = import.meta.dirname + '/upload';
-const SCHOOLS = {
-    day: 'Daylight',
-    night: 'Nightshade',
-    space: 'Arcane',
-    primal: 'Primal',
-    neutral: 'Neutral',
-    bonus: 'Neutral',
-};
 
 // =====================================================================================================================
 //  P U B L I C
@@ -32,16 +27,18 @@ async function uploadFiles() {
         console.log('No files found to upload.');
         return;
     }
+    files.sort();
 
     console.log(`🚀 Found ${files.length} files to upload. Fetching CSRF Token...`);
-    const csrfToken = await getCsrfToken();
+    const csrfToken = DRY_RUN ? null : await getCsrfToken();
 
     for (let i = 0; i < files.length; i++) {
         const fileName = files[i];
         const localPath = path.join(UPLOAD_SRC_DIR, fileName);
         const wikiFilename = fileName.replace(/_/g, ' ');
 
-        console.log(`   [${i + 1}/${files.length}] Uploading: ${wikiFilename}...`);
+        const action = DRY_RUN ? 'Testing' : 'Uploading';
+        console.log(`   [${i + 1}/${files.length}] ${action}: ${wikiFilename}...`);
 
         try {
             const fileBuffer = fs.readFileSync(localPath);
@@ -53,14 +50,17 @@ async function uploadFiles() {
             formData.append('filename', wikiFilename);
             formData.append('token', csrfToken);
             formData.append('file', fileBlob, wikiFilename); // Key must be named 'file'
-            formData.append('ignorewarnings', '1'); // Overwrites file if it already exists
+            //formData.append('ignorewarnings', '1'); // Overwrites file if it already exists
             formData.append('format', 'json');
 
             // Text
-            const school = wikiFilename.split(' ')[0];
-            const text = `[[Category:Spell Icons]] [[Category:${SCHOOLS[school]} Spell Icons]]`;
+            const text = getCategories(wikiFilename);
             formData.append('text', text);
             formData.append('comment', text);
+            if (DRY_RUN) {
+                console.log(text);
+                continue;
+            }
 
             const result = await requestFromApi({}, 'POST', formData);
 
@@ -81,6 +81,18 @@ async function uploadFiles() {
     console.log('\n🏁 Mass upload operation finalized.');
 }
 
+// =====================================================================================================================
+//  P R I V A T E
+// =====================================================================================================================
+/**
+ *
+ */
+function getCategories(fileName) {
+    const categories = [];
+    categories.push('Sub-skill Icons');
+    const clothed = categories.map((category) => `[[Category:${category}]]`);
+    return clothed.join(' ');
+}
 // =====================================================================================================================
 //  R U N
 // =====================================================================================================================
