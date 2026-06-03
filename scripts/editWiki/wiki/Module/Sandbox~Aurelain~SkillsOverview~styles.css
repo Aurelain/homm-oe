@@ -1,21 +1,27 @@
-.group {
-    background: #101622;
+.category {
     padding: 16px;
-    border-top: solid 2px #c8b36c;
-    font-size: x-large;
-    border-bottom: solid 1px #45494e !important;
+    border-bottom: solid 3px #c8b36c !important;
+    text-align: center;
 }
 
-.group::after {
-    content: none !important;
+.category::after {
+    content: none !important; /* remove the line added by the skin */
 }
 
-.rank {
-    margin-top: 16px;
+.group {
+    border-bottom: solid 1px #cbced1;
 }
 
 .sub {
     margin-left: 96px;
+}
+
+.rank + .sub {
+    margin-top: 0;
+}
+
+.sub + .rank {
+    margin-top: 32px;
 }
 
 .box {
@@ -37,9 +43,9 @@
 }
 
 .toctitle {
-    padding: 4px 8px;
+    padding: 4px 8px; /* fix mistakes in the skin */
 }
 
 .toc > ul {
-    padding-left: 8px;
+    padding: 4px 8px; /* fix mistakes in the skin */
 }

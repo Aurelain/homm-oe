@@ -1,9 +1,11 @@
 -- Usage: {{#invoke:SkillsOverview|display|lang=en}}
 local p = {}
-local CATEGORY_MIGHT = 1
-local CATEGORY_MAGIC = 2
-local CATEGORY_GENERAL = 3
-local CATEGORY_FACTION = 4
+
+local CATEGORY_MIGHT = 'wiki_skills_might'
+local CATEGORY_MAGIC = 'wiki_skills_magic'
+local CATEGORY_GENERAL = 'wiki_skills_general'
+local CATEGORY_FACTION = 'wiki_skills_faction'
+
 local CATEGORIES = {
     skill_assault = CATEGORY_MIGHT,            -- Offense
     skill_battle_artistry = CATEGORY_MIGHT,    -- Combat
@@ -37,6 +39,7 @@ local CATEGORIES = {
     skill_trainer = CATEGORY_MIGHT,            -- Recruitment
     skill_wisdom = CATEGORY_MAGIC,             -- Thaumaturgy
 }
+
 local ORDER = {
     'skill_assault',          -- Offense
     'skill_protection',       -- Defense
@@ -71,11 +74,63 @@ local ORDER = {
     'skill_first_aid',        -- currently unused!
 }
 
+-- Note: The right side is just a fallback, it will seldom be used.
+local TRANSLATION_IDS = {
+    wiki_skills_might = 'Might Skills⚠️',
+    wiki_skills_magic = 'Magic Skills⚠️',
+    wiki_skills_general = 'General Skills⚠️',
+    wiki_skills_faction = 'Faction Skills⚠️',
+}
 ------------------------------------------------------------------------------------------------------------------------
 -- Debugs a variable
 ------------------------------------------------------------------------------------------------------------------------
 local function dump(target)
     return '<pre>' .. mw.dumpObject(target) .. '</pre>'
+end
+
+------------------------------------------------------------------------------------------------------------------------
+-- Searches by id for an item in array
+------------------------------------------------------------------------------------------------------------------------
+local function findInArray(list, id)
+    for _, item in ipairs(list) do
+        if item and item.id == id then
+            return item
+        end
+    end
+    return nil
+end
+
+------------------------------------------------------------------------------------------------------------------------
+-- Retrieves the text for some specific ids from Cargo Translations.
+------------------------------------------------------------------------------------------------------------------------
+local function translateIds(ids, lang, extra)
+    -- Key list
+    local list = {}
+    for key, _ in pairs(ids) do
+        list[#list + 1] = key
+    end
+    local idListString = '"' .. table.concat(list, '", "') .. '"'
+
+    -- Cargo
+    local where = {}
+    table.insert(where, 'target_id IN (' .. idListString .. ')')
+    table.insert(where, 'language = "' .. lang .. '"')
+    if extra then
+        table.insert(where, extra)
+    end
+    local results = mw.ext.cargo.query('Translation', 'target_id, name', {
+        where = table.concat(where, ' AND '),
+        limit = 100
+    })
+
+    -- Dictionary
+    local dictionary = mw.clone(ids)
+    if results then
+        for _, row in ipairs(results) do
+            dictionary[row['target_id']] = row['name']
+        end
+    end
+    return dictionary
 end
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -187,7 +242,9 @@ local function consolidateSkills(main, iconAndOffers, subs)
         local ids = csv and mw.text.split(csv, ',') or {}
         rank.subSkills = {}
         for _, subId in ipairs(ids) do
-            rank.subSkills[subId] = {}
+            table.insert(rank.subSkills, {
+                id = subId
+            })
         end
     end
     for _, row in ipairs(subs) do
@@ -196,10 +253,11 @@ local function consolidateSkills(main, iconAndOffers, subs)
         local entry = hub[parentId] or { ranks = {} }
         for _, rank in ipairs(entry.ranks) do
             local subSkills = rank.subSkills or {}
-            if subSkills[id] then
-                subSkills[id].icon = row.icon
-                subSkills[id].name = row.name
-                subSkills[id].description = row.description
+            local subSkill = findInArray(subSkills, id)
+            if subSkill then
+                subSkill.icon = row.icon
+                subSkill.name = row.name
+                subSkill.description = row.description
                 break
             end
         end
@@ -245,30 +303,64 @@ local function compareSkills(a, b)
 end
 
 ------------------------------------------------------------------------------------------------------------------------
---
+-- Moves punctuation outside the quotes
 ------------------------------------------------------------------------------------------------------------------------
-local function wrapQuotes(str)
-    if not str then return nil end
-    local result = string.gsub(str, "“_*(.-)_*”", "[[%1]]")
-    return result
+local function repairPunctuation(text)
+    local allQuotes = [=["„“”‘’«»「」『』]=]
+    local punctuation = "%,%.%!%?"
+    local pattern = "([" .. punctuation .. "])([" .. allQuotes .. "])"
+    text = mw.ustring.gsub(text, pattern, "%2%1")
+    return text
+end
+
+------------------------------------------------------------------------------------------------------------------------
+-- Converts quoted text into wiki links
+------------------------------------------------------------------------------------------------------------------------
+local function replaceQuotesWithLinks(text, lang)
+    local allQuotes = [=["„“”«»「」『』]=]
+    local pattern = "([" .. allQuotes .. "])([^" .. allQuotes .. "]+)([" .. allQuotes .. "])"
+    text = mw.ustring.gsub(text, pattern, "[[%2]]")
+
+    local quotePairs = {
+        { '‘', '’' }, -- English "smart" single quotes
+    }
+    if lang == 'ko' then
+        table.insert(quotePairs, { "'", "'" }) -- we're checking for single quotes only in Korean
+    end
+    for _, pair in ipairs(quotePairs) do
+        local openQuote = pair[1]
+        local closeQuote = pair[2]
+        local pairedPattern = openQuote .. "([^" .. closeQuote .. "]+)" .. closeQuote
+        text = mw.ustring.gsub(text, pairedPattern, "[[%1]]")
+    end
+
+    return text
 end
 
 ------------------------------------------------------------------------------------------------------------------------
 -- Displays a single skill (icon+name+description)
 ------------------------------------------------------------------------------------------------------------------------
-local function createSkill(target, size)
-    local root = mw.html.create('div'):addClass('box')
+local function createSkill(target, class, size, lang)
+    local root = mw.html.create('div'):addClass('box'):addClass(class)
     root:tag('div'):addClass('icon-container'):wikitext('[[File:' .. target.icon .. '.png|' .. size .. 'px]]')
     local textContainer = root:tag('div'):addClass('text-container')
     textContainer:tag('div'):addClass('box-name'):wikitext('<b>' .. target.name .. '</b>')
-    textContainer:tag('div'):addClass('box-description'):wikitext(wrapQuotes(target.description))
+
+    -- Description:
+    local description = target.description
+    --description = hideTags(description)
+    description = repairPunctuation(description)
+    description = replaceQuotesWithLinks(description, lang)
+    --description = restoreTags(description)
+    textContainer:tag('div'):addClass('box-description'):wikitext(description)
+
     return root
 end
 
 ------------------------------------------------------------------------------------------------------------------------
 -- Displays the main content
 ------------------------------------------------------------------------------------------------------------------------
-local function renderSkills(skills)
+local function renderSkills(skills, words, lang)
     local root = mw.html.create()
     local currentCategory = nil
     for _, group in pairs(skills) do
@@ -277,20 +369,18 @@ local function renderSkills(skills)
         local category = CATEGORIES[id]
         if category and category ~= currentCategory then
             currentCategory = category
-            root:tag('h2'):wikitext(currentCategory)
+            root:tag('h2'):addClass('category'):wikitext(words[category])
         end
 
         local ranks = group.ranks or {}
-        root:tag('h3'):addClass(''):wikitext('[[' .. group.name .. ']]')
+        root:tag('h3'):addClass('group'):wikitext('[[' .. group.name .. ']]')
 
-        for n, rank in ipairs(ranks) do
-            root:node(createSkill(rank, 64))
-
-            local sub = root:tag('div'):addClass('sub')
+        for _, rank in ipairs(ranks) do
+            root:node(createSkill(rank, 'rank', 64, lang))
 
             local subSkills = rank.subSkills or {}
             for _, subSkill in pairs(subSkills) do
-                sub:node(createSkill(subSkill, 32))
+                root:node(createSkill(subSkill, 'sub', 32, lang))
             end
         end
     end
@@ -301,10 +391,21 @@ end
 -- Main public function
 ------------------------------------------------------------------------------------------------------------------------
 function p.display(frame)
+    --if 1 then
+    --    local text =
+    --    "<i>All who fall in battle do so in the hero’s name!</i> Whenever a friendly creature dies or kills an enemy, the hero’s Attack, Defense, Spell Power and Knowledge increase by {0} for one round. This effect is stackable."
+    --    text = repairPunctuation(text)
+    --    text = replaceQuotesWithLinks(text)
+    --    return text
+    --end
+
     -- Args
     local args = frame.args
     local lang = args.lang or 'en'
     local skill = args.skill
+
+    -- Language
+    local words = translateIds(TRANSLATION_IDS, lang)
 
     -- Cargo
     local main = queryMain(lang, skill)
@@ -320,7 +421,7 @@ function p.display(frame)
     table.sort(skills, compareSkills)
 
     -- Content
-    local markup = renderSkills(skills)
+    local markup = renderSkills(skills, words, lang)
 
     -- Output
     local styleTag = frame:extensionTag('templatestyles', '', { src = frame:getTitle() .. '/styles.css' })
