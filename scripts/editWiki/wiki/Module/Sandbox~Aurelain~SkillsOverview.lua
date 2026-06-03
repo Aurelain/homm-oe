@@ -1,10 +1,76 @@
 -- Usage: {{#invoke:SkillsOverview|display|lang=en}}
 local p = {}
-local ICONS = {
-    '',
-    'Advanced_',
-    'Expert_',
+local CATEGORY_MIGHT = 1
+local CATEGORY_MAGIC = 2
+local CATEGORY_GENERAL = 3
+local CATEGORY_FACTION = 4
+local CATEGORIES = {
+    skill_assault = CATEGORY_MIGHT,            -- Offense
+    skill_battle_artistry = CATEGORY_MIGHT,    -- Combat
+    skill_battlemage = CATEGORY_MAGIC,         -- Battle Magic
+    skill_diplomacy = CATEGORY_GENERAL,        -- Diplomacy
+    skill_economy = CATEGORY_GENERAL,          -- Economy
+    skill_enlightenment = CATEGORY_GENERAL,    -- Insight
+    skill_faction_demons = CATEGORY_FACTION,   -- Hive
+    skill_faction_dungeon = CATEGORY_FACTION,  -- Dungeon
+    skill_faction_humans = CATEGORY_FACTION,   -- Temple
+    skill_faction_nature = CATEGORY_FACTION,   -- Grove
+    skill_faction_undead = CATEGORY_FACTION,   -- Necropolis
+    skill_faction_unfrozen = CATEGORY_FACTION, -- Schism
+    skill_first_aid = CATEGORY_GENERAL,        -- currently unused!
+    skill_formation = CATEGORY_MIGHT,          -- Battlecraft
+    skill_leadership = CATEGORY_MIGHT,         -- Leadership
+    skill_logistic = CATEGORY_GENERAL,         -- Logistics
+    skill_luck = CATEGORY_MIGHT,               -- Luck
+    skill_magic_day = CATEGORY_MAGIC,          -- Daylight
+    skill_magic_night = CATEGORY_MAGIC,        -- Nightshade
+    skill_magic_primal = CATEGORY_MAGIC,       -- Primal
+    skill_magic_space = CATEGORY_MAGIC,        -- Arcane
+    skill_mastery = CATEGORY_MAGIC,            -- Wisdom
+    skill_protection = CATEGORY_MIGHT,         -- Defense
+    skill_resistance = CATEGORY_MIGHT,         -- Resistance
+    skill_scouting = CATEGORY_GENERAL,         -- Scouting
+    skill_siege = CATEGORY_MIGHT,              -- Siegecraft
+    skill_sorcery = CATEGORY_MAGIC,            -- Sorcery
+    skill_summoner = CATEGORY_MAGIC,           -- Summon Avatar
+    skill_tactics = CATEGORY_MIGHT,            -- Tactics
+    skill_trainer = CATEGORY_MIGHT,            -- Recruitment
+    skill_wisdom = CATEGORY_MAGIC,             -- Thaumaturgy
 }
+local ORDER = {
+    'skill_assault',          -- Offense
+    'skill_protection',       -- Defense
+    'skill_leadership',       -- Leadership
+    'skill_luck',             -- Luck
+    'skill_resistance',       -- Resistance
+    'skill_tactics',          -- Tactics
+    'skill_formation',        -- Battlecraft
+    'skill_siege',            -- Siegecraft
+    'skill_trainer',          -- Recruitment
+    'skill_battle_artistry',  -- Combat
+    'skill_battlemage',       -- Battle Magic
+    'skill_sorcery',          -- Sorcery
+    'skill_summoner',         -- Summon Avatar
+    'skill_mastery',          -- Wisdom
+    'skill_magic_day',        -- Daylight
+    'skill_magic_night',      -- Nightshade
+    'skill_magic_space',      -- Arcane
+    'skill_magic_primal',     -- Primal
+    'skill_wisdom',           -- Thaumaturgy
+    'skill_diplomacy',        -- Diplomacy
+    'skill_logistic',         -- Logistics
+    'skill_scouting',         -- Scouting
+    'skill_enlightenment',    -- Insight
+    'skill_economy',          -- Economy
+    'skill_faction_humans',   -- Temple
+    'skill_faction_undead',   -- Necropolis
+    'skill_faction_nature',   -- Grove
+    'skill_faction_demons',   -- Hive
+    'skill_faction_unfrozen', -- Schism
+    'skill_faction_dungeon',  -- Dungeon
+    'skill_first_aid',        -- currently unused!
+}
+
 ------------------------------------------------------------------------------------------------------------------------
 -- Debugs a variable
 ------------------------------------------------------------------------------------------------------------------------
@@ -101,7 +167,7 @@ local function consolidateSkills(main, iconAndOffers, subs)
     for _, row in ipairs(main) do
         local id = row.id
         local variant = row.variant
-        hub[id] = hub[id] or { ranks = {} }
+        hub[id] = hub[id] or { id = id, ranks = {} }
         local entry = hub[id]
         if variant then
             entry.ranks[tonumber(variant)] = {
@@ -142,11 +208,47 @@ local function consolidateSkills(main, iconAndOffers, subs)
 end
 
 ------------------------------------------------------------------------------------------------------------------------
--- Displays a single skill (icon+name+description)
+-- Converts a dictionary into a linear array
+------------------------------------------------------------------------------------------------------------------------
+local function flatten(hub)
+    local list = {}
+    for _, entry in pairs(hub) do
+        list[#list + 1] = entry
+    end
+    return list
+end
+
+------------------------------------------------------------------------------------------------------------------------
+-- Converts an array into a dictionary, where the array.value becomes dic.key and array.index becomes dic.value
+------------------------------------------------------------------------------------------------------------------------
+local function flipArray(array)
+    local dic = {}
+    for index, value in ipairs(array) do
+        dic[value] = index
+    end
+    return dic
+end
+local ID_TO_ORDER = flipArray(ORDER)
+
+------------------------------------------------------------------------------------------------------------------------
+-- Decides the order between two skills.
+------------------------------------------------------------------------------------------------------------------------
+local function compareSkills(a, b)
+    local rankA = ID_TO_ORDER[a.id] or 99
+    local rankB = ID_TO_ORDER[b.id] or 99
+
+    if rankA ~= rankB then
+        return rankA < rankB
+    end
+
+    return a.name < b.name
+end
+
+------------------------------------------------------------------------------------------------------------------------
+--
 ------------------------------------------------------------------------------------------------------------------------
 local function wrapQuotes(str)
     if not str then return nil end
-    --local result = string.gsub(str, '"([^"]+)"', '[[%1]]')
     local result = string.gsub(str, "“_*(.-)_*”", "[[%1]]")
     return result
 end
@@ -168,19 +270,26 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 local function renderSkills(skills)
     local root = mw.html.create()
-    for id, group in pairs(skills) do
-        --root:tag('h2'):addClass('group'):wikitext(group.name)
+    local currentCategory = nil
+    for _, group in pairs(skills) do
+        local id = group.id
+
+        local category = CATEGORIES[id]
+        if category and category ~= currentCategory then
+            currentCategory = category
+            root:tag('h2'):wikitext(currentCategory)
+        end
 
         local ranks = group.ranks or {}
-        for n, rank in ipairs(ranks) do
+        root:tag('h3'):addClass(''):wikitext('[[' .. group.name .. ']]')
 
+        for n, rank in ipairs(ranks) do
             root:node(createSkill(rank, 64))
 
             local sub = root:tag('div'):addClass('sub')
 
             local subSkills = rank.subSkills or {}
             for _, subSkill in pairs(subSkills) do
-
                 sub:node(createSkill(subSkill, 32))
             end
         end
@@ -200,27 +309,17 @@ function p.display(frame)
     -- Cargo
     local main = queryMain(lang, skill)
     if #main == 0 then
-        return 'Cannot find skill "' .. skill .. '"'
+        return 'No skills found!'
     end
     local iconAndOffers = queryIconAndOffers(skill)
     local subs = querySubs(lang, skill)
-    local skills = consolidateSkills(main, iconAndOffers, subs)
+    local hub = consolidateSkills(main, iconAndOffers, subs)
+    local skills = flatten(hub);
 
-    skills.skill_assault.ranks[1].icon = 'Skill_Offence'
-    skills.skill_assault.ranks[2].icon = 'Skill_Advanced_Offence'
-    skills.skill_assault.ranks[2].subSkills.sub_skill_assault_2.icon = 'Offense_sub_archery'
-    skills.skill_assault.ranks[2].subSkills.sub_skill_assault_3.icon = 'Offense_sub_battle_march'
-    skills.skill_assault.ranks[2].subSkills.sub_skill_assault_6.icon = 'Offense_sub_battle_frenzy'
-    skills.skill_assault.ranks[3].icon = 'Skill_Expert_Offence'
-    skills.skill_assault.ranks[3].subSkills.sub_skill_assault_1.icon = 'Offense_sub_shadow_blades'
-    skills.skill_assault.ranks[3].subSkills.sub_skill_assault_4.icon = 'Offense_sub_reality_wardens'
-    skills.skill_assault.ranks[3].subSkills.sub_skill_assault_5.icon = 'Defense_sub_firmness'
+    -- Various manipulations
+    table.sort(skills, compareSkills)
 
-    local t = skills.skill_assault.ranks[3].subSkills.sub_skill_assault_4.description
-    skills.skill_assault.ranks[3].subSkills.sub_skill_assault_4.description = string.gsub(t, ".”", "”.")
-    t = skills.skill_assault.ranks[2].subSkills.sub_skill_assault_3.description
-    skills.skill_assault.ranks[2].subSkills.sub_skill_assault_3.description = string.gsub(t, ".”", "”.")
-    -- Table
+    -- Content
     local markup = renderSkills(skills)
 
     -- Output

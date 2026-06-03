@@ -35,7 +35,8 @@ async function uploadFiles() {
     for (let i = 0; i < files.length; i++) {
         const fileName = files[i];
         const localPath = path.join(UPLOAD_SRC_DIR, fileName);
-        const wikiFilename = fileName.replace(/_/g, ' ');
+        let wikiFilename = fileName.replace(/_/g, ' ');
+        wikiFilename = wikiFilename.substring(0, 1).toUpperCase() + wikiFilename.substring(1);
 
         const action = DRY_RUN ? 'Testing' : 'Uploading';
         console.log(`   [${i + 1}/${files.length}] ${action}: ${wikiFilename}...`);
@@ -50,7 +51,7 @@ async function uploadFiles() {
             formData.append('filename', wikiFilename);
             formData.append('token', csrfToken);
             formData.append('file', fileBlob, wikiFilename); // Key must be named 'file'
-            //formData.append('ignorewarnings', '1'); // Overwrites file if it already exists
+            // formData.append('ignorewarnings', '1'); // Overwrites file if it already exists
             formData.append('format', 'json');
 
             // Text
