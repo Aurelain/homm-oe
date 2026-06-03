@@ -7,6 +7,7 @@
         "compute": "node scripts/compute-skill-chances/compute-skill-chances",
         "listAllUnits": "node scripts/listAllUnits/listAllUnits",
         "target": "node scripts/editWiki/targetWiki",
+        "targetAll": "node scripts/download/download",
         "build": "node scripts/editWiki/getWiki",
         "refresh": "node scripts/editWiki/setWiki",
         "downloadFiles": "node scripts/editWiki/downloadFiles",
