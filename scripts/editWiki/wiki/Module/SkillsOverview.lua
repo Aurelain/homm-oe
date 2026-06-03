@@ -364,17 +364,22 @@ end
 local function renderSkills(skills, words, lang)
     local root = mw.html.create()
     local currentCategory = nil
-    for _, group in pairs(skills) do
+    local isAll = #skills > 1
+    for _, group in ipairs(skills) do
         local id = group.id
 
         local category = CATEGORIES[id]
         if category and category ~= currentCategory then
             currentCategory = category
-            root:tag('h2'):addClass('category'):wikitext(words[category])
+            if isAll then
+                root:tag('h2'):addClass('category'):wikitext(words[category])
+            end
         end
 
         local ranks = group.ranks or {}
-        root:tag('h3'):addClass('group'):wikitext('[[' .. group.name .. ']]')
+        if isAll then
+            root:tag('h3'):addClass('group'):wikitext('[[' .. group.name .. ']]')
+        end
 
         for _, rank in ipairs(ranks) do
             root:node(createSkill(rank, 'rank', 64, lang))

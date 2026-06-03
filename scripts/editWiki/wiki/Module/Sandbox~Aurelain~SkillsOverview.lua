@@ -103,7 +103,7 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 -- Retrieves the text for some specific ids from Cargo Translations.
 ------------------------------------------------------------------------------------------------------------------------
-local function translateIds(ids, lang, extra, please)
+local function translateIds(ids, lang, extra)
     -- Key list
     local list = {}
     for key, _ in pairs(ids) do
@@ -126,7 +126,7 @@ local function translateIds(ids, lang, extra, please)
     -- Dictionary
     local dictionary = mw.clone(ids)
     for key, value in pairs(dictionary) do
-        dictionary[key] = value .. please
+        dictionary[key] = value .. '[[Data:WikiTranslations/' .. lang .. '#' .. key .. '|💬]]'
     end
     for _, row in ipairs(results) do
         dictionary[row['target_id']] = row['name']
@@ -364,17 +364,22 @@ end
 local function renderSkills(skills, words, lang)
     local root = mw.html.create()
     local currentCategory = nil
-    for _, group in pairs(skills) do
+    local isAll = #skills > 1
+    for _, group in ipairs(skills) do
         local id = group.id
 
         local category = CATEGORIES[id]
         if category and category ~= currentCategory then
             currentCategory = category
-            root:tag('h2'):addClass('category'):wikitext(words[category])
+            if isAll then
+                root:tag('h2'):addClass('category'):wikitext(words[category])
+            end
         end
 
         local ranks = group.ranks or {}
-        root:tag('h3'):addClass('group'):wikitext('[[' .. group.name .. ']]')
+        if isAll then
+            root:tag('h3'):addClass('group'):wikitext('[[' .. group.name .. ']]')
+        end
 
         for _, rank in ipairs(ranks) do
             root:node(createSkill(rank, 'rank', 64, lang))
@@ -402,8 +407,7 @@ function p.display(frame)
     local skill = args.skill
 
     -- Language
-    local please = '[[Data:WikiTranslations/' .. lang .. '|💬]]'
-    local words = translateIds(TRANSLATION_IDS, lang, nil, please)
+    local words = translateIds(TRANSLATION_IDS, lang)
 
     -- Cargo
     local main = queryMain(lang, skill)
