@@ -1,6 +1,7 @@
 node_modules/
 .idea/
-Core/
+/Core/
 **/volatile/*.js
-scripts/editWiki/wiki/Files
-WIKI.json
+/scripts/editWiki/wiki/Files
+/WIKI.json
+/wiki
