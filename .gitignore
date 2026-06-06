@@ -3,5 +3,3 @@ node_modules/
 /Core/
 **/volatile/*.js
 /scripts/editWiki/wiki/Files
-/WIKI.json
-/wiki
