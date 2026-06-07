@@ -321,7 +321,7 @@ end
 local function replaceQuotesWithLinks(text, lang)
     local allQuotes = [=["„“”«»「」『』]=]
     local pattern = "([" .. allQuotes .. "])([^" .. allQuotes .. "]+)([" .. allQuotes .. "])"
-    text = mw.ustring.gsub(text, pattern, "[[%2]]")
+    text = mw.ustring.gsub(text, pattern, "%1[[%2]]%3")
 
     local quotePairs = {
         { '‘', '’' }, -- English "smart" single quotes
