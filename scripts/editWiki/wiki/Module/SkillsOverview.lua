@@ -80,6 +80,7 @@ local TRANSLATION_IDS = {
     wiki_skills_magic = 'Magic Skills',
     wiki_skills_general = 'General Skills',
     wiki_skills_faction = 'Faction Skills',
+    wiki_skills_levels = 'Levels',
 }
 ------------------------------------------------------------------------------------------------------------------------
 -- Debugs a variable
@@ -365,6 +366,9 @@ local function renderSkills(skills, words, lang)
     local root = mw.html.create()
     local currentCategory = nil
     local isAll = #skills > 1
+    if not isAll then
+        root:tag('h3'):addClass('group'):wikitext(words.wiki_skills_levels)
+    end
     for _, group in ipairs(skills) do
         local id = group.id
 
