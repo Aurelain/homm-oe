@@ -6,7 +6,6 @@ import match from '../../utils/match.js';
 import dress from '../helpers/dress.js';
 import {writeOds} from 'hucre/ods';
 import fs from 'fs';
-import enumerate from '../../utils/enumerate.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -33,6 +32,21 @@ const ORDER = {
     cs: 16,
 };
 
+const SYNERGY_BEGIN = '===\\{\\{Words\\|wiki-skills-synergy-title';
+const SYNERGY_BEGIN_LEGACY = {
+    en: '=== ?Skill Syn',
+    pl: '=== ?Synerg',
+    fr: '=== ?Synerg',
+    ru: '=== ?Синергия',
+};
+
+const ARTIFACTS_BEGIN = '===\\{\\{Words\\|wiki-skills-artifact-title';
+const ARTIFACTS_BEGIN_LEGACY = {
+    en: '=== ?Artifact',
+    fr: "=== ?Effets d'art",
+    ru: '=== ?Эффекты арт',
+};
+
 // =====================================================================================================================
 //  P U B L I C
 // =====================================================================================================================
@@ -43,7 +57,6 @@ async function skill() {
     const skillCargoFiles = getSkillCargoFiles();
 
     const skillPaths = suggestSkillPaths(skillCargoFiles);
-    enumerate(skillPaths);
 
     const grid = buildGiantGrid(skillPaths);
     await printGrid(grid);
@@ -159,7 +172,7 @@ function buildGiantGrid(skillPaths) {
     const byName = {};
     for (const path in skillPaths) {
         const {lang, skillEn} = skillPaths[path];
-        const sections = parseSections(path);
+        const sections = parseSections(path, lang, skillEn);
         if (sections) {
             byName[skillEn] = byName[skillEn] || {};
             byName[skillEn][lang] = sections;
@@ -170,7 +183,12 @@ function buildGiantGrid(skillPaths) {
         row.push(key);
         for (const lang in byName[key]) {
             const index = ORDER[lang];
-            row[index] = 1;
+            const sections = byName[key][lang];
+            let value = '';
+            value += sections.blurb ? '1' : '0';
+            value += sections.synergy ? '1' : '0';
+            value += sections.artifacts ? '1' : '0';
+            row[index] = sections.blurb;
         }
         grid.push(row);
     }
@@ -180,22 +198,68 @@ function buildGiantGrid(skillPaths) {
 /**
  *
  */
-function parseSections(path) {
-    if (path.includes('Battlecraft')) {
-        console.log(path);
-    }
+function parseSections(path, lang, skillEn) {
     if (!fs.existsSync(path)) {
         return;
     }
+    let content = fs.readFileSync(path, 'utf8');
+    if (!content || content.includes('REDIRECT')) {
+        return;
+    }
+    content = content.replaceAll(/\[\[Category.*?]]/g, '');
+    const {zone: blurb, clean: noBlurb} = extractBlurb(content);
+    content = noBlurb;
+    const {zone: artifacts, clean: noArtifacts} = extractZone(content, lang, ARTIFACTS_BEGIN, ARTIFACTS_BEGIN_LEGACY);
+    content = noArtifacts;
+    const {zone: synergy, clean: noSynergy} = extractZone(content, lang, SYNERGY_BEGIN, SYNERGY_BEGIN_LEGACY);
+    content = noSynergy;
+    content = content.replace(/\{\{loc.*?}}/i, '');
+    content = content.replace(/\{\{#invoke.*?}}/, '');
+    content = content.replace(/\{\{Skill table[\s\S]*?<\/table>/, '');
+    content = content.replace(/\{\{Skill table[\s\S]*?}}/, '');
+    content = content.replace(/\{\{SkillsNavbox.*?}}/, '');
+    content = content.replace(/__NOTOC__/, '');
+    content = content.trim();
+    if (skillEn !== 'Economy') {
+        assume(!content, path, content, 'Still some content left');
+    }
+    if (lang === 'en') {
+        // console.log('path:', path);
+        // console.log('blurb:', blurb);
+    }
+    return {blurb, synergy, artifacts};
+}
 
-    const content = fs.readFileSync(path, 'utf8');
-    if (!content) {
-        return;
+/**
+ *
+ */
+function extractBlurb(content) {
+    const endings = ['\\{\\{Skill table', '\\{\\{#invoke'];
+    for (const ending of endings) {
+        const pattern = new RegExp('\\{loc.*?}}([\\S\\s]*?)' + ending);
+        const [, zone] = match(content, pattern);
+        if (zone) {
+            return {zone: zone.trim(), clean: content.replace(zone, '')};
+        }
     }
-    if (content.includes('REDIRECT')) {
-        return;
+    return {zone: '', clean: content};
+}
+
+/**
+ *
+ */
+function extractZone(content, lang, begin, legacyBegin) {
+    const beginnings = [begin];
+    const legacy = legacyBegin[lang];
+    legacy && beginnings.push(legacy);
+    for (const beginning of beginnings) {
+        const pattern = new RegExp('(' + beginning + '[\\S\\s]*?)\\{\\{SkillsNav');
+        const [, zone] = match(content, pattern);
+        if (zone) {
+            return {zone, clean: content.replace(zone, '')};
+        }
     }
-    return content.substring(0, 32);
+    return {zone: '', clean: content};
 }
 
 /**
