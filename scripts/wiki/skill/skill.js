@@ -4,6 +4,9 @@ import {LANG_COUNT, WIKI_DIR} from '../SETTINGS.js';
 import assume from '../../utils/assume.js';
 import match from '../../utils/match.js';
 import dress from '../helpers/dress.js';
+import {writeOds} from 'hucre/ods';
+import fs from 'fs';
+import enumerate from '../../utils/enumerate.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -36,11 +39,14 @@ const ORDER = {
 /**
  *
  */
-function skill() {
+async function skill() {
     const skillCargoFiles = getSkillCargoFiles();
 
-    const skillFutureNames = getSkillFutureNames(skillCargoFiles);
-    // enumerate(skillFutureNames);
+    const skillPaths = suggestSkillPaths(skillCargoFiles);
+    enumerate(skillPaths);
+
+    const grid = buildGiantGrid(skillPaths);
+    await printGrid(grid);
 
     // const mainFiles = readFiles('Main');
     // const enSkillFiles = filter(mainFiles, '[[Category:Hero Skills]]');
@@ -66,9 +72,8 @@ function getSkillCargoFiles() {
 /**
  *
  */
-function getSkillFutureNames(skillCargoFiles) {
+function suggestSkillPaths(skillCargoFiles) {
     const hub = {};
-    const cleaned = [];
     for (const name in skillCargoFiles) {
         const text = skillCargoFiles[name];
         const matched = match(text, /target_id = (\w+)\n.*?type = skill\n.*?language = (\w+)\n.*?name = ([^\n]*)/g);
@@ -141,7 +146,70 @@ function undress(path) {
     return path.replace(/.*?Main\//, '').replace('.wiki', '');
 }
 
+/**
+ *
+ */
+function buildGiantGrid(skillPaths) {
+    const grid = [];
+    const header = ['Name'];
+    for (const key in ORDER) {
+        header.push(key);
+    }
+    grid.push(header);
+    const byName = {};
+    for (const path in skillPaths) {
+        const {lang, skillEn} = skillPaths[path];
+        const sections = parseSections(path);
+        if (sections) {
+            byName[skillEn] = byName[skillEn] || {};
+            byName[skillEn][lang] = sections;
+        }
+    }
+    for (const key in byName) {
+        const row = [];
+        row.push(key);
+        for (const lang in byName[key]) {
+            const index = ORDER[lang];
+            row[index] = 1;
+        }
+        grid.push(row);
+    }
+    return grid;
+}
+
+/**
+ *
+ */
+function parseSections(path) {
+    if (path.includes('Battlecraft')) {
+        console.log(path);
+    }
+    if (!fs.existsSync(path)) {
+        return;
+    }
+
+    const content = fs.readFileSync(path, 'utf8');
+    if (!content) {
+        return;
+    }
+    if (content.includes('REDIRECT')) {
+        return;
+    }
+    return content.substring(0, 32);
+}
+
+/**
+ *
+ */
+async function printGrid(rows) {
+    const spreadsheetData = {
+        sheets: [{name: 'skill', rows}],
+    };
+    const buffer = await writeOds(spreadsheetData);
+    fs.writeFileSync(import.meta.dirname + '/skill.ods', buffer);
+}
+
 // =====================================================================================================================
 //  R U N
 // =====================================================================================================================
-skill();
+await skill();
