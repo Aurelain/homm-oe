@@ -8,7 +8,8 @@
         "listAllUnits": "node scripts/listAllUnits/listAllUnits",
         "target": "node scripts/editWiki/targetWiki",
         "downloadFiles": "node scripts/editWiki/downloadFiles",
-        "uploadFiles": "node scripts/editWiki/uploadFiles"
+        "uploadFiles": "node scripts/editWiki/uploadFiles",
+        "skill": "node scripts/wiki/skill/skill"
     },
     "dependencies": {
         "fflate": "^0.8.2",

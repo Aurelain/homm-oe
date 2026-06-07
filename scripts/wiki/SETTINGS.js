@@ -1,1 +1,2 @@
 export const WIKI_DIR = '/a/aims/oe-wiki/wiki';
+export const LANG_COUNT = 16;
