@@ -6,6 +6,8 @@ import match from '../../utils/match.js';
 import dress from '../helpers/dress.js';
 import {writeOds} from 'hucre/ods';
 import fs from 'fs';
+import createFreshSkill from './createFreshSkill.js';
+import updateExistingSkill from './updateExistingSkill.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -32,6 +34,100 @@ const ORDER = {
     cs: 16,
 };
 
+const TRANSLATIONS = {
+    // `tutorial_M_13_name_1` in `tutorial.json`
+    heroSkills: {
+        pt_br: 'Habilidades de Herói',
+        cs: 'Schopnosti hrdiny',
+        en: 'Hero Skills',
+        fr: 'Compétences de héros',
+        de: 'Heldenfähigkeiten',
+        hu: 'A hősök képességei',
+        it: "Abilità dell'eroe",
+        ja: 'ヒーローのスキル',
+        ko: '영웅 스킬',
+        pl: 'Umiejętności bohatera',
+        ru: 'Навыки героев',
+        es: 'Habilidades del héroe',
+        tr: 'Kahraman Becerileri',
+        uk: 'Уміння героя',
+        zh_cn: '英雄技能',
+        zh_tw: '英雄技能',
+    },
+    levels: {
+        pt_br: '',
+        cs: '',
+        en: 'Levels',
+        fr: '',
+        de: '',
+        hu: '',
+        it: '',
+        ja: '',
+        ko: '',
+        pl: '',
+        ru: '',
+        es: '',
+        tr: '',
+        uk: '',
+        zh_cn: '',
+        zh_tw: '',
+    },
+    synergies: {
+        pt_br: '',
+        cs: '',
+        en: 'Skill Synergies',
+        fr: 'Synergies de compétences',
+        de: '',
+        hu: '',
+        it: '',
+        ja: '',
+        ko: '',
+        pl: 'Synergia',
+        ru: 'Синергия навыков',
+        es: '',
+        tr: '',
+        uk: '',
+        zh_cn: '',
+        zh_tw: '',
+    },
+    synergiesText: {
+        pt_br: '',
+        cs: '',
+        en: 'Knowing # will give the following benefits to other sub-skills:',
+        fr: 'Connaître la # apporte les avantages suivants aux autres compétences secondaires :',
+        de: '',
+        hu: '',
+        it: '',
+        ja: '',
+        ko: '',
+        pl: 'Znajomość umiejętności # zapewni następujące korzyści innym podumiejętnościom:',
+        ru: 'Владение навыком «#» даёт следующие преимущества для других поднавыков:',
+        es: '',
+        tr: '',
+        uk: '',
+        zh_cn: '',
+        zh_tw: '',
+    },
+    artifacts: {
+        pt_br: '',
+        cs: '',
+        en: 'Artifact Effects',
+        fr: "Effets d'artéfact",
+        de: '',
+        hu: '',
+        it: '',
+        ja: '',
+        ko: '',
+        pl: '',
+        ru: 'Эффекты артефактов',
+        es: '',
+        tr: '',
+        uk: '',
+        zh_cn: '',
+        zh_tw: '',
+    },
+};
+
 const SYNERGY_BEGIN = '===\\{\\{Words\\|wiki-skills-synergy-title';
 const SYNERGY_BEGIN_LEGACY = {
     en: '=== ?Skill Syn',
@@ -47,6 +143,25 @@ const ARTIFACTS_BEGIN_LEGACY = {
     ru: '=== ?Эффекты арт',
 };
 
+const TARGET_LANGUAGES = new Set([
+    'en',
+    // 'zh_cn',
+    // 'es',
+    'fr',
+    // 'pt_br',
+    'ru',
+    // 'de',
+    'ja',
+    // 'tr',
+    // 'ko',
+    // 'it',
+    // 'zh_tw',
+    'pl',
+    // 'uk',
+    // 'hu',
+    // 'cs',
+]);
+
 // =====================================================================================================================
 //  P U B L I C
 // =====================================================================================================================
@@ -58,8 +173,14 @@ async function skill() {
 
     const skillPaths = suggestSkillPaths(skillCargoFiles);
 
-    const grid = buildGiantGrid(skillPaths);
-    await printGrid(grid);
+    const emptyHub = createEmptyHub(skillPaths);
+    const existingHub = parseExisting(skillPaths);
+    const freshHub = createFreshHub(emptyHub, existingHub);
+
+    await printHub(existingHub);
+    return;
+
+    // await printHub(existingHub);
 
     // const mainFiles = readFiles('Main');
     // const enSkillFiles = filter(mainFiles, '[[Category:Hero Skills]]');
@@ -107,22 +228,20 @@ function suggestSkillPaths(skillCargoFiles) {
         // Others:
         for (const item of matched) {
             const [, skillId, lang, name] = item;
+            if (!TARGET_LANGUAGES.has(lang)) {
+                continue;
+            }
             assume(skillIdEn === skillId, 'Unexpected skillId!');
-            const trafficPath = WIKI_DIR + '/Main/' + dress(nameEn + '~' + lang);
-            hub[trafficPath] = {
-                isTraffic: true,
-                lang,
-                skillEn: nameEn,
-                skillId,
-            };
-
-            const pagePath = WIKI_DIR + '/Main/' + dress(name);
-            const safePagePath = resolveCollision(pagePath, lang, hub);
-            hub[safePagePath] = {
-                lang,
-                skillEn: nameEn,
-                skillId,
-            };
+            const possiblePaths = [WIKI_DIR + '/Main/' + dress(nameEn + '~' + lang), WIKI_DIR + '/Main/' + dress(name)];
+            for (const possiblePath of possiblePaths) {
+                const safePath = resolveCollision(possiblePath, lang, hub);
+                hub[safePath] = {
+                    lang,
+                    name,
+                    skillEn: nameEn,
+                    skillId,
+                };
+            }
         }
     }
     return hub;
@@ -162,43 +281,54 @@ function undress(path) {
 /**
  *
  */
-function buildGiantGrid(skillPaths) {
-    const grid = [];
-    const header = ['Name'];
-    for (const key in ORDER) {
-        header.push(key);
-    }
-    grid.push(header);
-    const byName = {};
+function createEmptyHub(skillPaths) {
+    const hub = {};
     for (const path in skillPaths) {
-        const {lang, skillEn} = skillPaths[path];
-        const sections = parseSections(path, lang, skillEn);
-        if (sections) {
-            byName[skillEn] = byName[skillEn] || {};
-            byName[skillEn][lang] = sections;
-        }
+        const {lang, skillEn, skillId} = skillPaths[path];
+        hub[skillEn] = hub[skillEn] || {id: skillId};
+        hub[skillEn][lang] = skillPaths[path];
     }
-    for (const key in byName) {
-        const row = [];
-        row.push(key);
-        for (const lang in byName[key]) {
-            const index = ORDER[lang];
-            const sections = byName[key][lang];
-            let value = '';
-            value += sections.blurb ? '1' : '0';
-            value += sections.synergy ? '1' : '0';
-            value += sections.artifacts ? '1' : '0';
-            row[index] = sections.blurb;
-        }
-        grid.push(row);
-    }
-    return grid;
+    return hub;
 }
 
 /**
  *
  */
-function parseSections(path, lang, skillEn) {
+function parseExisting(skillPaths) {
+    const hub = {};
+    for (const path in skillPaths) {
+        const {lang, skillEn, skillId} = skillPaths[path];
+        hub[skillEn] = hub[skillEn] || {id: skillId};
+        const content = getContent(path);
+        if (content) {
+            hub[skillEn][lang] = updateExistingSkill(skillPaths[path], TRANSLATIONS, content);
+        }
+    }
+    return hub;
+}
+
+/**
+ *
+ */
+function createFreshHub(emptyHub, existingHub) {
+    const hub = {};
+    for (const skillEn in emptyHub) {
+        for (const lang of TARGET_LANGUAGES) {
+            const existingInfo = existingHub[skillEn]?.[lang];
+            if (!existingInfo) {
+                const id = emptyHub[skillEn].id;
+                hub[skillEn] = hub[skillEn] || {id};
+                hub[skillEn][lang] = createFreshSkill(emptyHub[skillEn][lang], TRANSLATIONS);
+            }
+        }
+    }
+    return hub;
+}
+
+/**
+ *
+ */
+function getContent(path) {
     if (!fs.existsSync(path)) {
         return;
     }
@@ -206,6 +336,7 @@ function parseSections(path, lang, skillEn) {
     if (!content || content.includes('REDIRECT')) {
         return;
     }
+    return content;
     content = content.replaceAll(/\[\[Category.*?]]/g, '');
     const {zone: blurb, clean: noBlurb} = extractBlurb(content);
     content = noBlurb;
@@ -265,12 +396,42 @@ function extractZone(content, lang, begin, legacyBegin) {
 /**
  *
  */
-async function printGrid(rows) {
+async function printHub(hub) {
+    const rows = buildGridFromHub(hub);
     const spreadsheetData = {
         sheets: [{name: 'skill', rows}],
     };
     const buffer = await writeOds(spreadsheetData);
     fs.writeFileSync(import.meta.dirname + '/skill.ods', buffer);
+}
+
+/**
+ *
+ */
+function buildGridFromHub(hub) {
+    const allPossibleHeaders = new Set([]);
+    for (const key in hub) {
+        for (const prop in hub[key]) {
+            allPossibleHeaders.add(prop);
+        }
+    }
+    const headers = ['Name', ...allPossibleHeaders];
+    const columnToNr = {};
+    const {length} = headers;
+    for (let i = 0; i < length; i++) {
+        columnToNr[headers[i]] = i;
+    }
+    const grid = [headers];
+    for (const key in hub) {
+        const row = [];
+        row.push(key); // Name
+        for (const prop in hub[key]) {
+            const index = columnToNr[prop];
+            row[index] = hub[key][prop];
+        }
+        grid.push(row);
+    }
+    return grid;
 }
 
 // =====================================================================================================================
