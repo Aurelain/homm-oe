@@ -1,3 +1,5 @@
+import joinLines from '../../utils/joinLines.js';
+
 // =====================================================================================================================
 //  P U B L I C
 // =====================================================================================================================
@@ -5,7 +7,10 @@
  *
  */
 function buildCategory({lang}, translations) {
-    return `[[Category:${translations.heroSkills[lang]}]]`;
+    const lines = [];
+    lines.push(`{{SkillsNavbox|lang=${lang}}}`);
+    lines.push(`[[Category:${translations.heroSkills[lang]}]]`);
+    return joinLines(lines);
 }
 
 // =====================================================================================================================

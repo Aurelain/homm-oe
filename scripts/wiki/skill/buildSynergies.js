@@ -8,7 +8,7 @@ function buildSynergies({lang, name, skillId}, translations) {
     const lines = [];
 
     const section = translations.synergies[lang] || translations.synergies.en;
-    lines.push(`=== ${section} ===`);
+    lines.push(`==${section}==`);
 
     let synergiesText = translations.synergiesText[lang] || translations.synergiesText.en;
     synergiesText = synergiesText.replace('#', `'''${name}'''`);

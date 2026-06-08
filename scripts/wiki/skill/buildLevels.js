@@ -7,7 +7,7 @@
 function buildLevels({lang, skillId}, translations) {
     const lines = [];
     const section = translations.levels[lang] || translations.levels.en;
-    lines.push(`=== ${section} ===`);
+    lines.push(`==${section}==`);
     lines.push(`{{#invoke:SkillsOverview|display|lang=${lang}|skill=${skillId}}}`);
     return lines.join('\n');
 }

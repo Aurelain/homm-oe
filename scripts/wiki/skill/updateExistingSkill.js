@@ -2,10 +2,16 @@
 //  D E C L A R A T I O N S
 // =====================================================================================================================
 import buildLoc from './buildLoc.js';
+import buildCategory from './buildCategory.js';
+import buildLevels from './buildLevels.js';
+import buildSynergies from './buildSynergies.js';
+import buildArtifacts from './buildArtifacts.js';
+import joinLines from '../../utils/joinLines.js';
+import createFreshSkill from './createFreshSkill.js';
 
-const MARKER_SKILL_TABLE = '#MARKER_SKILL_TABLE';
-const MARKER_SYNERGIES = '#MARKER_SYNERGIES';
-const MARKER_ARTIFACTS = '#MARKER_ARTIFACTS';
+const MARKER_LEVELS = '###MARKER_LEVELS';
+const MARKER_SYNERGIES = '###MARKER_SYNERGIES';
+const MARKER_ARTIFACTS = '###MARKER_ARTIFACTS';
 
 // =====================================================================================================================
 //  P U B L I C
@@ -14,42 +20,50 @@ const MARKER_ARTIFACTS = '#MARKER_ARTIFACTS';
  *
  */
 function updateExistingSkill(info, translations, existingContent) {
-    console.log('existingContent:', existingContent);
-    console.log('--------------------');
-    const clean = cleanContent(existingContent);
-    console.log('clean:', clean);
+    // Fix broken Japanese by Akesha
+    if (!existingContent.includes('SkillsNav')) {
+        return createFreshSkill(info, translations);
+    }
 
-    // lines.push(buildLoc(info));
-    // lines.push('__NOTOC__');
-    process.exit(0);
-    /*console.log('info:', info);
+    const cleanedContent = cleanContent(existingContent);
+
+    let adaptedContent = cleanedContent;
+    adaptedContent = adaptedContent.replace(MARKER_LEVELS, '\n' + buildLevels(info, translations) + '\n');
+    adaptedContent = adaptedContent.replace(MARKER_SYNERGIES, '\n' + buildSynergies(info, translations) + '\n');
+    adaptedContent = adaptedContent.replace(MARKER_ARTIFACTS, '\n' + buildArtifacts(info, translations) + '\n');
+    adaptedContent = adaptedContent.replaceAll(/###\w+/g, '');
+
     const lines = [];
     lines.push(buildLoc(info));
     lines.push('__NOTOC__');
     lines.push('');
-    lines.push(buildInvocation('SkillsOverview', info));
-    lines.push('');
-    lines.push(buildInvocation('SkillSynergies', info));
-    lines.push('');
-    lines.push(buildInvocation('SkillArtifacts', info));
-    lines.push('');
-    lines.push('{{SkillsNavbox}}');
-    lines.push(`[[Category:${translations.heroSkills[info.lang]}]]`);
 
-    const output = lines.join('\n');
-    console.log(output);*/
-    return 1;
+    lines.push(adaptedContent);
+
+    lines.push('');
+    lines.push(buildCategory(info, translations));
+
+    const output = joinLines(lines);
+
+    // if (info.name === 'Arcane Magic') {
+    //     console.log('------------------------------');
+    //     console.log('existingContent:', existingContent);
+    //     console.log('output:', output);
+    // }
+    return output;
 }
 
 // =====================================================================================================================
 //  P R I V A T E
 // =====================================================================================================================
 function cleanContent(content) {
+    // General fixes:
+    content = content.replaceAll('</table>', '|}');
+
     // Inject main marker:
-    content = content.replace(/\{\{#invoke:SkillsOverview.*?}}/, MARKER_SKILL_TABLE);
-    content = content.replace(/\{\{#invoke:SubSkillsTable.*?}}/, MARKER_SKILL_TABLE);
-    content = content.replace(/\{\{Skill table[\s\S]*?<\/table>/, MARKER_SKILL_TABLE);
-    content = content.replace(/\{\{Skill table[\s\S]*?}}/, MARKER_SKILL_TABLE);
+    content = content.replace(/\{\{#invoke:SkillsOverview.*?}}/, MARKER_LEVELS);
+    content = content.replace(/\{\{#invoke:SubSkillsTable.*?}}/, MARKER_LEVELS);
+    content = content.replace(/\{\{Skill table[\s\S]*?}}?/, MARKER_LEVELS);
 
     // Inject synergies marker:
     content = content.replace(/\{\{#invoke:SkillSynergies.*?}}/, MARKER_SYNERGIES);

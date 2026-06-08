@@ -7,7 +7,7 @@
 function buildArtifacts({lang, skillId}, translations) {
     const lines = [];
     const section = translations.artifacts[lang] || translations.artifacts.en;
-    lines.push(`=== ${section} ===`);
+    lines.push(`==${section}==`);
     lines.push(`{{#invoke:SkillArtifacts|display|lang=${lang}|skill=${skillId}}}`);
     return lines.join('\n');
 }

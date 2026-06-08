@@ -128,21 +128,6 @@ const TRANSLATIONS = {
     },
 };
 
-const SYNERGY_BEGIN = '===\\{\\{Words\\|wiki-skills-synergy-title';
-const SYNERGY_BEGIN_LEGACY = {
-    en: '=== ?Skill Syn',
-    pl: '=== ?Synerg',
-    fr: '=== ?Synerg',
-    ru: '=== ?Синергия',
-};
-
-const ARTIFACTS_BEGIN = '===\\{\\{Words\\|wiki-skills-artifact-title';
-const ARTIFACTS_BEGIN_LEGACY = {
-    en: '=== ?Artifact',
-    fr: "=== ?Effets d'art",
-    ru: '=== ?Эффекты арт',
-};
-
 const TARGET_LANGUAGES = new Set([
     'en',
     // 'zh_cn',
@@ -162,6 +147,30 @@ const TARGET_LANGUAGES = new Set([
     // 'cs',
 ]);
 
+// Languages that use the `Skill/XX` page to store text:
+const ROBOTIC_LANGUAGES = new Set([
+    'en',
+    'zh_cn',
+    'es',
+    'fr',
+    'pt_br',
+    // 'ru',
+    'de',
+    'ja',
+    'tr',
+    'ko',
+    'it',
+    'zh_tw',
+    'pl',
+    'uk',
+    'hu',
+    'cs',
+]);
+
+const SPECIAL_FILE_NAMES = {
+    'Summon Avatar': 'Summon_Avatar_(Skill)',
+};
+
 // =====================================================================================================================
 //  P U B L I C
 // =====================================================================================================================
@@ -176,15 +185,9 @@ async function skill() {
     const emptyHub = createEmptyHub(skillPaths);
     const existingHub = parseExisting(skillPaths);
     const freshHub = createFreshHub(emptyHub, existingHub);
-
-    await printHub(existingHub);
-    return;
+    writeToDisk(skillPaths, existingHub, freshHub);
 
     // await printHub(existingHub);
-
-    // const mainFiles = readFiles('Main');
-    // const enSkillFiles = filter(mainFiles, '[[Category:Hero Skills]]');
-    // enumerate(enSkillFiles);
 }
 
 // =====================================================================================================================
@@ -218,11 +221,15 @@ function suggestSkillPaths(skillCargoFiles) {
         const firstItem = matched.shift();
         const [, skillIdEn, langEn, nameEn] = firstItem;
         assume(langEn === 'en', langEn, 'Expecting English to be the first language!');
-        const mainPath = WIKI_DIR + '/Main/' + dress(nameEn);
+        const englishFileName = SPECIAL_FILE_NAMES[nameEn] || nameEn;
+        const mainPath = WIKI_DIR + '/Main/' + dress(englishFileName);
         hub[mainPath] = {
             lang: langEn,
+            name: nameEn,
             skillEn: nameEn,
             skillId: skillIdEn,
+            path: mainPath,
+            isRobotic: null, // separate from true or false
         };
 
         // Others:
@@ -232,14 +239,19 @@ function suggestSkillPaths(skillCargoFiles) {
                 continue;
             }
             assume(skillIdEn === skillId, 'Unexpected skillId!');
-            const possiblePaths = [WIKI_DIR + '/Main/' + dress(nameEn + '~' + lang), WIKI_DIR + '/Main/' + dress(name)];
-            for (const possiblePath of possiblePaths) {
-                const safePath = resolveCollision(possiblePath, lang, hub);
+            const possiblePaths = [
+                WIKI_DIR + '/Main/' + dress(englishFileName + '~' + lang), // robotic
+                WIKI_DIR + '/Main/' + dress(name),
+            ];
+            for (let i = 0; i < possiblePaths.length; i++) {
+                const safePath = resolveCollision(possiblePaths[i], lang, hub);
                 hub[safePath] = {
                     lang,
                     name,
                     skillEn: nameEn,
                     skillId,
+                    path: safePath,
+                    isRobotic: i === 0,
                 };
             }
         }
@@ -337,28 +349,6 @@ function getContent(path) {
         return;
     }
     return content;
-    content = content.replaceAll(/\[\[Category.*?]]/g, '');
-    const {zone: blurb, clean: noBlurb} = extractBlurb(content);
-    content = noBlurb;
-    const {zone: artifacts, clean: noArtifacts} = extractZone(content, lang, ARTIFACTS_BEGIN, ARTIFACTS_BEGIN_LEGACY);
-    content = noArtifacts;
-    const {zone: synergy, clean: noSynergy} = extractZone(content, lang, SYNERGY_BEGIN, SYNERGY_BEGIN_LEGACY);
-    content = noSynergy;
-    content = content.replace(/\{\{loc.*?}}/i, '');
-    content = content.replace(/\{\{#invoke.*?}}/, '');
-    content = content.replace(/\{\{Skill table[\s\S]*?<\/table>/, '');
-    content = content.replace(/\{\{Skill table[\s\S]*?}}/, '');
-    content = content.replace(/\{\{SkillsNavbox.*?}}/, '');
-    content = content.replace(/__NOTOC__/, '');
-    content = content.trim();
-    if (skillEn !== 'Economy') {
-        assume(!content, path, content, 'Still some content left');
-    }
-    if (lang === 'en') {
-        // console.log('path:', path);
-        // console.log('blurb:', blurb);
-    }
-    return {blurb, synergy, artifacts};
 }
 
 /**
@@ -432,6 +422,37 @@ function buildGridFromHub(hub) {
         grid.push(row);
     }
     return grid;
+}
+
+/**
+ *
+ */
+function writeToDisk(skillPaths, existingHub, freshHub) {
+    for (const path in skillPaths) {
+        const {lang, isRobotic, name, skillEn} = skillPaths[path];
+        let content;
+        if (ROBOTIC_LANGUAGES.has(lang)) {
+            // Non-Russian
+            if (isRobotic === false) {
+                // This is a natural language page (e.g. Stratégie)
+                continue;
+            } else {
+                // This is a robotic page (e.g. Tactics/fr)
+                content = existingHub[skillEn][lang] || freshHub[skillEn][lang];
+            }
+        } else {
+            // This is Russian
+            if (isRobotic === false) {
+                // This is a natural language page (e.g. Нападение)
+                content = existingHub[skillEn][lang] || freshHub[skillEn][lang];
+            } else {
+                // This is a robotic page (e.g. Offense/ru)
+                content = '#REDIRECT [[' + name + ']]'; // todo account for renaming due to collisions
+            }
+        }
+        // console.log(content);
+        fs.writeFileSync(path, content);
+    }
 }
 
 // =====================================================================================================================

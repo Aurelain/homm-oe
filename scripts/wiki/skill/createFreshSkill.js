@@ -3,6 +3,7 @@ import buildCategory from './buildCategory.js';
 import buildLevels from './buildLevels.js';
 import buildSynergies from './buildSynergies.js';
 import buildArtifacts from './buildArtifacts.js';
+import joinLines from '../../utils/joinLines.js';
 
 // =====================================================================================================================
 //  P U B L I C
@@ -21,10 +22,9 @@ function createFreshSkill(info, translations) {
     lines.push('');
     lines.push(buildArtifacts(info, translations));
     lines.push('');
-    lines.push('{{SkillsNavbox}}');
     lines.push(buildCategory(info, translations));
 
-    const output = lines.join('\n');
+    const output = joinLines(lines);
     return output;
 }
 
