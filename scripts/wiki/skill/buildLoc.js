@@ -4,11 +4,11 @@
 /**
  *
  */
-function buildLoc({lang, name, skillEn}) {
+function buildLoc({lang, name, safeEn}) {
     if (lang === 'en') {
         return '{{Loc}}';
     }
-    return `{{Loc|${name}|link=${skillEn}/${lang}}}`;
+    return `{{Loc|${name}|link=${safeEn}/${lang}}}`;
 }
 
 // =====================================================================================================================

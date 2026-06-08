@@ -167,8 +167,13 @@ const ROBOTIC_LANGUAGES = new Set([
     'cs',
 ]);
 
-const SPECIAL_FILE_NAMES = {
-    'Summon Avatar': 'Summon_Avatar_(Skill)',
+const SAFE_NAMES = {
+    en: {
+        'Summon Avatar': 'Summon Avatar (Skill)',
+    },
+    ru: {
+        ['Призыв_аватара']: 'Призыв аватара (навык)',
+    },
 };
 
 // =====================================================================================================================
@@ -221,12 +226,13 @@ function suggestSkillPaths(skillCargoFiles) {
         const firstItem = matched.shift();
         const [, skillIdEn, langEn, nameEn] = firstItem;
         assume(langEn === 'en', langEn, 'Expecting English to be the first language!');
-        const englishFileName = SPECIAL_FILE_NAMES[nameEn] || nameEn;
-        const mainPath = WIKI_DIR + '/Main/' + dress(englishFileName);
+        const englishSafeName = getSafeName(nameEn, langEn);
+        const mainPath = WIKI_DIR + '/Main/' + dress(englishSafeName);
         hub[mainPath] = {
             lang: langEn,
             name: nameEn,
             skillEn: nameEn,
+            safeEn: englishSafeName,
             skillId: skillIdEn,
             path: mainPath,
             isRobotic: null, // separate from true or false
@@ -240,8 +246,8 @@ function suggestSkillPaths(skillCargoFiles) {
             }
             assume(skillIdEn === skillId, 'Unexpected skillId!');
             const possiblePaths = [
-                WIKI_DIR + '/Main/' + dress(englishFileName + '~' + lang), // robotic
-                WIKI_DIR + '/Main/' + dress(name),
+                WIKI_DIR + '/Main/' + dress(englishSafeName + '~' + lang), // robotic
+                WIKI_DIR + '/Main/' + dress(getSafeName(name, lang)),
             ];
             for (let i = 0; i < possiblePaths.length; i++) {
                 const safePath = resolveCollision(possiblePaths[i], lang, hub);
@@ -249,6 +255,7 @@ function suggestSkillPaths(skillCargoFiles) {
                     lang,
                     name,
                     skillEn: nameEn,
+                    safeEn: englishSafeName,
                     skillId,
                     path: safePath,
                     isRobotic: i === 0,
@@ -272,6 +279,7 @@ function resolveCollision(path, lang, hub) {
         // The existing language should be left alone. We're editing the current path.
         const suffixedPath = path.replace('.wiki', `_(${lang}).wiki`);
         console.log('Collision resolved: ' + undress(suffixedPath) + ` [favored ${existingLang}]`);
+        // TODO: add to SAFE_NAMES
         return suffixedPath;
     } else {
         // The current language should become the principal. We'll add a suffix to the existing language.
@@ -279,6 +287,7 @@ function resolveCollision(path, lang, hub) {
         console.log('Collision resolved: ' + undress(suffixedPath) + ` [favored ${lang}]`);
         delete hub[path];
         hub[suffixedPath] = existingEntry;
+        // TODO: add to SAFE_NAMES
         return path;
     }
 }
@@ -354,38 +363,6 @@ function getContent(path) {
 /**
  *
  */
-function extractBlurb(content) {
-    const endings = ['\\{\\{Skill table', '\\{\\{#invoke'];
-    for (const ending of endings) {
-        const pattern = new RegExp('\\{loc.*?}}([\\S\\s]*?)' + ending);
-        const [, zone] = match(content, pattern);
-        if (zone) {
-            return {zone: zone.trim(), clean: content.replace(zone, '')};
-        }
-    }
-    return {zone: '', clean: content};
-}
-
-/**
- *
- */
-function extractZone(content, lang, begin, legacyBegin) {
-    const beginnings = [begin];
-    const legacy = legacyBegin[lang];
-    legacy && beginnings.push(legacy);
-    for (const beginning of beginnings) {
-        const pattern = new RegExp('(' + beginning + '[\\S\\s]*?)\\{\\{SkillsNav');
-        const [, zone] = match(content, pattern);
-        if (zone) {
-            return {zone, clean: content.replace(zone, '')};
-        }
-    }
-    return {zone: '', clean: content};
-}
-
-/**
- *
- */
 async function printHub(hub) {
     const rows = buildGridFromHub(hub);
     const spreadsheetData = {
@@ -447,12 +424,19 @@ function writeToDisk(skillPaths, existingHub, freshHub) {
                 content = existingHub[skillEn][lang] || freshHub[skillEn][lang];
             } else {
                 // This is a robotic page (e.g. Offense/ru)
-                content = '#REDIRECT [[' + name + ']]'; // todo account for renaming due to collisions
+                content = '#REDIRECT [[' + getSafeName(name, lang) + ']]';
             }
         }
         // console.log(content);
         fs.writeFileSync(path, content);
     }
+}
+
+/**
+ *
+ */
+function getSafeName(name, lang) {
+    return SAFE_NAMES[lang]?.[name] || name;
 }
 
 // =====================================================================================================================

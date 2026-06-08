@@ -8,7 +8,12 @@ import joinLines from '../../utils/joinLines.js';
  */
 function buildCategory({lang}, translations) {
     const lines = [];
-    lines.push(`{{SkillsNavbox|lang=${lang}}}`);
+    if (lang === 'fr') {
+        // TODO: remove
+        lines.push(`{{SkillsNavbox/fr}}`);
+    } else {
+        lines.push(`{{SkillsNavbox|lang=${lang}}}`);
+    }
     lines.push(`[[Category:${translations.heroSkills[lang]}]]`);
     return joinLines(lines);
 }
