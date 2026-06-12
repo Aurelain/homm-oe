@@ -64,25 +64,27 @@ function cleanContent(content) {
     content = content.replace(/\{\{#invoke:SkillsOverview.*?}}/, MARKER_LEVELS);
     content = content.replace(/\{\{#invoke:SubSkillsTable.*?}}/, MARKER_LEVELS);
     content = content.replace(/\{\{Skill table[\s\S]*?}}?/, MARKER_LEVELS);
-    content = content.replace(/==.*?Levels.*?==+/, MARKER_LEVELS);
+    content = content.replace(/== ?Levels.*?==+/, MARKER_LEVELS);
 
     // Inject synergies marker:
     content = content.replace(/\{\{#invoke:SkillSynergies.*?}}/, MARKER_SYNERGIES);
-    content = content.replace(/==.*?Skill Syn.*?==+[^:]*:/, MARKER_SYNERGIES);
-    content = content.replace(/==.*?Synerg.*?==+[^:]*:/, MARKER_SYNERGIES);
-    content = content.replace(/==.*?Синергия.*?==+[^:]*:/, MARKER_SYNERGIES);
+    content = content.replace(/== ?Skill Syn.*?==+[^:]*:/, MARKER_SYNERGIES);
+    content = content.replace(/== ?Synerg.*?==+[^:]*:/, MARKER_SYNERGIES);
+    content = content.replace(/== ?Синергия.*?==+[^:]*:/, MARKER_SYNERGIES);
 
     // Inject artifacts marker:
     content = content.replace(/\{\{#invoke:SkillArtifacts.*?}}/, MARKER_ARTIFACTS);
-    content = content.replace(/==.*?Artifact.*?==+/, MARKER_ARTIFACTS);
-    content = content.replace(/==.*?Effets d'art.*?==+/, MARKER_ARTIFACTS);
-    content = content.replace(/==.*?Эффекты арт.*?==+/, MARKER_ARTIFACTS);
+    content = content.replace(/== ?Artifact.*?==+/, MARKER_ARTIFACTS);
+    content = content.replace(/== ?Effets d'art.*?==+/, MARKER_ARTIFACTS);
+    content = content.replace(/== ?Эффекты арт.*?==+/, MARKER_ARTIFACTS);
 
     // Clean footer:
     content = content.replaceAll(/\{\{SkillsNavbox.*?}}/g, '');
     content = content.replaceAll(/\[\[Category.*?]]/g, '');
     content = content.replaceAll('__NOTOC__', '');
     content = content.replaceAll(/\{\{loc.*?}}/gi, '');
+    content = content.replaceAll(/\{\|class="wikitable"[\s\S]*?\|}/gi, '');
+    content = content.replaceAll(/\*[\s\S]*?\{/, '{');
     content = content.trim();
 
     return content;

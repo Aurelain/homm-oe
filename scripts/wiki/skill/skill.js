@@ -93,7 +93,7 @@ const TRANSLATIONS = {
     synergiesText: {
         pt_br: '',
         cs: '',
-        en: 'Knowing # will give the following benefits to other sub-skills:',
+        en: 'Knowing # will give the following benefits to other subskills:',
         fr: 'Connaître la # apporte les avantages suivants aux autres compétences secondaires :',
         de: '',
         hu: '',
