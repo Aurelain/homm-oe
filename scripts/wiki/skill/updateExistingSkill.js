@@ -84,7 +84,7 @@ function cleanContent(content) {
     content = content.replaceAll('__NOTOC__', '');
     content = content.replaceAll(/\{\{loc.*?}}/gi, '');
     content = content.replaceAll(/\{\|class="wikitable"[\s\S]*?\|}/gi, '');
-    content = content.replaceAll(/\*[\s\S]*?\{/, '{');
+    content = content.replaceAll(/\*[\s\S]*?\{/g, '{');
     content = content.trim();
 
     return content;

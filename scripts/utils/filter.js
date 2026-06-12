@@ -14,15 +14,15 @@ function filter(target, pattern, property) {
         verify = pattern; // assume this is a function
     }
 
-    const hub = {};
+    const isArray = Array.isArray(target);
+    const hub = isArray ? [] : {};
     for (const key in target) {
         const value = target[key];
-        if (property === 'key') {
-            if (verify(key)) {
-                hub[key] = value;
-            }
-        } else {
-            if (verify(value)) {
+        const isAccepted = property === 'key' ? verify(key) : verify(value);
+        if (isAccepted) {
+            if (isArray) {
+                hub.push(value);
+            } else {
                 hub[key] = value;
             }
         }

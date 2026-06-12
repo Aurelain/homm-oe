@@ -11,7 +11,8 @@
         "uploadFiles": "node scripts/editWiki/uploadFiles",
         "build": "node scripts/editWiki/getWiki",
         "refresh": "node scripts/editWiki/setWiki",
-        "skill": "node scripts/wiki/skill/skill"
+        "skill": "node scripts/wiki/skill/skill",
+        "redirect": "node scripts/wiki/redirect/redirect"
     },
     "dependencies": {
         "fflate": "^0.8.2",
