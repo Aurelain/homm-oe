@@ -5,8 +5,71 @@
     const TESTS = [
         // -------------------------------------------------------------------------------------------------------------
         {
-            input: 'Main/Foo~Bar_Hello.wiki',
-            output: 'Foo/Bar Hello',
+            name: 'basic',
+            input: [
+                {
+                    name: {
+                        en: 'Foo Bar',
+                        fr: 'Foo Baz'
+                    }
+                }
+            ],
+            output: {
+                'Foo Bar@en': 'Foo_Bar.wiki',
+                'Foo Baz@fr': 'Foo_Baz.wiki'
+            },
+        },
+        // -------------------------------------------------------------------------------------------------------------
+        {
+            name: 'collision',
+            input: [
+                {
+                    name: {
+                        en: 'Foo Bar',
+                        fr: 'Foo Bar'
+                    }
+                }
+            ],
+            output: {
+                'Foo Bar@en': 'Foo_Bar.wiki',
+                'Foo Bar@fr': 'Foo_Bar_(fr).wiki'
+            },
+        },
+        // -------------------------------------------------------------------------------------------------------------
+        {
+            name: 'special collision',
+            input: [
+                {
+                    name: {
+                        en: 'Summon Avatar',
+                        fr: "Summon l'Avatar",
+                    }
+                }
+            ],
+            output: {
+                'Summon Avatar@en': 'Summon_Avatar_(Skill).wiki',
+                "Summon l'Avatar@fr": "Summon_l'Avatar_(Competence).wiki"
+            },
+        },
+        // -------------------------------------------------------------------------------------------------------------
+        {
+            name: 'multiple collision',
+            input: [
+                {
+                    name: {
+                        en: 'Foo Bar',
+                        fr: 'Foo Baz',
+                        es: 'Foo Baz',
+                        it: 'Foo Baz',
+                    }
+                }
+            ],
+            output: {
+                'Foo Bar@en': 'Foo_Bar.wiki',
+                'Foo Baz@fr': 'Foo_Baz_(fr).wiki',
+                'Foo Baz@es': 'Foo_Baz.wiki',
+                'Foo Baz@it': 'Foo_Baz_(it).wiki',
+            },
         },
     ];
 
