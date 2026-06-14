@@ -4,7 +4,6 @@ import buildLevels from './buildLevels.js';
 import buildSynergies from './buildSynergies.js';
 import buildArtifacts from './buildArtifacts.js';
 import joinLines from '../../utils/joinLines.js';
-import createFreshSkill from './createFreshSkill.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -20,11 +19,6 @@ const MARKER_ARTIFACTS = '###MARKER_ARTIFACTS';
  *
  */
 function updateExistingSkill(info, translations, existingContent) {
-    // Fix broken Japanese by Akesha
-    if (!existingContent.includes('SkillsNav')) {
-        return createFreshSkill(info, translations);
-    }
-
     const cleanedContent = cleanContent(existingContent);
 
     let adaptedContent = cleanedContent;
@@ -79,12 +73,12 @@ function cleanContent(content) {
     content = content.replace(/== ?Эффекты арт.*?==+/, MARKER_ARTIFACTS);
 
     // Clean footer:
+    content = content.replaceAll(/\*[\s\S]*?\{/g, '{');
     content = content.replaceAll(/\{\{SkillsNavbox.*?}}/g, '');
     content = content.replaceAll(/\[\[Category.*?]]/g, '');
     content = content.replaceAll('__NOTOC__', '');
     content = content.replaceAll(/\{\{loc.*?}}/gi, '');
     content = content.replaceAll(/\{\|class="wikitable"[\s\S]*?\|}/gi, '');
-    content = content.replaceAll(/\*[\s\S]*?\{/g, '{');
     content = content.trim();
 
     return content;

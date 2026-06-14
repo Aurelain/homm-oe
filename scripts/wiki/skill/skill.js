@@ -30,6 +30,7 @@ const TRANSLATIONS = {
         zh_cn: '英雄技能',
         zh_tw: '英雄技能',
     },
+    // We could take these from `tutorial_M_13_name`, but it's a delicate operation:
     levels: {
         pt_br: '',
         cs: '',
@@ -108,7 +109,7 @@ const TARGET_LANGUAGES = new Set([
     // 'en',
     // 'zh_cn',
     // 'es',
-    // 'fr',
+    'fr',
     // 'pt_br',
     // 'ru',
     // 'de',
@@ -117,7 +118,7 @@ const TARGET_LANGUAGES = new Set([
     // 'ko',
     // 'it',
     // 'zh_tw',
-    'pl',
+    // 'pl',
     // 'uk',
     // 'hu',
     // 'cs',
@@ -149,6 +150,7 @@ function generatePayloads(skills, fileNames) {
     for (const skill of skills) {
         for (const lang of TARGET_LANGUAGES) {
             const titleX = skill.name[lang];
+            // if (titleX !== 'Adresse') continue;
             const fileNameX = fileNames[titleX + '@' + lang];
             assume(fileNameX, titleX, 'Cannot resolve path!');
 
