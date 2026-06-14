@@ -1,3 +1,4 @@
+<meta charset="UTF-8" />
 <script type='module'>
     import suggestFileNames from './suggestFileNames.js';
     import focus from '../../utils/focus.js';
@@ -48,7 +49,52 @@
             ],
             output: {
                 'Summon Avatar@en': 'Summon_Avatar_(Skill).wiki',
-                "Summon l'Avatar@fr": "Summon_l'Avatar_(Competence).wiki"
+                "Summon l'Avatar@fr": "Summon_l'Avatar_(Compétence).wiki"
+            },
+        },
+        // -------------------------------------------------------------------------------------------------------------
+        {
+            name: 'all summon avatars',
+            input: [
+                {
+                    name: {
+                        en: 'Summon Avatar',
+                        zh_cn: 'foo',
+                        es: 'foo',
+                        fr: 'foo',
+                        pt_br: 'foo',
+                        ru: 'foo',
+                        de: 'foo',
+                        ja: 'foo',
+                        tr: 'foo',
+                        ko: 'foo',
+                        it: 'foo',
+                        zh_tw: 'foo',
+                        pl: 'foo',
+                        uk: 'foo',
+                        hu: 'foo',
+                        cs: 'foo',
+
+                    }
+                }
+            ],
+            output: {
+                'Summon Avatar@en': 'Summon_Avatar_(Skill).wiki',
+                'foo@zh_cn': 'foo_(技能).wiki',
+                'foo@es': 'foo_(Habilidad).wiki',
+                'foo@fr': 'foo_(Compétence).wiki',
+                'foo@pt_br': 'foo_(Habilidade).wiki',
+                'foo@ru': 'foo_(навык).wiki',
+                'foo@de': 'foo_(Fähigkeit).wiki',
+                'foo@ja': 'foo_(スキル).wiki',
+                'foo@tr': 'foo_(Beceri).wiki',
+                'foo@ko': 'foo_(스킬).wiki',
+                'foo@it': 'foo_(Abilità).wiki',
+                'foo@zh_tw': 'foo_(技能)_(zh_tw).wiki',
+                'foo@pl': 'foo_(Umiejętność).wiki',
+                'foo@uk': 'foo_(Вміння).wiki',
+                'foo@hu': 'foo_(Képesség).wiki',
+                'foo@cs': 'foo_(Schopnost).wiki',
             },
         },
         // -------------------------------------------------------------------------------------------------------------
