@@ -12,7 +12,8 @@
         "build": "node scripts/editWiki/getWiki",
         "refresh": "node scripts/editWiki/setWiki",
         "skill": "node scripts/wiki/skill/skill",
-        "redirect": "node scripts/wiki/redirect/redirect"
+        "redirect": "node scripts/wiki/redirect/redirect",
+        "obelisk": "node scripts/wiki/obelisk/obelisk"
     },
     "dependencies": {
         "fflate": "^0.8.2",
