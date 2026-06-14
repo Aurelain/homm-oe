@@ -1,6 +1,3 @@
-// =====================================================================================================================
-//  D E C L A R A T I O N S
-// =====================================================================================================================
 import buildLoc from './buildLoc.js';
 import buildCategory from './buildCategory.js';
 import buildLevels from './buildLevels.js';
@@ -9,6 +6,9 @@ import buildArtifacts from './buildArtifacts.js';
 import joinLines from '../../utils/joinLines.js';
 import createFreshSkill from './createFreshSkill.js';
 
+// =====================================================================================================================
+//  D E C L A R A T I O N S
+// =====================================================================================================================
 const MARKER_LEVELS = '###MARKER_LEVELS';
 const MARKER_SYNERGIES = '###MARKER_SYNERGIES';
 const MARKER_ARTIFACTS = '###MARKER_ARTIFACTS';

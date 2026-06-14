@@ -1,5 +1,5 @@
 import filter from '../../utils/filter.js';
-import {WIKI_DIR} from '../SETTINGS.js';
+import {LANG_COUNT, SKILLS_COUNT, WIKI_DIR} from '../SETTINGS.js';
 import walk from '../../utils/walk.js';
 import parseTranslationFile from '../helpers/parseTranslationFile.js';
 import assume from '../../utils/assume.js';
@@ -32,9 +32,13 @@ function getSkills() {
     for (const path of actualSkillPaths) {
         const definitions = parseTranslationFile(path);
         const skillDefinitions = definitions.filter((item) => item.type === 'skill');
-        skills.push(...skillDefinitions);
+        const skillDefinition = skillDefinitions.find((item) => item.type === 'skill');
+        assume(skillDefinitions.length === 1, 'Expecting only one skill from a file!');
+        const names = Object.values(skillDefinitions[0].name);
+        assume(names.length === LANG_COUNT, names, 'Unexpected languages count!');
+        skills.push(skillDefinition);
     }
-    assume(skills.length === 30, skills.length, 'Unexpected skills count!');
+    assume(skills.length === SKILLS_COUNT, skills.length, 'Unexpected skills count!');
     return skills;
 }
 

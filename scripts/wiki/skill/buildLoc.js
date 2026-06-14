@@ -1,14 +1,33 @@
+import convertFileNameToWikiUrl from '../helpers/convertFileNameToWikiUrl.js';
+
 // =====================================================================================================================
 //  P U B L I C
 // =====================================================================================================================
 /**
  *
  */
-function buildLoc({lang, name, safeEn}) {
+function buildLoc({lang, fileNameX, fileNameXRobotic}) {
     if (lang === 'en') {
         return '{{Loc}}';
     }
-    return `{{Loc|${name}|link=${safeEn}/${lang}}}`;
+    const title = generateTitle(fileNameX);
+    const url = convertFileNameToWikiUrl(fileNameXRobotic);
+    return `{{Loc|${title}|link=${url}}}`;
+}
+
+// =====================================================================================================================
+//  P R I V A T E
+// =====================================================================================================================
+/**
+ *
+ */
+function generateTitle(fileNameX) {
+    let title = fileNameX;
+    title = title.replace('.wiki', '');
+    title = title.replace(/\(\w\w\)$/, ''); // remove simple language code
+    title = title.replace(/\(\w\w_\w\w\)$/, ''); // remove advanced language code
+    title = title.replaceAll('_', ' ');
+    return title;
 }
 
 // =====================================================================================================================

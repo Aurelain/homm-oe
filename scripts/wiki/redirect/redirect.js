@@ -1,8 +1,10 @@
-import getSkills from './getSkills.js';
+import getSkills from '../helpers/getSkills.js';
 import assume from '../../utils/assume.js';
 import fs from 'node:fs';
 import {WIKI_DIR} from '../SETTINGS.js';
 import suggestFileNames from '../helpers/suggestFileNames.js';
+import buildLoc from '../skill/buildLoc.js';
+import convertFileNameToWikiUrl from '../helpers/convertFileNameToWikiUrl.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -72,7 +74,7 @@ function redirectItem(item, lang, fileNames) {
     assume(fileNameX, titleX, `Could not find a filename for ${titleX}!`);
 
     // Move content
-    const adaptedContent = adaptContent(content, fileNameX, fileNameXRobotic);
+    const adaptedContent = adaptContent(content, lang, fileNameX, fileNameXRobotic);
     const pathX = WIKI_DIR + '/Main/' + fileNameX;
     fs.writeFileSync(pathX, adaptedContent);
 
@@ -84,30 +86,10 @@ function redirectItem(item, lang, fileNames) {
 /**
  *
  */
-function adaptContent(content, fileNameX, fileNameXRobotic) {
-    let title = fileNameX;
-    title = title.replace('.wiki', '');
-    for (const lang of TARGET_LANGUAGES) {
-        title = title.replace(`(${lang})`, ''); // remove the language parenthesis, if any
-    }
-    title = title.replaceAll('_', ' ');
-
-    const url = convertFileNameToWikiUrl(fileNameXRobotic);
-
-    const loc = `{{Loc|${title}|link=${url}}}`;
+function adaptContent(content, lang, fileNameX, fileNameXRobotic) {
+    const loc = buildLoc({lang, fileNameX, fileNameXRobotic});
     content = content.replace(/\{\{Loc.*?}}/i, loc);
     return content;
-}
-
-/**
- *
- */
-function convertFileNameToWikiUrl(fileNameX) {
-    let url = fileNameX;
-    url = url.replace('.wiki', '');
-    url = url.replace('~', '/');
-    url = url.replaceAll('_', ' ');
-    return url;
 }
 
 // =====================================================================================================================
