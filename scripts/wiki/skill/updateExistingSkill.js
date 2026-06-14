@@ -73,12 +73,10 @@ function cleanContent(content) {
     content = content.replace(/== ?Эффекты арт.*?==+/, MARKER_ARTIFACTS);
 
     // Clean footer:
-    content = content.replaceAll(/\*[\s\S]*?\{/g, '{');
     content = content.replaceAll(/\{\{SkillsNavbox.*?}}/g, '');
     content = content.replaceAll(/\[\[Category.*?]]/g, '');
     content = content.replaceAll('__NOTOC__', '');
     content = content.replaceAll(/\{\{loc.*?}}/gi, '');
-    content = content.replaceAll(/\{\|class="wikitable"[\s\S]*?\|}/gi, '');
     content = content.trim();
 
     return content;

@@ -106,19 +106,19 @@ const TRANSLATIONS = {
 };
 
 const TARGET_LANGUAGES = new Set([
-    // 'en',
+    'en',
     // 'zh_cn',
     // 'es',
     'fr',
     // 'pt_br',
-    // 'ru',
+    'ru',
     // 'de',
     // 'ja',
     // 'tr',
     // 'ko',
     // 'it',
     // 'zh_tw',
-    // 'pl',
+    'pl',
     // 'uk',
     // 'hu',
     // 'cs',
