@@ -51,7 +51,7 @@ async function uploadFiles() {
             formData.append('filename', wikiFilename);
             formData.append('token', csrfToken);
             formData.append('file', fileBlob, wikiFilename); // Key must be named 'file'
-            // formData.append('ignorewarnings', '1'); // Overwrites file if it already exists
+            formData.append('ignorewarnings', '1'); // Overwrites file if it already exists
             formData.append('format', 'json');
 
             // Text
@@ -90,7 +90,7 @@ async function uploadFiles() {
  */
 function getCategories(fileName) {
     const categories = [];
-    categories.push('Sub-skill Icons');
+    categories.push('Hero Class Icons');
     const clothed = categories.map((category) => `[[Category:${category}]]`);
     return clothed.join(' ');
 }
