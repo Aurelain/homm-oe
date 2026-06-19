@@ -18,7 +18,6 @@ function walk(dir, pattern, depth) {
     const unixDir = dir.replaceAll('\\', '/');
 
     depth = depth !== undefined ? Number(depth) : Number.MAX_VALUE;
-    pattern = pattern instanceof RegExp || typeof pattern === 'function' ? pattern : null;
 
     return recurse(unixDir, pattern, depth, 0, []);
 }
