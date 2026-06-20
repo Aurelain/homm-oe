@@ -12,6 +12,7 @@
         "build": "node scripts/editWiki/getWiki",
         "refresh": "node scripts/editWiki/setWiki",
         "skill": "node scripts/wiki/skill/skill",
+        "hero": "node scripts/wiki/hero/hero",
         "redirect": "node scripts/wiki/redirect/redirect",
         "obelisk": "node scripts/wiki/obelisk/obelisk",
         "translations": "node scripts/wiki/translations/translations"
