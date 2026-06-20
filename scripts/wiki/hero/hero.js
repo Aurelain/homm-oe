@@ -61,10 +61,9 @@ async function hero() {
     enumerate(heroes);
     const fileNames = suggestFileNames(heroes);
     const payloads = generatePayloads(heroes, fileNames);
-    console.log('payloads:', payloads);
-    // for (const {path, content} of payloads) {
-    //     fs.writeFileSync(path, content);
-    // }
+    for (const {path, content} of payloads) {
+        fs.writeFileSync(path, content);
+    }
 }
 
 // =====================================================================================================================
