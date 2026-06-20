@@ -3,7 +3,7 @@ import assume from '../../utils/assume.js';
 import fs from 'node:fs';
 import {WIKI_DIR} from '../SETTINGS.js';
 import suggestFileNames from '../helpers/suggestFileNames.js';
-import buildLoc from '../skill/buildLoc.js';
+import buildLoc from '../helpers/buildLoc.js';
 import convertFileNameToWikiUrl from '../helpers/convertFileNameToWikiUrl.js';
 
 // =====================================================================================================================

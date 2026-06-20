@@ -1,4 +1,4 @@
-import convertFileNameToWikiUrl from '../helpers/convertFileNameToWikiUrl.js';
+import convertFileNameToWikiUrl from './convertFileNameToWikiUrl.js';
 
 // =====================================================================================================================
 //  P U B L I C

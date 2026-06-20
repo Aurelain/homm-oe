@@ -1,4 +1,4 @@
-import buildLoc from './buildLoc.js';
+import buildLoc from '../helpers/buildLoc.js';
 import buildCategory from './buildCategory.js';
 import buildLevels from './buildLevels.js';
 import buildSynergies from './buildSynergies.js';

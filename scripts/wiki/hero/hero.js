@@ -1,16 +1,35 @@
+import fs from 'node:fs';
 import {WIKI_DIR} from '../SETTINGS.js';
-import assume from '../../utils/assume.js';
-import fs from 'fs';
-import getSkills from '../helpers/getSkills.js';
 import suggestFileNames from '../helpers/suggestFileNames.js';
 import convertFileNameToWikiUrl from '../helpers/convertFileNameToWikiUrl.js';
 import getHeroes from './getHeroes.js';
 import enumerate from '../../utils/enumerate.js';
+import createFreshHero from './createFreshHero.js';
+import updateExistingHero from './updateExistingHero.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
-const TRANSLATIONS = {};
+const TRANSLATIONS = {
+    category_Heroes: {
+        pt_br: 'Heróis',
+        cs: 'Hrdinové',
+        en: 'Heroes',
+        fr: 'Héros',
+        de: 'Helden',
+        hu: 'Hősök',
+        it: 'Eroi',
+        ja: 'ヒーロー',
+        ko: '영웅',
+        pl: 'Bohaterowie',
+        ru: 'Герои',
+        es: 'Héroes',
+        tr: 'Kahramanlar',
+        uk: 'Герої',
+        zh_cn: '英雄',
+        zh_tw: '英雄',
+    },
+};
 
 const TARGET_LANGUAGES = new Set([
     'en',
@@ -40,8 +59,9 @@ const TARGET_LANGUAGES = new Set([
 async function hero() {
     const heroes = getHeroes();
     enumerate(heroes);
-    // const fileNames = suggestFileNames(skills);
-    // const payloads = generatePayloads(skills, fileNames);
+    const fileNames = suggestFileNames(heroes);
+    const payloads = generatePayloads(heroes, fileNames);
+    console.log('payloads:', payloads);
     // for (const {path, content} of payloads) {
     //     fs.writeFileSync(path, content);
     // }
@@ -53,27 +73,25 @@ async function hero() {
 /**
  *
  */
-function generatePayloads(skills, fileNames) {
+function generatePayloads(heroes, fileNames) {
     const payloads = [];
-    for (const skill of skills) {
+    for (const hero of heroes) {
         for (const lang of TARGET_LANGUAGES) {
-            const titleX = skill.name[lang];
-            // if (titleX !== 'Adresse') continue;
+            const titleX = hero.name[lang];
             const fileNameX = fileNames[titleX + '@' + lang];
-            assume(fileNameX, titleX, 'Cannot resolve path!');
 
             const pathX = WIKI_DIR + '/Main/' + fileNameX;
-            const fileNameXRobotic = fileNames[skill.name.en + '@en'].replace('.wiki', '~' + lang + '.wiki');
+            const fileNameXRobotic = fileNames[hero.name.en + '@en'].replace('.wiki', '~' + lang + '.wiki');
             const info = {
                 lang,
                 name: titleX,
-                skillId: skill.target_id,
+                heroId: hero.target_id,
                 fileNameX,
                 fileNameXRobotic,
             };
             payloads.push({
                 path: pathX,
-                content: fs.existsSync(pathX) ? overwrite(pathX, info) : createFreshSkill(info, TRANSLATIONS),
+                content: fs.existsSync(pathX) ? overwrite(pathX, info) : createFreshHero(info, TRANSLATIONS),
             });
             if (lang !== 'en') {
                 const url = convertFileNameToWikiUrl(fileNameX);
@@ -92,7 +110,7 @@ function generatePayloads(skills, fileNames) {
  */
 function overwrite(path, info) {
     const content = fs.readFileSync(path, 'utf8');
-    return updateExistingSkill(info, TRANSLATIONS, content);
+    return updateExistingHero(info, TRANSLATIONS, content);
 }
 
 // =====================================================================================================================

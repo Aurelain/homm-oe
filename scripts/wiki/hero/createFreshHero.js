@@ -1,9 +1,6 @@
 import buildLoc from '../helpers/buildLoc.js';
-import buildCategory from './buildCategory.js';
-import buildLevels from './buildLevels.js';
-import buildSynergies from './buildSynergies.js';
-import buildArtifacts from './buildArtifacts.js';
 import joinLines from '../../utils/joinLines.js';
+import assume from '../../utils/assume.js';
 
 // =====================================================================================================================
 //  P U B L I C
@@ -11,19 +8,12 @@ import joinLines from '../../utils/joinLines.js';
 /**
  *
  */
-function createFreshSkill(info, translations) {
+function createFreshHero(info, translations) {
+    assume(false, 'Cannot create fresh heroes at the moment!');
     const lines = [];
     lines.push(buildLoc(info));
     lines.push('__NOTOC__');
     lines.push('');
-    lines.push(buildLevels(info, translations));
-    lines.push('');
-    lines.push(buildSynergies(info, translations));
-    lines.push('');
-    lines.push(buildArtifacts(info, translations));
-    lines.push('');
-    lines.push(buildCategory(info, translations));
-
     const output = joinLines(lines);
     return output;
 }
@@ -31,4 +21,4 @@ function createFreshSkill(info, translations) {
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default createFreshSkill;
+export default createFreshHero;
