@@ -20,7 +20,7 @@ function generatePayloads({items, fileNames, languages, translations, handleFres
             const info = {
                 lang,
                 name: titleX,
-                heroId: item['target_id'],
+                id: item['target_id'],
                 fileNameX,
                 fileNameXRobotic,
             };

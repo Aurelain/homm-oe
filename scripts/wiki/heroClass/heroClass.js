@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import suggestFileNames from '../helpers/suggestFileNames.js';
 import handleFreshHeroClass from './handleFreshHeroClass.js';
 import handleOldHeroClass from './handleOldHeroClass.js';
@@ -12,6 +13,24 @@ const TRANSLATIONS = {
         pt_br: '',
         cs: '',
         en: 'Hero Classes',
+        fr: '',
+        de: '',
+        hu: '',
+        it: '',
+        ja: '',
+        ko: '',
+        pl: '',
+        ru: '',
+        es: '',
+        tr: '',
+        uk: '',
+        zh_cn: '',
+        zh_tw: '',
+    },
+    heroes: {
+        pt_br: '',
+        cs: '',
+        en: 'Heroes',
         fr: '',
         de: '',
         hu: '',
@@ -65,7 +84,7 @@ async function heroClass() {
         handleOld: handleOldHeroClass,
     });
     for (const {path, content} of payloads) {
-        // fs.writeFileSync(path, content);
+        fs.writeFileSync(path, content);
     }
 }
 
