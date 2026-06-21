@@ -16,7 +16,8 @@
         "heroClass": "node scripts/wiki/heroClass/heroClass",
         "redirect": "node scripts/wiki/redirect/redirect",
         "obelisk": "node scripts/wiki/obelisk/obelisk",
-        "translations": "node scripts/wiki/translations/translations"
+        "translations": "node scripts/wiki/translations/translations",
+        "preparePurge": "node scripts/wiki/preparePurge/preparePurge"
     },
     "dependencies": {
         "fflate": "^0.8.2",
