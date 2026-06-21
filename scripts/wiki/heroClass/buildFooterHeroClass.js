@@ -6,14 +6,15 @@ import joinLines from '../../utils/joinLines.js';
 /**
  *
  */
-function buildCategoryHeroClass({lang}, translations) {
+function buildFooterHeroClass({lang}, translations) {
     const lines = [];
-    lines.push(`{{HeroesNavbox|lang=${lang}}}`);
-    lines.push(`[[Category:${translations.category_Heroes[lang]}]]`);
+    lines.push(`{{HeroClassNavbox|lang=${lang}}}`);
+    const category = translations.category_HeroClasses[lang] || translations.category_HeroClasses[lang] + '/' + lang;
+    lines.push(`[[Category:${category}]]`);
     return joinLines(lines);
 }
 
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default buildCategoryHeroClass;
+export default buildFooterHeroClass;

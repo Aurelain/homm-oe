@@ -8,7 +8,6 @@ function convertFileNameToWikiUrl(fileNameX) {
     let url = fileNameX;
     url = url.replace('.wiki', '');
     url = url.replace('~', '/');
-    url = url.replaceAll('_', ' ');
     return url;
 }
 

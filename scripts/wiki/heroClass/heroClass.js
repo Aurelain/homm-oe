@@ -1,33 +1,30 @@
-import fs from 'node:fs';
-import {WIKI_DIR} from '../SETTINGS.js';
 import suggestFileNames from '../helpers/suggestFileNames.js';
-import convertFileNameToWikiUrl from '../helpers/convertFileNameToWikiUrl.js';
-import getHeroClasses from './getHeroClasses.js';
-import enumerate from '../../utils/enumerate.js';
 import createFreshHeroClass from './createFreshHeroClass.js';
 import updateExistingHeroClass from './updateExistingHeroClass.js';
+import generatePayloads from '../helpers/generatePayloads.js';
+import getTranslations from '../helpers/getTranslations.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
 const TRANSLATIONS = {
-    category_Heroes: {
-        pt_br: 'Heróis',
-        cs: 'Hrdinové',
-        en: 'Heroes',
-        fr: 'Héros',
-        de: 'Helden',
-        hu: 'Hősök',
-        it: 'Eroi',
-        ja: 'ヒーロー',
-        ko: '영웅',
-        pl: 'Bohaterowie',
-        ru: 'Герои',
-        es: 'Héroes',
-        tr: 'Kahramanlar',
-        uk: 'Герої',
-        zh_cn: '英雄',
-        zh_tw: '英雄',
+    category_HeroClasses: {
+        pt_br: '',
+        cs: '',
+        en: 'Hero Classes',
+        fr: '',
+        de: '',
+        hu: '',
+        it: '',
+        ja: '',
+        ko: '',
+        pl: '',
+        ru: '',
+        es: '',
+        tr: '',
+        uk: '',
+        zh_cn: '',
+        zh_tw: '',
     },
 };
 
@@ -57,59 +54,21 @@ const TARGET_LANGUAGES = new Set([
  *
  */
 async function heroClass() {
-    const heroes = getHeroClasses();
-    enumerate(heroes);
-    const fileNames = suggestFileNames(heroes);
-    const payloads = generatePayloads(heroes, fileNames);
+    const classes = getTranslations('/HeroClass~', 'hero_class');
+    console.log('classes:', classes);
+    return;
+    const fileNames = suggestFileNames(classes);
+    const payloads = generatePayloads({
+        items: classes,
+        fileNames,
+        languages: TARGET_LANGUAGES,
+        translations: TRANSLATIONS,
+        handleFresh: createFreshHeroClass,
+        handleOld: updateExistingHeroClass,
+    });
     for (const {path, content} of payloads) {
-        fs.writeFileSync(path, content);
+        // fs.writeFileSync(path, content);
     }
-}
-
-// =====================================================================================================================
-//  P R I V A T E
-// =====================================================================================================================
-/**
- *
- */
-function generatePayloads(heroes, fileNames) {
-    const payloads = [];
-    for (const hero of heroes) {
-        for (const lang of TARGET_LANGUAGES) {
-            const titleX = hero.name[lang];
-            const fileNameX = fileNames[titleX + '@' + lang];
-
-            const pathX = WIKI_DIR + '/Main/' + fileNameX;
-            const fileNameXRobotic = fileNames[hero.name.en + '@en'].replace('.wiki', '~' + lang + '.wiki');
-            const info = {
-                lang,
-                name: titleX,
-                heroId: hero.target_id,
-                fileNameX,
-                fileNameXRobotic,
-            };
-            payloads.push({
-                path: pathX,
-                content: fs.existsSync(pathX) ? overwrite(pathX, info) : createFreshHeroClass(info, TRANSLATIONS),
-            });
-            if (lang !== 'en') {
-                const url = convertFileNameToWikiUrl(fileNameX);
-                payloads.push({
-                    path: WIKI_DIR + '/Main/' + fileNameXRobotic,
-                    content: `#REDIRECT [[${url}]]`,
-                });
-            }
-        }
-    }
-    return payloads;
-}
-
-/**
- *
- */
-function overwrite(path, info) {
-    const content = fs.readFileSync(path, 'utf8');
-    return updateExistingHeroClass(info, TRANSLATIONS, content);
 }
 
 // =====================================================================================================================

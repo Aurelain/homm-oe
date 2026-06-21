@@ -8,7 +8,6 @@ import assume from '../../utils/assume.js';
 //  P U B L I C
 // =====================================================================================================================
 /**
- * Returns the array of all heroes:
  * [
  *     {
  *         target_id: 'unfrozen_hero_9',
@@ -23,24 +22,23 @@ import assume from '../../utils/assume.js';
  *     }
  * ]
  */
-function getHeroClasses() {
+function getTranslations(filePattern, type) {
     const dataPaths = walk(WIKI_DIR + '/Data');
-    const heroPaths = filter(dataPaths, '/Hero~');
-    const skirmishHeroPaths = filter(heroPaths, (item) => !item.match(/tutorial|campaign|cm_fun/));
-    const heroes = [];
-    for (const path of skirmishHeroPaths) {
+    const paths = filter(dataPaths, filePattern);
+    const items = [];
+    for (const path of paths) {
         const definitions = parseTranslationFile(path);
-        const heroDefinitions = definitions.filter((item) => item.type === 'hero');
-        assume(heroDefinitions.length === 1, 'Expecting only one hero from a file!');
-        const heroDefinition = heroDefinitions[0];
-        const names = Object.values(heroDefinition.name);
+        const targetDefinitions = definitions.filter((item) => item.type === type);
+        assume(targetDefinitions.length === 1, 'Expecting only one hero from a file!');
+        const definition = targetDefinitions[0];
+        const names = Object.values(definition.name);
         assume(names.length === LANG_COUNT, names, 'Unexpected languages count!');
-        heroes.push(heroDefinition);
+        items.push(definition);
     }
-    return heroes;
+    return items;
 }
 
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default getHeroClasses;
+export default getTranslations;
