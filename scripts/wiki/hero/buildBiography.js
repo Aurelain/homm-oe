@@ -9,8 +9,10 @@ import buildHeading from '../helpers/buildHeading.js';
  */
 function buildBiography({lang, id}, translations) {
     const lines = [];
+    lines.push('');
     lines.push(buildHeading('Biography', translations, lang));
     lines.push(`{{Biography|lang=${lang}|id=${id}}}`);
+    lines.push('');
     return joinLines(lines);
 }
 

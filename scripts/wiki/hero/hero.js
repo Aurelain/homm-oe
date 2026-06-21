@@ -31,14 +31,14 @@ const TRANSLATIONS = {
         pt_br: '',
         cs: '',
         en: 'Specialization',
-        fr: '',
+        fr: 'Spécialisation',
         de: '',
         hu: '',
         it: '',
         ja: '',
         ko: '',
-        pl: '',
-        ru: '',
+        pl: 'Specjalizacja',
+        ru: 'Специализация',
         es: '',
         tr: '',
         uk: '',
@@ -49,14 +49,14 @@ const TRANSLATIONS = {
         pt_br: '',
         cs: '',
         en: 'Biography',
-        fr: '',
+        fr: 'Biographie',
         de: '',
         hu: '',
         it: '',
         ja: '',
         ko: '',
         pl: '',
-        ru: '',
+        ru: 'Лор',
         es: '',
         tr: '',
         uk: '',
@@ -67,7 +67,7 @@ const TRANSLATIONS = {
         pt_br: '',
         cs: '',
         en: 'Strategy',
-        fr: '',
+        fr: 'Stratégie',
         de: '',
         hu: '',
         it: '',
@@ -84,7 +84,7 @@ const TRANSLATIONS = {
     Strategy_text: {
         pt_br: '',
         cs: '',
-        en: 'Nothing yet.  Maybe you can add it...?',
+        en: 'Nothing yet. Maybe you can add it...?',
         fr: '',
         de: '',
         hu: '',
@@ -250,9 +250,9 @@ async function hero() {
         handleOld: handleOldHero,
     });
     console.log('payloads:', payloads);
-    // for (const {path, content} of payloads) {
-    //     fs.writeFileSync(path, content);
-    // }
+    for (const {path, content} of payloads) {
+        // content && fs.writeFileSync(path, content);
+    }
 }
 
 // =====================================================================================================================

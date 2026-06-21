@@ -9,8 +9,10 @@ import buildHeading from '../helpers/buildHeading.js';
  */
 function buildSpecialization({lang, id}, translations) {
     const lines = [];
+    lines.push('');
     lines.push(buildHeading('Specialization', translations, lang));
     lines.push(`{{Specialization|lang=${lang}|id=${id}}}`);
+    lines.push('');
     return joinLines(lines);
 }
 
