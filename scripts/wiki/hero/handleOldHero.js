@@ -38,6 +38,8 @@ function cleanContent(content) {
     content = content.replaceAll(/\{\{HeroesNavbox.*?}}/g, '');
     content = content.replaceAll(/\[\[Category.*?]]/g, '');
     content = content.replaceAll('__NOTOC__', '');
+    content = content.replaceAll('----', '');
+    content = content.replaceAll(/\{\{clear}}/i, '');
     content = content.replaceAll(/\{\{loc.*?}}/gi, '');
     content = content.trim();
     return content;

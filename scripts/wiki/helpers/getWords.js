@@ -1,5 +1,4 @@
-import joinLines from '../../utils/joinLines.js';
-import getWords from '../helpers/getWords.js';
+import assume from '../../utils/assume.js';
 
 // =====================================================================================================================
 //  P U B L I C
@@ -7,17 +6,15 @@ import getWords from '../helpers/getWords.js';
 /**
  *
  */
-function buildFooterHero({lang}, translations) {
-    const lines = [];
-    lines.push('');
-    lines.push(`{{Clear}}`);
-    lines.push(`----`);
-    lines.push(`{{HeroesNavbox|lang=${lang}}}`);
-    lines.push(`[[Category:${getWords('Heroes', translations, lang)}]]`);
-    return joinLines(lines);
+function getWords(key, translations, lang) {
+    const entry = translations[key];
+    assume(entry, key, 'No entry!');
+    const value = entry[lang] || entry.en;
+    assume(value, key, 'No words!');
+    return value;
 }
 
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default buildFooterHero;
+export default getWords;

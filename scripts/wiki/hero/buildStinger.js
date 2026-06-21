@@ -1,23 +1,14 @@
-import joinLines from '../../utils/joinLines.js';
-import getWords from '../helpers/getWords.js';
-
 // =====================================================================================================================
 //  P U B L I C
 // =====================================================================================================================
 /**
  *
  */
-function buildFooterHero({lang}, translations) {
-    const lines = [];
-    lines.push('');
-    lines.push(`{{Clear}}`);
-    lines.push(`----`);
-    lines.push(`{{HeroesNavbox|lang=${lang}}}`);
-    lines.push(`[[Category:${getWords('Heroes', translations, lang)}]]`);
-    return joinLines(lines);
+function buildStinger({lang, id}) {
+    return `\n{{HeroStinger|lang=${lang}|id=${id}}}\n`;
 }
 
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default buildFooterHero;
+export default buildStinger;

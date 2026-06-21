@@ -123,7 +123,6 @@ function compareLanguageCodes(a, b) {
  *
  */
 function flatten(byWikiSorted) {
-    console.log('byWikiSorted:', byWikiSorted);
     const output = {};
     for (const wikiName in byWikiSorted) {
         const payload = byWikiSorted[wikiName];

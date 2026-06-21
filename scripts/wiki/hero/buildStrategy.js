@@ -1,4 +1,5 @@
 import joinLines from '../../utils/joinLines.js';
+import buildHeading from '../helpers/buildHeading.js';
 import getWords from '../helpers/getWords.js';
 
 // =====================================================================================================================
@@ -7,17 +8,14 @@ import getWords from '../helpers/getWords.js';
 /**
  *
  */
-function buildFooterHero({lang}, translations) {
+function buildStrategy({lang, id}, translations) {
     const lines = [];
-    lines.push('');
-    lines.push(`{{Clear}}`);
-    lines.push(`----`);
-    lines.push(`{{HeroesNavbox|lang=${lang}}}`);
-    lines.push(`[[Category:${getWords('Heroes', translations, lang)}]]`);
+    lines.push(buildHeading('Strategy', translations, lang));
+    lines.push(`''${getWords('Strategy_text', translations, lang)}''`);
     return joinLines(lines);
 }
 
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default buildFooterHero;
+export default buildStrategy;
