@@ -3,7 +3,7 @@ import assume from '../../utils/assume.js';
 import fs from 'fs';
 import createFreshSkill from './createFreshSkill.js';
 import updateExistingSkill from './updateExistingSkill.js';
-import getSkills from '../helpers/getSkills.js';
+import getSkills from './getSkills.js';
 import suggestFileNames from '../helpers/suggestFileNames.js';
 import convertFileNameToWikiUrl from '../helpers/convertFileNameToWikiUrl.js';
 

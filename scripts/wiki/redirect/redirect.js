@@ -1,4 +1,4 @@
-import getSkills from '../helpers/getSkills.js';
+import getSkills from '../skill/getSkills.js';
 import assume from '../../utils/assume.js';
 import fs from 'node:fs';
 import {WIKI_DIR} from '../SETTINGS.js';
