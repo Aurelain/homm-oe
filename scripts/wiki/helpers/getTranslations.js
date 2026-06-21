@@ -22,9 +22,12 @@ import assume from '../../utils/assume.js';
  *     }
  * ]
  */
-function getTranslations(filePattern, type) {
+function getTranslations(filePattern, type, fileBlacklist = null) {
     const dataPaths = walk(WIKI_DIR + '/Data');
-    const paths = filter(dataPaths, filePattern);
+    let paths = filter(dataPaths, filePattern);
+    if (fileBlacklist) {
+        paths = filter(paths, (path) => !path.match(fileBlacklist));
+    }
     const items = [];
     for (const path of paths) {
         const definitions = parseTranslationFile(path);

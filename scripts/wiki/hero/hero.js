@@ -4,7 +4,6 @@ import handleFreshHero from './handleFreshHero.js';
 import handleOldHero from './handleOldHero.js';
 import getTranslations from '../helpers/getTranslations.js';
 import generatePayloads from '../helpers/generatePayloads.js';
-import filter from '../../utils/filter.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -56,8 +55,7 @@ const TARGET_LANGUAGES = new Set([
  *
  */
 async function hero() {
-    const allHeroes = getTranslations('/Hero~', 'hero');
-    const skirmishHeroes = filter(allHeroes, (item) => !item.target_id.match(/tutorial|campaign|cm_fun/));
+    const skirmishHeroes = getTranslations('/Hero~', 'hero', /tutorial|campaign|cm_fun/);
     const fileNames = suggestFileNames(skirmishHeroes);
     const payloads = generatePayloads({
         items: skirmishHeroes,
