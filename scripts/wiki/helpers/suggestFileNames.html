@@ -117,6 +117,26 @@
                 'Foo Baz@it': 'Foo_Baz_(it).wiki',
             },
         },
+        // -------------------------------------------------------------------------------------------------------------
+        {
+            name: '+mixed collisions',
+            input: [
+                {
+                    name: {
+                        en: 'Foo Bar',
+                        fr: 'Foo Bar',
+                        es: 'Foo Baz',
+                        it: 'Foo Baz',
+                    }
+                }
+            ],
+            output: {
+                'Foo Bar@en': 'Foo_Bar.wiki',
+                'Foo Bar@fr': 'Foo_Bar~fr.wiki',
+                'Foo Baz@es': 'Foo_Baz.wiki',
+                'Foo Baz@it': 'Foo_Baz_(it).wiki',
+            },
+        },
     ];
 
     await focus(suggestFileNames, TESTS, {});

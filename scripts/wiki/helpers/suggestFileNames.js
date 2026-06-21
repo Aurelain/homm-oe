@@ -123,13 +123,18 @@ function compareLanguageCodes(a, b) {
  *
  */
 function flatten(byWikiSorted) {
+    console.log('byWikiSorted:', byWikiSorted);
     const output = {};
     for (const wikiName in byWikiSorted) {
         const payload = byWikiSorted[wikiName];
         const firstItem = payload.shift();
         output[firstItem.name + '@' + firstItem.lang] = wikiName;
         for (const item of payload) {
-            output[item.name + '@' + item.lang] = wikiName + ` (${item.lang})`;
+            if (firstItem.lang === 'en') {
+                output[item.name + '@' + item.lang] = wikiName + `~${item.lang}`;
+            } else {
+                output[item.name + '@' + item.lang] = wikiName + ` (${item.lang})`;
+            }
         }
     }
     return output;

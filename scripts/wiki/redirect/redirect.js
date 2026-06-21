@@ -1,10 +1,10 @@
-import getSkills from '../skill/getSkills.js';
 import assume from '../../utils/assume.js';
 import fs from 'node:fs';
 import {WIKI_DIR} from '../SETTINGS.js';
 import suggestFileNames from '../helpers/suggestFileNames.js';
 import buildLoc from '../helpers/buildLoc.js';
 import convertFileNameToWikiUrl from '../helpers/convertFileNameToWikiUrl.js';
+import getTranslations from '../helpers/getTranslations.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -35,9 +35,9 @@ const TARGET_LANGUAGES = new Set([
  *
  */
 function redirect() {
-    const items = getSkills();
+    // const items = getSkills();
+    const items = getTranslations('/Hero~', 'hero', /tutorial|campaign|cm_fun/);
     const fileNames = suggestFileNames(items);
-
     for (const lang of TARGET_LANGUAGES) {
         for (const item of items) {
             redirectItem(item, lang, fileNames);
@@ -71,6 +71,11 @@ function redirectItem(item, lang, fileNames) {
 
     const titleX = item.name[lang];
     const fileNameX = fileNames[titleX + '@' + lang];
+    if (fileNameX === fileNameXRobotic) {
+        // This page has the same title as the English one, so the main page is actually the robotic page
+        console.log(`The file "${fileNameXRobotic}" needs no redirect!`);
+        return;
+    }
     assume(fileNameX, titleX, `Could not find a filename for ${titleX}!`);
 
     // Move content
