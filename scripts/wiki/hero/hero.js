@@ -56,7 +56,7 @@ const TRANSLATIONS = {
         ja: '',
         ko: '',
         pl: '',
-        ru: 'Лор',
+        ru: 'Биография',
         es: '',
         tr: '',
         uk: '',
@@ -74,7 +74,7 @@ const TRANSLATIONS = {
         ja: '',
         ko: '',
         pl: '',
-        ru: '',
+        ru: 'Стратегия',
         es: '',
         tr: '',
         uk: '',
@@ -92,7 +92,7 @@ const TRANSLATIONS = {
         ja: '',
         ko: '',
         pl: '',
-        ru: '',
+        ru: 'Здесь пока ничего нет. Возможно, вы сможете это исправить?',
         es: '',
         tr: '',
         uk: '',
@@ -105,11 +105,11 @@ const TARGET_LANGUAGES = new Set([
     // 'en',
     // 'zh_cn',
     // 'es',
-    'fr',
+    // 'fr',
     // 'pt_br',
-    // 'ru',
+    'ru',
     // 'de',
-    'ja',
+    // 'ja',
     // 'tr',
     // 'ko',
     // 'it',
@@ -249,9 +249,9 @@ async function hero() {
         handleFresh: handleFreshHero,
         handleOld: handleOldHero,
     });
-    console.log('payloads:', payloads);
+    // console.log('payloads:', payloads);
     for (const {path, content} of payloads) {
-        // content && fs.writeFileSync(path, content);
+        content && fs.writeFileSync(path, content);
     }
 }
 

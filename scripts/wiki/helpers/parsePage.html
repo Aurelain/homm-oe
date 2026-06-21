@@ -1,0 +1,96 @@
+<meta charset="UTF-8" />
+<script type='module'>
+    import parsePage from './parsePage.js';
+    import focus from '../../utils/focus.js';
+
+    const TESTS = [
+        // -------------------------------------------------------------------------------------------------------------
+        {
+            name: 'basic',
+            input: {
+                content: ``,
+                zones: {},
+            },
+            output: {
+                header:'',
+                zones: {},
+                footer:'',
+            },
+        },
+        // -------------------------------------------------------------------------------------------------------------
+        {
+            name: 'just footer',
+            input: {
+                content: `foo`,
+                zones: {},
+            },
+            output: {
+                header:'',
+                zones: {},
+                footer:'foo',
+            },
+        },
+        // -------------------------------------------------------------------------------------------------------------
+        {
+            name: 'header',
+            input: {
+                content: `foo==`,
+                zones: {},
+            },
+            output: {
+                header:'foo',
+                zones: {},
+                footer:'==',
+            },
+        },
+        // -------------------------------------------------------------------------------------------------------------
+        {
+            name: 'zones',
+            input: {
+                content: `
+                ==Foo==
+                Bar
+                ==Hello
+                `,
+                zones: {
+                    id1: 'Foo'
+                },
+            },
+            output: {
+                header:'',
+                zones: {
+                    id1: 'Bar'
+                },
+                footer:`==Hello`,
+            },
+        },
+        // -------------------------------------------------------------------------------------------------------------
+        {
+            name: 'all',
+            input: {
+                content: `
+                lorem
+                ==Hello==
+                ==Foo==
+                Bar
+                ==World==
+                `,
+                zones: {
+                    id1: 'Foo'
+                },
+            },
+            output: {
+                header:'lorem',
+                zones: {
+                    id1: 'Bar'
+                },
+                footer:`==Hello==
+                ==World==`,
+            },
+        },
+    ];
+
+    await focus(parsePage, TESTS, {
+        sendInputAsArguments: true,
+    });
+</script>
