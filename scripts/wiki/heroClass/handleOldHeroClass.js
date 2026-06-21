@@ -12,7 +12,7 @@ import joinLines from '../../utils/joinLines.js';
 /**
  *
  */
-function updateExistingHeroClass(info, translations, existingContent) {
+function handleOldHeroClass(info, translations, existingContent) {
     const cleanedContent = cleanContent(existingContent);
 
     let adaptedContent = cleanedContent;
@@ -49,4 +49,4 @@ function cleanContent(content) {
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default updateExistingHeroClass;
+export default handleOldHeroClass;

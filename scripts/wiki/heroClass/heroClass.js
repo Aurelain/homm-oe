@@ -1,6 +1,6 @@
 import suggestFileNames from '../helpers/suggestFileNames.js';
-import createFreshHeroClass from './createFreshHeroClass.js';
-import updateExistingHeroClass from './updateExistingHeroClass.js';
+import handleFreshHeroClass from './handleFreshHeroClass.js';
+import handleOldHeroClass from './handleOldHeroClass.js';
 import generatePayloads from '../helpers/generatePayloads.js';
 import getTranslations from '../helpers/getTranslations.js';
 
@@ -55,16 +55,14 @@ const TARGET_LANGUAGES = new Set([
  */
 async function heroClass() {
     const classes = getTranslations('/HeroClass~', 'hero_class');
-    console.log('classes:', classes);
-    return;
     const fileNames = suggestFileNames(classes);
     const payloads = generatePayloads({
         items: classes,
         fileNames,
         languages: TARGET_LANGUAGES,
         translations: TRANSLATIONS,
-        handleFresh: createFreshHeroClass,
-        handleOld: updateExistingHeroClass,
+        handleFresh: handleFreshHeroClass,
+        handleOld: handleOldHeroClass,
     });
     for (const {path, content} of payloads) {
         // fs.writeFileSync(path, content);

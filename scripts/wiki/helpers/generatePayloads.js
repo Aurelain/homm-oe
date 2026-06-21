@@ -26,7 +26,9 @@ function generatePayloads({items, fileNames, languages, translations, handleFres
             };
             payloads.push({
                 path: pathX,
-                content: fs.existsSync(pathX) ? overwrite(pathX, info, handleOld) : handleFresh(info, translations),
+                content: fs.existsSync(pathX)
+                    ? overwrite(handleOld, pathX, info, translations)
+                    : handleFresh(info, translations),
             });
             if (lang !== 'en') {
                 const url = convertFileNameToWikiUrl(fileNameX);
@@ -46,7 +48,7 @@ function generatePayloads({items, fileNames, languages, translations, handleFres
 /**
  *
  */
-function overwrite(path, info, handleOld, translations) {
+function overwrite(handleOld, path, info, translations) {
     const content = fs.readFileSync(path, 'utf8');
     return handleOld(info, translations, content);
 }
