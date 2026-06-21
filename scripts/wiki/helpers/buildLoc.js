@@ -26,6 +26,7 @@ function generateTitle(fileNameX) {
     title = title.replace('.wiki', '');
     title = title.replace(/\(\w\w\)$/, ''); // remove simple language code
     title = title.replace(/\(\w\w_\w\w\)$/, ''); // remove advanced language code
+    title = title.replace(/~\w+$/, ''); // remove any robotic leftovers
     title = title.replaceAll('_', ' ');
     return title;
 }

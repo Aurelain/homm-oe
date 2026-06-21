@@ -30,7 +30,7 @@ function generatePayloads({items, fileNames, languages, translations, handleFres
                     ? overwrite(handleOld, pathX, info, translations)
                     : handleFresh(info, translations),
             });
-            if (lang !== 'en') {
+            if (lang !== 'en' && fileNameX !== fileNameXRobotic) {
                 const url = convertFileNameToWikiUrl(fileNameX);
                 payloads.push({
                     path: WIKI_DIR + '/Main/' + fileNameXRobotic,

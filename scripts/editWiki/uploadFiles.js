@@ -90,7 +90,7 @@ async function uploadFiles() {
  */
 function getCategories(fileName) {
     const categories = [];
-    categories.push('Hero Class Icons');
+    categories.push('Hero Specialty Icons');
     const clothed = categories.map((category) => `[[Category:${category}]]`);
     return clothed.join(' ');
 }

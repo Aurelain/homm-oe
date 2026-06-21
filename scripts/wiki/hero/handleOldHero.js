@@ -35,7 +35,7 @@ function handleOldHero(info, translations, existingContent) {
 //  P R I V A T E
 // =====================================================================================================================
 function cleanContent(content) {
-    content = content.replaceAll(/\{\{HeroesNavbox.*?}}/gi, '');
+    content = content.replaceAll(/\{\{\w*HeroesNavbox.*?}}/gi, '');
     content = content.replaceAll(/\[\[Category.*?]]/gi, '');
     content = content.replaceAll('__NOTOC__', '');
     content = content.replaceAll('----', '');
