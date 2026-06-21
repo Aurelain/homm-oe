@@ -8,7 +8,7 @@ import assume from '../../utils/assume.js';
 /**
  *
  */
-function createFreshHero(info, translations) {
+function handleFreshHero(info, translations) {
     assume(false, 'Cannot create fresh heroes at the moment!');
     const lines = [];
     lines.push(buildLoc(info));
@@ -21,4 +21,4 @@ function createFreshHero(info, translations) {
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default createFreshHero;
+export default handleFreshHero;

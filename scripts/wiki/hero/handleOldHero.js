@@ -1,5 +1,5 @@
 import buildLoc from '../helpers/buildLoc.js';
-import buildCategory from './buildCategory.js';
+import buildFooterHero from './buildFooterHero.js';
 import joinLines from '../../utils/joinLines.js';
 
 // =====================================================================================================================
@@ -12,7 +12,7 @@ import joinLines from '../../utils/joinLines.js';
 /**
  *
  */
-function updateExistingHero(info, translations, existingContent) {
+function handleOldHero(info, translations, existingContent) {
     const cleanedContent = cleanContent(existingContent);
 
     let adaptedContent = cleanedContent;
@@ -25,7 +25,7 @@ function updateExistingHero(info, translations, existingContent) {
     lines.push(adaptedContent);
 
     lines.push('');
-    lines.push(buildCategory(info, translations));
+    lines.push(buildFooterHero(info, translations));
 
     const output = joinLines(lines);
     return output;
@@ -45,4 +45,4 @@ function cleanContent(content) {
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default updateExistingHero;
+export default handleOldHero;

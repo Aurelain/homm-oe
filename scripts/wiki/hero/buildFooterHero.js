@@ -6,7 +6,7 @@ import joinLines from '../../utils/joinLines.js';
 /**
  *
  */
-function buildCategory({lang}, translations) {
+function buildFooterHero({lang}, translations) {
     const lines = [];
     lines.push(`{{HeroesNavbox|lang=${lang}}}`);
     lines.push(`[[Category:${translations.category_Heroes[lang]}]]`);
@@ -16,4 +16,4 @@ function buildCategory({lang}, translations) {
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default buildCategory;
+export default buildFooterHero;

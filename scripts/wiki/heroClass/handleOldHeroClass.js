@@ -26,9 +26,9 @@ function handleOldHeroClass(info, translations, existingContent) {
     lines.push('');
 
     // Middle
-    lines.push(adaptedContent);
     adaptedContent = adaptedContent.replace(MARKER_HEROES, '\n' + buildHeroesList(info, translations) + '\n');
     adaptedContent = adaptedContent.replaceAll(/###\w+/g, '');
+    lines.push(adaptedContent);
 
     // Footer
     lines.push('');
