@@ -105,6 +105,27 @@ const TRANSLATIONS = {
     },
 };
 
+const SWITCHEROOS = {
+    'Summon Avatar': {
+        en: 'Skill',
+        zh_cn: '技能',
+        es: 'Habilidad',
+        fr: 'Compétence',
+        pt_br: 'Habilidade',
+        ru: 'навык',
+        de: 'Fähigkeit',
+        ja: 'スキル',
+        tr: 'Beceri',
+        ko: '스킬',
+        it: 'Abilità',
+        zh_tw: '技能',
+        pl: 'Umiejętność',
+        uk: 'Вміння',
+        hu: 'Képesség',
+        cs: 'Schopnost',
+    },
+};
+
 const TARGET_LANGUAGES = new Set([
     'en',
     // 'zh_cn',
@@ -132,7 +153,7 @@ const TARGET_LANGUAGES = new Set([
  */
 async function skill() {
     const skills = getSkills();
-    const fileNames = suggestFileNames(skills);
+    const fileNames = suggestFileNames(skills, SWITCHEROOS);
     const payloads = generatePayloads(skills, fileNames);
     for (const {path, content} of payloads) {
         fs.writeFileSync(path, content);

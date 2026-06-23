@@ -23,37 +23,16 @@ const ORDER = {
     cs: 16,
 };
 
-const WIKI_SUFFIXES = {
-    'Summon Avatar': {
-        en: 'Skill',
-        zh_cn: '技能',
-        es: 'Habilidad',
-        fr: 'Compétence',
-        pt_br: 'Habilidade',
-        ru: 'навык',
-        de: 'Fähigkeit',
-        ja: 'スキル',
-        tr: 'Beceri',
-        ko: '스킬',
-        it: 'Abilità',
-        zh_tw: '技能',
-        pl: 'Umiejętność',
-        uk: 'Вміння',
-        hu: 'Képesség',
-        cs: 'Schopnost',
-    },
-};
-
 // =====================================================================================================================
 //  P U B L I C
 // =====================================================================================================================
 /**
  *
  */
-function suggestFileNames(list) {
+function suggestFileNames(list, switcheroos = {}) {
     const hub = {};
     for (const {name: nameHub} of list) {
-        const byWiki = distributeByWiki(nameHub);
+        const byWiki = distributeByWiki(nameHub, switcheroos);
         const byWikiSorted = sortByLanguageImportance(byWiki);
         const flattened = flatten(byWikiSorted);
         for (const key in flattened) {
@@ -74,12 +53,12 @@ function suggestFileNames(list) {
  *     ...
  * }
  */
-function distributeByWiki(nameHub) {
+function distributeByWiki(nameHub, switcheroos) {
     const byWiki = {};
     const nameEn = nameHub.en;
     for (const lang in nameHub) {
         assume(lang in ORDER, lang, 'Unexpected language!');
-        const wiki = suggestWikiName(nameHub[lang], lang, nameEn);
+        const wiki = suggestWikiName(nameHub[lang], lang, nameEn, switcheroos);
         byWiki[wiki] = byWiki[wiki] || [];
         byWiki[wiki].push({
             lang,
@@ -92,9 +71,9 @@ function distributeByWiki(nameHub) {
 /**
  *
  */
-function suggestWikiName(name, lang, nameEn) {
-    if (nameEn in WIKI_SUFFIXES) {
-        const suffix = WIKI_SUFFIXES[nameEn][lang];
+function suggestWikiName(name, lang, nameEn, switcheroos) {
+    if (nameEn in switcheroos) {
+        const suffix = switcheroos[nameEn][lang];
         return name + ' (' + suffix + ')';
     } else {
         return name;
