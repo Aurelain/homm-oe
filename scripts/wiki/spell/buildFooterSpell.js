@@ -7,13 +7,13 @@ import getWords from '../helpers/getWords.js';
 /**
  *
  */
-function buildFooterSpell({lang}, translations) {
+function buildFooterSpell({lang, school}, translations) {
     const lines = [];
     lines.push('');
     lines.push(`{{Clear}}`);
     lines.push(`----`);
-    lines.push(`{{HeroesNavbox|lang=${lang}}}`);
-    lines.push(`[[Category:${getWords('Heroes', translations, lang)}]]`);
+    lines.push(`{{SpellsNavbox|lang=${lang}}|school=${school}}}`);
+    lines.push(`[[Category:${getWords('Spells', translations, lang)}]]`);
     return joinLines(lines);
 }
 

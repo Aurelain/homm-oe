@@ -4,6 +4,7 @@ import buildInfoBox from './buildInfoBox.js';
 import buildFooterSpell from './buildFooterSpell.js';
 import buildStinger from './buildStinger.js';
 import buildStrategy from './buildStrategy.js';
+import buildInteractions from './buildInteractions.js';
 
 // =====================================================================================================================
 //  P U B L I C
@@ -21,6 +22,7 @@ function handleFreshSpell(info, translations) {
     // Middle
     lines.push(buildInfoBox(info));
     lines.push(buildStinger(info));
+    lines.push(buildInteractions(info, translations));
     lines.push(buildStrategy(info, translations));
 
     // Footer

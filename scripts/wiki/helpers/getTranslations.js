@@ -36,7 +36,10 @@ function getTranslations(filePattern, type, fileBlacklist = null) {
         const definition = targetDefinitions[0];
         const names = Object.values(definition.name);
         assume(names.length === LANG_COUNT, names, 'Unexpected languages count!');
-        items.push(definition);
+        items.push({
+            path,
+            ...definition,
+        });
     }
     return items;
 }

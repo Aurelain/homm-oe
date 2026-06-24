@@ -18,6 +18,7 @@ function generatePayloads({items, fileNames, languages, translations, handleFres
             const pathX = WIKI_DIR + '/Main/' + fileNameX;
             const fileNameXRobotic = fileNames[item.name.en + '@en'].replace('.wiki', '~' + lang + '.wiki');
             const info = {
+                ...item,
                 lang,
                 name: titleX,
                 id: item['target_id'],

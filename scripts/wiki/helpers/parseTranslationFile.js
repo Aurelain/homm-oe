@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import match from '../../utils/match.js';
 import assume from '../../utils/assume.js';
+import parseDefinition from './parseDefinition.js';
 
 const MAIN_PROPS = new Set(['name', 'description']);
 
@@ -18,6 +19,9 @@ function parseTranslationFile(path) {
     for (const definitionFound of definitionsFound) {
         const [definitionText] = definitionFound;
         const definition = parseDefinition(definitionText);
+        assume(definition.target_id, definition, 'Unexpected target_id!');
+        assume(definition.language, definition, 'Unexpected language!');
+        assume(definition.name || definition.description, definition, 'No actual content!');
 
         const signature = generateSignature(definition);
         if (!hub[signature]) {
@@ -42,22 +46,6 @@ function parseTranslationFile(path) {
 // =====================================================================================================================
 //  P R I V A T E
 // =====================================================================================================================
-/**
- *
- */
-function parseDefinition(definitionText) {
-    const lines = match(definitionText, /\| (\w+) = ([^|}]*)/g);
-    const output = {};
-    for (const line of lines) {
-        const [, prop, value] = line;
-        output[prop] = value.trim();
-    }
-    assume(output.target_id, output, 'Unexpected target_id!');
-    assume(output.language, output, 'Unexpected language!');
-    assume(output.name || output.description, output, 'No actual content!');
-    return output;
-}
-
 /**
  *
  */

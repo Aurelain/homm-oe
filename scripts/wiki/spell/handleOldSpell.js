@@ -7,6 +7,7 @@ import buildInfoBox from './buildInfoBox.js';
 import buildStinger from './buildStinger.js';
 import buildStrategy from './buildStrategy.js';
 import buildHeading from '../helpers/buildHeading.js';
+import buildInteractions from './buildInteractions.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -19,11 +20,11 @@ import buildHeading from '../helpers/buildHeading.js';
  *
  */
 function handleOldSpell(info, translations, existingContent) {
+    console.log('info:', info);
     const {lang} = info;
     const zones = {
-        specialization: getWords('Specialization', translations, lang),
-        biography: getWords('Biography', translations, lang),
         strategy: getWords('Strategy', translations, lang),
+        interactions: getWords('Interactions', translations, lang),
     };
     const cleanedContent = cleanContent(existingContent);
     const parsed = parsePage(cleanedContent, zones);
@@ -36,6 +37,13 @@ function handleOldSpell(info, translations, existingContent) {
     lines.push(buildInfoBox(info));
     lines.push(buildStinger(info));
     parsed.header && lines.push(parsed.header);
+
+    if (parsed.zones.interactions) {
+        lines.push(buildHeading('Interactions', translations, lang));
+        lines.push(parsed.zones.interactions);
+    } else {
+        lines.push(buildInteractions(info, translations));
+    }
 
     if (parsed.zones.strategy) {
         lines.push(buildHeading('Strategy', translations, lang));
@@ -57,11 +65,10 @@ function handleOldSpell(info, translations, existingContent) {
 //  P R I V A T E
 // =====================================================================================================================
 function cleanContent(content) {
-    content = content.replaceAll(/\{\{Template:HeroInfoBox.*?}}/gi, '');
-    content = content.replaceAll(/\{\{HeroStinger.*?}}/gi, '');
-    content = content.replaceAll(/\{\{Specialization.*?}}/gi, '');
-    content = content.replaceAll(/\{\{Biography.*?}}/gi, '');
-    content = content.replaceAll(/\{\{\w*HeroesNavbox.*?}}/gi, '');
+    content = content.replaceAll(/\{\{#invoke.*?}}/gi, '');
+    content = content.replaceAll(/\{\{Template:SpellInfobox.*?}}/gi, '');
+    content = content.replaceAll(/\{\{SpellStinger.*?}}/gi, '');
+    content = content.replaceAll(/\{\{SpellsNavbox.*?}}/gi, '');
     content = content.replaceAll(/\[\[Category.*?]]/gi, '');
     content = content.replaceAll('__NOTOC__', '');
     content = content.replaceAll('----', '');
