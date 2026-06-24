@@ -101,6 +101,24 @@ const TRANSLATIONS = {
         zh_cn: '',
         zh_tw: '',
     },
+    Specialist: {
+        pt_br: '',
+        cs: '',
+        en: 'Specialist Hero',
+        fr: '',
+        de: '',
+        hu: '',
+        it: '',
+        ja: '',
+        ko: '',
+        pl: '',
+        ru: '',
+        es: '',
+        tr: '',
+        uk: '',
+        zh_cn: '',
+        zh_tw: '',
+    },
 };
 
 const TARGET_LANGUAGES = new Set([
@@ -124,7 +142,7 @@ const TARGET_LANGUAGES = new Set([
 
 const IDS = [
     //'bonus_magic_astral_summon_1',
-    'bonus_magic_pure_bolt',
+    // 'bonus_magic_pure_bolt',
     //'change_use_necromancy',
     //'day_10_magic_second_song',
     //'day_11_magic_masterful_parry',
@@ -135,7 +153,7 @@ const IDS = [
     //'day_16_magic_arinas_chosen',
     //'day_17_magic_clear_view',
     //'day_18_magic_farsight',
-    //'day_1_magic_healing_water',
+    // 'day_1_magic_healing_water',
     //'day_2_magic_sharp_edge',
     //'day_3_magic_haste',
     //'day_4_magic_favorable_wind',
@@ -185,7 +203,7 @@ const IDS = [
     //'primal_3_magic_wean',
     //'primal_4_magic_fire_globe',
     //'primal_5_magic_crystal_crown',
-    //'primal_6_magic_ice_bolt',
+    'primal_6_magic_ice_bolt',
     //'primal_7_magic_wall_of_flame',
     //'primal_8_magic_cave_in',
     //'primal_9_magic_earths_rage',
@@ -242,10 +260,10 @@ async function spell() {
         handleFresh: handleFreshSpell,
         handleOld: handleOldSpell,
     });
-    console.log('payloads:', payloads);
+    // console.log('payloads:', payloads);
 
     for (const {path, content} of payloads) {
-        // content && fs.writeFileSync(path, content);
+        content && fs.writeFileSync(path, content);
     }
 }
 

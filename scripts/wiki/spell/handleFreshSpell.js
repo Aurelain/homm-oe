@@ -22,6 +22,9 @@ function handleFreshSpell(info, translations) {
     // Middle
     lines.push(buildInfoBox(info));
     lines.push(buildStinger(info));
+    // if (info.masterfulFragment) {
+    //     lines.push(buildMasterfulSection(info));
+    // }
     lines.push(buildInteractions(info, translations));
     lines.push(buildStrategy(info, translations));
 
