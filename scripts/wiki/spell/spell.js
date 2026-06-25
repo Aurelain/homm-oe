@@ -2,10 +2,9 @@ import fs from 'node:fs';
 import suggestFileNames from '../helpers/suggestFileNames.js';
 import handleFreshSpell from './handleFreshSpell.js';
 import handleOldSpell from './handleOldSpell.js';
-import getTranslations from '../helpers/getTranslations.js';
 import generatePayloads from '../helpers/generatePayloads.js';
-import enumerate from '../../utils/enumerate.js';
 import fattenSpells from './fattenSpells.js';
+import getSpells from './getSpells.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -234,17 +233,7 @@ const IDS = [
  *
  */
 async function spell() {
-    const blackList = [
-        '~kara_',
-        '_special.wiki',
-        'astral_summon',
-        'bonus_magic_kill_summon',
-        'neutral_1_magic_back_to_garrison',
-        'neutral_1_magic_mana_transfer',
-        'night_bonus_magic_1_magic',
-        'primal_bonus_magic_1_magic',
-    ];
-    let spells = getTranslations('/Spell~', 'spell', new RegExp(blackList.join('|')));
+    let spells = getSpells();
     const fileNames = suggestFileNames(spells);
     // const ids = spells.map((item) => item.target_id);
 

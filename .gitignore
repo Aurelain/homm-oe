@@ -3,3 +3,4 @@ node_modules/
 /Core/
 **/volatile/*.js
 /scripts/editWiki/wiki/Files
+purge.json

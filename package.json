@@ -18,7 +18,8 @@
         "redirect": "node scripts/wiki/redirect/redirect",
         "obelisk": "node scripts/wiki/obelisk/obelisk",
         "translations": "node scripts/wiki/translations/translations",
-        "preparePurge": "node scripts/wiki/preparePurge/preparePurge"
+        "preparePurge": "node scripts/wiki/preparePurge/preparePurge",
+        "purgeSpells": "node scripts/wiki/purgeSpells/purgeSpells"
     },
     "dependencies": {
         "fflate": "^0.8.2",
