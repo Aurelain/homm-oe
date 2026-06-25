@@ -5,7 +5,7 @@
  *
  */
 function buildStinger({lang, id}) {
-    return `\n{{SpellStinger|lang=${lang}|id=${id}}}\n`;
+    return `{{SpellStinger|lang=${lang}|id=${id}}}`;
 }
 
 // =====================================================================================================================

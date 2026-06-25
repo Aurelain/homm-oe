@@ -10,10 +10,8 @@ import getWords from '../helpers/getWords.js';
  */
 function buildStrategy({lang, id}, translations) {
     const lines = [];
-    lines.push('');
     lines.push(buildHeading('Strategy', translations, lang));
     lines.push(`''${getWords('Strategy_text', translations, lang)}''`);
-    lines.push('');
     return joinLines(lines);
 }
 

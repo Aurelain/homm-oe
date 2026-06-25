@@ -7,7 +7,7 @@
 function buildInfoBox({lang, id, masterfulFragment}) {
     const masterfulText = masterfulFragment?.[lang] || '';
     const masterful = masterfulFragment ? `|masterful=${masterfulText}` : '';
-    return `\n{{Template:SpellInfobox|lang=${lang}|id=${id}${masterful}}}\n`;
+    return `{{Template:SpellInfobox|lang=${lang}|id=${id}${masterful}}}`;
 }
 
 // =====================================================================================================================

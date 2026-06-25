@@ -9,10 +9,10 @@ import getWords from '../helpers/getWords.js';
  */
 function buildFooterSpell({lang, school}, translations) {
     const lines = [];
-    lines.push('');
     lines.push(`{{Clear}}`);
-    lines.push(`{{SpellsNavbox|lang=${lang}}|school=${school}}}`);
+    lines.push(`{{SpellsNavbox|lang=${lang}|school=${school}}}`);
     lines.push(`[[Category:${getWords('Spells', translations, lang)}]]`);
+    lines.push('__NOTOC__');
     return joinLines(lines);
 }
 

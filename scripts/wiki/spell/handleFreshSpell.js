@@ -17,7 +17,6 @@ function handleFreshSpell(info, translations) {
 
     // Header
     lines.push(buildLoc(info));
-    lines.push('__NOTOC__');
 
     // Middle
     lines.push(buildInfoBox(info));
@@ -25,10 +24,13 @@ function handleFreshSpell(info, translations) {
     // if (info.masterfulFragment) {
     //     lines.push(buildMasterfulSection(info));
     // }
-    lines.push(buildInteractions(info, translations));
+    // lines.push(buildInteractions(info, translations));
+
+    lines.push('');
     lines.push(buildStrategy(info, translations));
 
     // Footer
+    lines.push('');
     lines.push(buildFooterSpell(info, translations));
 
     const output = joinLines(lines);
