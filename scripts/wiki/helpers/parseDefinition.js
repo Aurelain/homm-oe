@@ -7,7 +7,8 @@ import match from '../../utils/match.js';
  *
  */
 function parseDefinition(definitionText) {
-    const lines = match(definitionText, /\| (\w+) = ([^|}]*)/g);
+    definitionText = definitionText.replace(/}}\s*$/, '');
+    const lines = match(definitionText, /\|\s*(\w+)\s*=\s*([^|]*)/g);
     const output = {};
     for (const line of lines) {
         const [, prop, value] = line;

@@ -4,6 +4,7 @@ import walk from '../../utils/walk.js';
 import match from '../../utils/match.js';
 import assume from '../../utils/assume.js';
 import cloneDeep from '../../utils/cloneDeep.js';
+import parseDefinition from '../helpers/parseDefinition.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -39,33 +40,21 @@ function translations() {
  */
 function parseFile(path) {
     const content = fs.readFileSync(path, 'utf8');
-    const definitionsFound = match(content, /\{\{WikiTranslation[\s\S]*?}}/g);
+    const definitionsFound = match(content, /\{\{WikiTranslation[\s\S]*?\n}}/g);
     assume(definitionsFound.length > 1, path, 'Unexpected results!');
     const hub = {};
     for (const definitionFound of definitionsFound) {
         const definition = parseDefinition(definitionFound[0]);
+        assume(definition.subtype, definition, 'Unexpected subtype!');
+        assume(definition.target_id, definition, 'Unexpected target_id!');
+        assume(definition.en, definition, 'Unexpected en!');
+        assume(typeof definition.name === 'string', definition, 'Unexpected name!');
+
         const {target_id} = definition;
         assume(!hub[target_id], definition, 'Id collision!');
         hub[target_id] = definition;
     }
     return hub;
-}
-
-/**
- *
- */
-function parseDefinition(definitionText) {
-    const lines = match(definitionText, /\| (\w+) =([^|}]*)/g);
-    const output = {};
-    for (const line of lines) {
-        const [, prop, value] = line;
-        output[prop] = value.trim();
-    }
-    assume(output.subtype, output, 'Unexpected subtype!');
-    assume(output.target_id, output, 'Unexpected target_id!');
-    assume(output.en, output, 'Unexpected en!');
-    assume(typeof output.name === 'string', output, 'Unexpected name!');
-    return output;
 }
 
 /**
