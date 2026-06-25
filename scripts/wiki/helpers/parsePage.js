@@ -22,12 +22,12 @@ function parsePage(content, zones) {
     for (const id in zones) {
         const title = zones[id];
         outputZones[id] = '';
-        rest = rest.replace(new RegExp('==\\s*' + title + '.*?==+([\\s\\S]*?)==', 'i'), (all, captured) => {
+        rest = rest.replace(new RegExp('==\\s*' + title + '.*?==+([\\s\\S]*?)(==+)', 'i'), (all, captured, last) => {
             outputZones[id] = captured.trim();
-            return '==';
+            return last;
         });
     }
-    rest = rest.replace(/==$/, '');
+    rest = rest.replace(/=+$/, '');
 
     return {
         header: header.trim(),
