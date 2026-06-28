@@ -47,6 +47,7 @@ function fattenSpells(spells) {
  *
  */
 function findMasterful(name) {
+    name = name.replaceAll("'", '’'); // undo the fix by Ketura
     const dataPaths = walk(WIKI_DIR + '/Data');
     let paths = filter(dataPaths, '/HeroSpecialization~');
     paths = filter(paths, (path) => !path.match(/tutorial|campaign|cm_fun/));

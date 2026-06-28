@@ -5,6 +5,7 @@ import buildFooterSpell from './buildFooterSpell.js';
 import buildStinger from './buildStinger.js';
 import buildStrategy from './buildStrategy.js';
 import buildInteractions from './buildInteractions.js';
+import buildSpecialist from './buildSpecialist.js';
 
 // =====================================================================================================================
 //  P U B L I C
@@ -17,15 +18,20 @@ function handleFreshSpell(info, translations) {
 
     // Header
     lines.push(buildLoc(info));
-
-    // Middle
     lines.push(buildInfoBox(info));
     lines.push(buildStinger(info));
-    // if (info.masterfulFragment) {
-    //     lines.push(buildMasterfulSection(info));
-    // }
+
+    // Specialist
+    if (info.masterfulFragment) {
+        lines.push('');
+        lines.push(buildSpecialist(info, translations));
+    }
+
+    // Interactions
+    // lines.push('');
     // lines.push(buildInteractions(info, translations));
 
+    // Strategy
     lines.push('');
     lines.push(buildStrategy(info, translations));
 

@@ -7,10 +7,10 @@ import joinLines from '../../utils/joinLines.js';
 /**
  *
  */
-function buildMasterfulSection({lang, id, masterfulHero}, translations) {
+function buildSpecialist({lang, id}, translations) {
     const lines = [];
-    lines.push('');
     lines.push(buildHeading('Specialist', translations, lang));
+    lines.push(`{{Specialist | id=${id}}}`);
     lines.push('');
     return joinLines(lines);
 }
@@ -18,4 +18,4 @@ function buildMasterfulSection({lang, id, masterfulHero}, translations) {
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default buildMasterfulSection;
+export default buildSpecialist;

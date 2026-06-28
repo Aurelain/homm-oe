@@ -8,6 +8,7 @@ import buildStinger from './buildStinger.js';
 import buildStrategy from './buildStrategy.js';
 import buildHeading from '../helpers/buildHeading.js';
 import buildInteractions from './buildInteractions.js';
+import buildSpecialist from './buildSpecialist.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -29,15 +30,24 @@ function handleOldSpell(info, translations, existingContent) {
     const parsed = parsePage(cleanedContent, zones);
 
     const lines = [];
+
+    // Header
     lines.push(buildLoc(info));
     lines.push(buildInfoBox(info));
     lines.push(buildStinger(info));
-
     if (parsed.header) {
         lines.push('');
         lines.push(parsed.header);
     }
 
+    // Specialist
+    if (info.masterfulFragment) {
+        lines.push('');
+        lines.push(buildSpecialist(info, translations));
+    }
+
+    // Interactions
+    // lines.push('');
     // if (parsed.zones.interactions) {
     //     lines.push(buildHeading('Interactions', translations, lang));
     //     lines.push(parsed.zones.interactions);
@@ -45,6 +55,7 @@ function handleOldSpell(info, translations, existingContent) {
     //     lines.push(buildInteractions(info, translations));
     // }
 
+    // Strategy
     lines.push('');
     if (parsed.zones.strategy) {
         lines.push(buildHeading('Strategy', translations, lang));
@@ -53,6 +64,7 @@ function handleOldSpell(info, translations, existingContent) {
         lines.push(buildStrategy(info, translations));
     }
 
+    // Footer
     if (parsed.footer) {
         lines.push('');
         lines.push(parsed.footer);
@@ -70,6 +82,7 @@ function handleOldSpell(info, translations, existingContent) {
 // =====================================================================================================================
 function cleanContent(content) {
     content = content.replaceAll(/\{\{#invoke.*?}}/gi, '');
+    content = content.replaceAll(/\{\{Specialist.*?}}/gi, '');
     content = content.replaceAll(/\{\{Template:SpellInfobox.*?}}/gi, '');
     content = content.replaceAll(/\{\{SpellStinger.*?}}/gi, '');
     content = content.replaceAll(/\{\{SpellsNavbox.*?}}/gi, '');
