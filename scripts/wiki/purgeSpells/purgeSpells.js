@@ -32,7 +32,11 @@ async function purgeSpells() {
 
     spells = spells.map((item) => ({
         name: {
-            ru: item.name.ru,
+            en: item.name.en,
+            // fr: item.name.fr,
+            // ja: item.name.ja,
+            // pl: item.name.pl,
+            // ru: item.name.ru,
         },
     }));
 

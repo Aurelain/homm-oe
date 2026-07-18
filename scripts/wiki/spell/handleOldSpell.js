@@ -9,6 +9,7 @@ import buildStrategy from './buildStrategy.js';
 import buildHeading from '../helpers/buildHeading.js';
 import buildInteractions from './buildInteractions.js';
 import buildSpecialist from './buildSpecialist.js';
+import match from '../../utils/match.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -22,18 +23,19 @@ import buildSpecialist from './buildSpecialist.js';
  */
 function handleOldSpell(info, translations, existingContent) {
     const {lang} = info;
-    const zones = {
+    const [, previousMasterful] = match(existingContent, /masterful=([^}]+)/);
+    const cleanedContent = cleanContent(existingContent);
+    const parsed = parsePage(cleanedContent, {
         strategy: getWords('Strategy', translations, lang),
         interactions: getWords('Interactions', translations, lang),
-    };
-    const cleanedContent = cleanContent(existingContent);
-    const parsed = parsePage(cleanedContent, zones);
+        specialist: getWords('Specialist', translations, lang),
+    });
 
     const lines = [];
 
     // Header
     lines.push(buildLoc(info));
-    lines.push(buildInfoBox(info));
+    lines.push(buildInfoBox(info, previousMasterful));
     lines.push(buildStinger(info));
     if (parsed.header) {
         lines.push('');
@@ -44,6 +46,9 @@ function handleOldSpell(info, translations, existingContent) {
     if (info.masterfulFragment) {
         lines.push('');
         lines.push(buildSpecialist(info, translations));
+        if (parsed.zones.specialist) {
+            lines.push(parsed.zones.specialist);
+        }
     }
 
     // Interactions
