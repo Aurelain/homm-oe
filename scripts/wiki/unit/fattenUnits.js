@@ -13,27 +13,25 @@ import parseTranslationFile from '../helpers/parseTranslationFile.js';
 /**
  *
  */
-function fattenUnits(spells) {
+function fattenUnits(units) {
     const output = [];
-    for (const spell of spells) {
-        const {path} = spell;
+    for (const unit of units) {
+        const {path} = unit;
 
         const content = fs.readFileSync(path, 'utf8');
-        const [spellDef] = match(content, /\{\{SpellDef[\s\S]*?}}/);
-        const definition = parseDefinition(spellDef);
-        assume(definition.school, definition, 'School missing!');
-        assume(definition.rank, definition, 'Rank missing!');
+        const [unitDef] = match(content, /\{\{UnitDef[\s\S]*?}}/);
+        const definition = parseDefinition(unitDef);
 
         const extra = {};
-        if (fs.existsSync(path.replace('.wiki', '_special.wiki'))) {
-            const {hero, fragment} = findMasterful(spell.name.en);
-            extra.masterfulHero = hero;
-            extra.masterfulFragment = fragment;
-        }
+        // if (fs.existsSync(path.replace('.wiki', '_special.wiki'))) {
+        // const {hero, fragment} = findMasterful(unit.name.en);
+        // extra.masterfulHero = hero;
+        // extra.masterfulFragment = fragment;
+        // }
 
         output.push({
             ...definition,
-            ...spell,
+            ...unit,
             ...extra,
         });
     }

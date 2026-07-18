@@ -31,8 +31,11 @@ function getTranslations(filePattern, type, fileBlacklist = null) {
     const items = [];
     for (const path of paths) {
         const definitions = parseTranslationFile(path);
+        if (!definitions) {
+            continue;
+        }
         const targetDefinitions = definitions.filter((item) => item.type === type);
-        assume(targetDefinitions.length === 1, 'Expecting only one hero from a file!');
+        assume(targetDefinitions.length === 1, path, 'Expecting only one result from a file!');
         const definition = targetDefinitions[0];
         const names = Object.values(definition.name);
         assume(names.length === LANG_COUNT, names, 'Unexpected languages count!');

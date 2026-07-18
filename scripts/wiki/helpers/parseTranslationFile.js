@@ -13,6 +13,10 @@ const MAIN_PROPS = new Set(['name', 'description']);
  */
 function parseTranslationFile(path) {
     const content = fs.readFileSync(path, 'utf8');
+    if (content.match(/^[^}]*unused = yes/)) {
+        console.log(`Unused item at "${path}"! Skipping it.`);
+        return;
+    }
     const definitionsFound = match(content, /\{\{TranslationDef[\s\S]*?}}/g);
     assume(definitionsFound.length > 1, path, 'Unexpected results!');
     const hub = {};

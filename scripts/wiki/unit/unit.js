@@ -118,6 +118,8 @@ async function unit() {
     // spells = spells.filter((item) => IDS.includes(item.target_id));
 
     const fatUnits = fattenUnits(units);
+    console.log('fatUnits:', fatUnits);
+    return;
 
     const payloads = generatePayloads({
         items: fatUnits,
