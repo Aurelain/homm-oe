@@ -25,8 +25,8 @@ async function purgeSpells() {
             es: '',
             tr: '',
             uk: '',
-            zh_cn: '',
-            zh_tw: '',
+            zh_hans: '',
+            zh_hant: '',
         },
     });
 

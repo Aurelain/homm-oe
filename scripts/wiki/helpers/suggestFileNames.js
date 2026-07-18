@@ -6,7 +6,7 @@ import assume from '../../utils/assume.js';
 // Languages ordered by number of speakers:
 const ORDER = {
     en: 1,
-    zh_cn: 2,
+    zh_hans: 2,
     es: 3,
     fr: 4,
     pt_br: 5,
@@ -16,7 +16,7 @@ const ORDER = {
     tr: 9,
     ko: 10,
     it: 11,
-    zh_tw: 12,
+    zh_hant: 12,
     pl: 13,
     uk: 14,
     hu: 15,

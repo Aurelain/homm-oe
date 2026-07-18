@@ -5,23 +5,24 @@ import suggestFileNames from '../helpers/suggestFileNames.js';
 import buildLoc from '../helpers/buildLoc.js';
 import convertFileNameToWikiUrl from '../helpers/convertFileNameToWikiUrl.js';
 import getTranslations from '../helpers/getTranslations.js';
+import getUnits from '../unit/getUnits.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
 const TARGET_LANGUAGES = new Set([
     // 'en',
-    // 'zh_cn',
+    // 'zh_hans',
     // 'es',
     // 'fr',
     // 'pt_br',
-    'ru',
+    // 'ru',
     // 'de',
     // 'ja',
     // 'tr',
     // 'ko',
     // 'it',
-    // 'zh_tw',
+    // 'zh_hant',
     // 'pl',
     // 'uk',
     // 'hu',
@@ -36,7 +37,7 @@ const TARGET_LANGUAGES = new Set([
  */
 function redirect() {
     // const items = getSkills();
-    const items = getTranslations('/Hero~', 'hero', /tutorial|campaign|cm_fun/);
+    const items = getUnits();
     const fileNames = suggestFileNames(items);
     for (const lang of TARGET_LANGUAGES) {
         for (const item of items) {

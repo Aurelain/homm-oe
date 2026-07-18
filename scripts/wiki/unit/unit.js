@@ -26,7 +26,7 @@ const TRANSLATIONS = {
         tr: '',
         uk: '',
         zh_hans: '',
-        zh_tw: '',
+        zh_hant: '',
     },
     Strategy: {
         pt_br: '',
@@ -44,7 +44,7 @@ const TRANSLATIONS = {
         tr: '',
         uk: '',
         zh_hans: '',
-        zh_tw: '',
+        zh_hant: '',
     },
     Strategy_text: {
         pt_br: '',
@@ -62,7 +62,7 @@ const TRANSLATIONS = {
         tr: '',
         uk: '',
         zh_hans: '',
-        zh_tw: '',
+        zh_hant: '',
     },
     Specialist: {
         pt_br: '',
@@ -80,7 +80,7 @@ const TRANSLATIONS = {
         tr: '',
         uk: '',
         zh_hans: '',
-        zh_tw: '',
+        zh_hant: '',
     },
 };
 
@@ -96,7 +96,7 @@ const TARGET_LANGUAGES = new Set([
     // 'tr',
     // 'ko',
     // 'it',
-    // 'zh_tw',
+    // 'zh_hant',
     // 'pl',
     // 'uk',
     // 'hu',
