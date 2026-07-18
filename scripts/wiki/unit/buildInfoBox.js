@@ -4,10 +4,8 @@
 /**
  *
  */
-function buildInfoBox({lang, id, masterfulFragment}, previousMasterful = '') {
-    const masterfulText = previousMasterful || masterfulFragment?.[lang] || '';
-    const masterful = masterfulFragment ? `|masterful=${masterfulText}` : '';
-    return `{{Template:SpellInfobox|lang=${lang}|id=${id}${masterful}}}`;
+function buildInfoBox({lang, id}) {
+    return `{{UnitInfobox|lang=${lang}|id=${id}}}`;
 }
 
 // =====================================================================================================================

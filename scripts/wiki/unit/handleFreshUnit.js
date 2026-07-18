@@ -19,21 +19,6 @@ function handleFreshUnit(info, translations) {
     // Header
     lines.push(buildLoc(info));
     lines.push(buildInfoBox(info));
-    lines.push(buildStinger(info));
-
-    // Specialist
-    if (info.masterfulFragment) {
-        lines.push('');
-        lines.push(buildSpecialist(info, translations));
-    }
-
-    // Interactions
-    // lines.push('');
-    // lines.push(buildInteractions(info, translations));
-
-    // Strategy
-    lines.push('');
-    lines.push(buildStrategy(info, translations));
 
     // Footer
     lines.push('');

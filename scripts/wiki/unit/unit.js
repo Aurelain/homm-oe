@@ -25,7 +25,7 @@ const TRANSLATIONS = {
         es: '',
         tr: '',
         uk: '',
-        zh_cn: '',
+        zh_hans: '',
         zh_tw: '',
     },
     Strategy: {
@@ -43,7 +43,7 @@ const TRANSLATIONS = {
         es: '',
         tr: '',
         uk: '',
-        zh_cn: '',
+        zh_hans: '',
         zh_tw: '',
     },
     Strategy_text: {
@@ -61,7 +61,7 @@ const TRANSLATIONS = {
         es: '',
         tr: '',
         uk: '',
-        zh_cn: '',
+        zh_hans: '',
         zh_tw: '',
     },
     Specialist: {
@@ -79,14 +79,14 @@ const TRANSLATIONS = {
         es: '',
         tr: '',
         uk: '',
-        zh_cn: '',
+        zh_hans: '',
         zh_tw: '',
     },
 };
 
 const TARGET_LANGUAGES = new Set([
     'en',
-    // 'zh_cn',
+    // 'zh_hans',
     // 'es',
     // 'fr',
     // 'pt_br',
@@ -103,7 +103,17 @@ const TARGET_LANGUAGES = new Set([
     // 'cs',
 ]);
 
-const IDS = [];
+const FACTIONS = new Set([
+    'human',
+    // 'undead',
+    // 'nature',
+    // 'demon',
+    // 'unfrozen',
+    // 'dungeon',
+    // 'neutral',
+]);
+
+const IDS = ['angel'];
 
 // =====================================================================================================================
 //  P U B L I C
@@ -115,14 +125,12 @@ async function unit() {
     let units = getUnits();
     const fileNames = suggestFileNames(units);
 
-    // spells = spells.filter((item) => IDS.includes(item.target_id));
-
-    const fatUnits = fattenUnits(units);
-    console.log('fatUnits:', fatUnits);
-    return;
+    // units = units.filter((item) => IDS.includes(item.target_id));
+    units = fattenUnits(units);
+    units = units.filter((item) => FACTIONS.has(item.faction));
 
     const payloads = generatePayloads({
-        items: fatUnits,
+        items: units,
         fileNames,
         languages: TARGET_LANGUAGES,
         translations: TRANSLATIONS,
