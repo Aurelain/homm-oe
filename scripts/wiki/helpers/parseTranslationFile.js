@@ -5,6 +5,11 @@ import parseDefinition from './parseDefinition.js';
 
 const MAIN_PROPS = new Set(['name', 'description']);
 
+const FIX_LANGUAGE_CODE = {
+    zh_cn: 'zh_hans',
+    zh_tw: 'zh_hant',
+};
+
 // =====================================================================================================================
 //  P U B L I C
 // =====================================================================================================================
@@ -26,6 +31,7 @@ function parseTranslationFile(path) {
         assume(definition.target_id, definition, 'Unexpected target_id!');
         assume(definition.language, definition, 'Unexpected language!');
         assume(definition.name || definition.description, definition, 'No actual content!');
+        definition.language = FIX_LANGUAGE_CODE[definition.language] || definition.language;
 
         const signature = generateSignature(definition);
         if (!hub[signature]) {

@@ -23,7 +23,7 @@ const TARGET_LANGUAGES = new Set([
     // 'ko',
     // 'it',
     // 'zh_hant',
-    // 'pl',
+    'pl',
     // 'uk',
     // 'hu',
     // 'cs',
