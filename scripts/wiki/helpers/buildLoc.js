@@ -28,6 +28,7 @@ function generateTitle(fileNameX) {
     title = title.replace(/\(\w\w_\w\w\)$/, ''); // remove advanced language code
     title = title.replace(/~\w+$/, ''); // remove any robotic leftovers
     title = title.replaceAll('_', ' ');
+    title = title.trim();
     return title;
 }
 

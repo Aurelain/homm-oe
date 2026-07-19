@@ -11,8 +11,8 @@ import WORDS from './WORDS.js';
 //  D E C L A R A T I O N S
 // =====================================================================================================================
 const TARGET_LANGUAGES = new Set([
-    'en',
-    // 'zh-hans',
+    // 'en',
+    'zh-hans',
     // 'es',
     // 'fr',
     // 'pt_br',
@@ -30,13 +30,13 @@ const TARGET_LANGUAGES = new Set([
 ]);
 
 const FACTIONS = new Set([
-    // 'human',
+    'human',
     // 'undead',
     // 'nature',
     // 'demon',
     // 'unfrozen',
     // 'dungeon',
-    'neutral',
+    // 'neutral',
 ]);
 
 const IDS = ['angel'];
@@ -45,6 +45,8 @@ const SWITCHEROOS = {
     Stinger: {
         en: 'unit',
         fr: 'unité',
+        ja: 'unit',
+        pl: 'unit',
     },
 };
 
@@ -58,7 +60,7 @@ async function unit() {
     let units = getUnits();
     const fileNames = suggestFileNames(units, SWITCHEROOS);
 
-    // units = units.filter((item) => IDS.includes(item.target_id));
+    units = units.filter((item) => IDS.includes(item.target_id));
     units = fattenUnits(units);
     units = units.filter((item) => FACTIONS.has(item.faction));
 
