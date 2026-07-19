@@ -5,108 +5,16 @@ import handleOldUnit from './handleOldUnit.js';
 import generatePayloads from '../helpers/generatePayloads.js';
 import fattenUnits from './fattenUnits.js';
 import getUnits from './getUnits.js';
+import WORDS from './WORDS.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
-const TRANSLATIONS = {
-    Category_Units: {
-        pt_br: '',
-        cs: '',
-        en: 'Units',
-        fr: 'Unités',
-        de: '',
-        hu: '',
-        it: '',
-        ja: '',
-        ko: '',
-        pl: '',
-        ru: '',
-        es: '',
-        tr: '',
-        uk: '',
-        ['zh-hans']: '',
-        ['zh-hant']: '',
-    },
-    Strategy: {
-        pt_br: '',
-        cs: '',
-        en: 'Strategy',
-        fr: 'Stratégie',
-        de: '',
-        hu: '',
-        it: '',
-        ja: '',
-        ko: '',
-        pl: 'Strategia',
-        ru: 'Стратегия',
-        es: '',
-        tr: '',
-        uk: '',
-        ['zh-hans']: '',
-        ['zh-hant']: '',
-    },
-    Strategy_text: {
-        pt_br: '',
-        cs: '',
-        en: 'Nothing yet. Maybe you can add it...?',
-        fr: '',
-        de: '',
-        hu: '',
-        it: '',
-        ja: '',
-        ko: '',
-        pl: 'Jeszcze nic. Może możesz to dodać...?',
-        ru: 'Здесь пока ничего нет. Возможно, вы сможете это исправить?',
-        es: '',
-        tr: '',
-        uk: '',
-        ['zh-hans']: '',
-        ['zh-hant']: '',
-    },
-    Specialist: {
-        pt_br: '',
-        cs: '',
-        en: 'Specialist hero',
-        fr: '',
-        de: '',
-        hu: '',
-        it: '',
-        ja: '',
-        ko: '',
-        pl: '',
-        ru: '',
-        es: '',
-        tr: '',
-        uk: '',
-        ['zh-hans']: '',
-        ['zh-hant']: '',
-    },
-    Category_human_Units: {
-        pt_br: '',
-        cs: '',
-        en: 'Temple Units',
-        fr: 'Unités du Temple',
-        de: '',
-        hu: '',
-        it: '',
-        ja: 'Temple Units/ja',
-        ko: '',
-        pl: '',
-        ru: '',
-        es: '',
-        tr: '',
-        uk: '',
-        ['zh-hans']: '',
-        ['zh-hant']: '',
-    },
-};
-
 const TARGET_LANGUAGES = new Set([
-    // 'en',
+    'en',
     // 'zh-hans',
     // 'es',
-    'fr',
+    // 'fr',
     // 'pt_br',
     // 'ru',
     // 'de',
@@ -122,16 +30,23 @@ const TARGET_LANGUAGES = new Set([
 ]);
 
 const FACTIONS = new Set([
-    'human',
+    // 'human',
     // 'undead',
     // 'nature',
     // 'demon',
     // 'unfrozen',
     // 'dungeon',
-    // 'neutral',
+    'neutral',
 ]);
 
 const IDS = ['angel'];
+
+const SWITCHEROOS = {
+    Stinger: {
+        en: 'unit',
+        fr: 'unité',
+    },
+};
 
 // =====================================================================================================================
 //  P U B L I C
@@ -141,7 +56,7 @@ const IDS = ['angel'];
  */
 async function unit() {
     let units = getUnits();
-    const fileNames = suggestFileNames(units);
+    const fileNames = suggestFileNames(units, SWITCHEROOS);
 
     // units = units.filter((item) => IDS.includes(item.target_id));
     units = fattenUnits(units);
@@ -151,7 +66,7 @@ async function unit() {
         items: units,
         fileNames,
         languages: TARGET_LANGUAGES,
-        translations: TRANSLATIONS,
+        translations: WORDS,
         handleFresh: handleFreshUnit,
         handleOld: handleOldUnit,
     });

@@ -74,10 +74,11 @@ function distributeByWiki(nameHub, switcheroos) {
 function suggestWikiName(name, lang, nameEn, switcheroos) {
     if (nameEn in switcheroos) {
         const suffix = switcheroos[nameEn][lang];
-        return name + ' (' + suffix + ')';
-    } else {
-        return name;
+        if (suffix) {
+            return name + ' (' + suffix + ')';
+        }
     }
+    return name;
 }
 
 /**

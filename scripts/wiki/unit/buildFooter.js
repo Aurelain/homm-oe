@@ -8,9 +8,10 @@ import getWords from '../helpers/getWords.js';
  *
  */
 function buildFooter({lang, faction}, translations) {
+    const navboxSuffix = lang === 'en' ? '' : `|l=${lang}`;
     const lines = [];
     lines.push(`{{Clear}}`);
-    lines.push(`{{UnitsNavbox|l=${lang}}}`);
+    lines.push(`{{UnitsNavbox${navboxSuffix}}}`);
     lines.push(`[[Category:${getWords(`Category_${faction}_Units`, translations, lang)}]]`);
     lines.push(`[[Category:${getWords('Category_Units', translations, lang)}]]`);
     lines.push('__NOTOC__');
