@@ -6,13 +6,14 @@ import generatePayloads from '../helpers/generatePayloads.js';
 import fattenUnits from './fattenUnits.js';
 import getUnits from './getUnits.js';
 import WORDS from './WORDS.js';
+import purge from '../helpers/purge.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
 const TARGET_LANGUAGES = new Set([
-    // 'en',
-    'zh-hans',
+    'en',
+    // 'zh-hans',
     // 'es',
     // 'fr',
     // 'pt_br',
@@ -29,15 +30,7 @@ const TARGET_LANGUAGES = new Set([
     // 'cs',
 ]);
 
-const FACTIONS = new Set([
-    'human',
-    // 'undead',
-    // 'nature',
-    // 'demon',
-    // 'unfrozen',
-    // 'dungeon',
-    // 'neutral',
-]);
+const FACTIONS = new Set(['human', 'undead', 'nature', 'demon', 'unfrozen', 'dungeon', 'neutral']);
 
 const IDS = ['angel'];
 
@@ -58,9 +51,13 @@ const SWITCHEROOS = {
  */
 async function unit() {
     let units = getUnits();
+
+    // Uncomment the following line to just purge the wiki pages:
+    // return purge(units, TARGET_LANGUAGES, SWITCHEROOS);
+
     const fileNames = suggestFileNames(units, SWITCHEROOS);
 
-    units = units.filter((item) => IDS.includes(item.target_id));
+    // units = units.filter((item) => IDS.includes(item.target_id));
     units = fattenUnits(units);
     units = units.filter((item) => FACTIONS.has(item.faction));
 

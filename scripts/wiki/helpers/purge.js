@@ -18,8 +18,11 @@ const PURGE_LIST = join(import.meta.dirname, '/purge.json');
 /**
  *
  */
-function purge(items) {
-    const fileNames = suggestFileNames(items);
+function purge(items, targetLanguages, switcheroos) {
+    items = filterItemsByLanguage(items, targetLanguages);
+
+    const fileNames = suggestFileNames(items, switcheroos);
+
     const titles = [];
     for (const key in fileNames) {
         const value = fileNames[key];
@@ -31,6 +34,22 @@ function purge(items) {
     fs.writeFileSync(PURGE_LIST, JSON.stringify(titles, null, 4));
     const child = spawn('node', [EXTERNAL_SCRIPT, SETTINGS_PATH, PURGE_LIST], {stdio: 'inherit'});
     child.on('close', (code) => process.exit(code));
+}
+
+// =====================================================================================================================
+//  P R I V A T E
+// =====================================================================================================================
+/**
+ *
+ */
+function filterItemsByLanguage(items, targetLanguages) {
+    return items.map((item) => {
+        const nameHub = {};
+        for (const lang of targetLanguages) {
+            nameHub[lang] = item.name[lang];
+        }
+        return {name: nameHub};
+    });
 }
 
 // =====================================================================================================================
