@@ -21,7 +21,7 @@ function translations() {
     const paths = walk(WIKI_DIR + '/Data', 'WikiTranslations~');
     const hubs = {};
     for (const path of paths) {
-        const lang = path.match(/~(\w+)/)[1];
+        const lang = path.match(/~([\w-]+)/)[1];
         const hub = parseFile(path);
         hubs[lang] = hub;
     }

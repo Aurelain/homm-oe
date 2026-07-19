@@ -27,8 +27,8 @@ const TRANSLATIONS = {
         es: 'Habilidades del héroe',
         tr: 'Kahraman Becerileri',
         uk: 'Уміння героя',
-        zh_hans: '英雄技能',
-        zh_hant: '英雄技能',
+        ['zh-hans']: '英雄技能',
+        ['zh-hant']: '英雄技能',
     },
     // We could take these from `tutorial_M_13_name`, but it's a delicate operation:
     levels: {
@@ -46,8 +46,8 @@ const TRANSLATIONS = {
         es: '',
         tr: '',
         uk: '',
-        zh_hans: '',
-        zh_hant: '',
+        ['zh-hans']: '',
+        ['zh-hant']: '',
     },
     synergies: {
         pt_br: '',
@@ -64,8 +64,8 @@ const TRANSLATIONS = {
         es: '',
         tr: '',
         uk: '',
-        zh_hans: '',
-        zh_hant: '',
+        ['zh-hans']: '',
+        ['zh-hant']: '',
     },
     synergiesText: {
         pt_br: '',
@@ -82,8 +82,8 @@ const TRANSLATIONS = {
         es: '',
         tr: '',
         uk: '',
-        zh_hans: '',
-        zh_hant: '',
+        ['zh-hans']: '',
+        ['zh-hant']: '',
     },
     artifacts: {
         pt_br: '',
@@ -100,15 +100,15 @@ const TRANSLATIONS = {
         es: '',
         tr: '',
         uk: '',
-        zh_hans: '',
-        zh_hant: '',
+        ['zh-hans']: '',
+        ['zh-hant']: '',
     },
 };
 
 const SWITCHEROOS = {
     'Summon Avatar': {
         en: 'Skill',
-        zh_hans: '技能',
+        ['zh-hans']: '技能',
         es: 'Habilidad',
         fr: 'Compétence',
         pt_br: 'Habilidade',
@@ -118,7 +118,7 @@ const SWITCHEROOS = {
         tr: 'Beceri',
         ko: '스킬',
         it: 'Abilità',
-        zh_hant: '技能',
+        ['zh-hant']: '技能',
         pl: 'Umiejętność',
         uk: 'Вміння',
         hu: 'Képesség',
@@ -128,7 +128,7 @@ const SWITCHEROOS = {
 
 const TARGET_LANGUAGES = new Set([
     'en',
-    // 'zh_hans',
+    // 'zh-hans',
     // 'es',
     'fr',
     // 'pt_br',
@@ -138,7 +138,7 @@ const TARGET_LANGUAGES = new Set([
     // 'tr',
     // 'ko',
     // 'it',
-    // 'zh_hant',
+    // 'zh-hant',
     'pl',
     // 'uk',
     // 'hu',

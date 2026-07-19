@@ -6,8 +6,8 @@ import parseDefinition from './parseDefinition.js';
 const MAIN_PROPS = new Set(['name', 'description']);
 
 const FIX_LANGUAGE_CODE = {
-    zh_cn: 'zh_hans',
-    zh_tw: 'zh_hant',
+    zh_cn: 'zh-hans',
+    zh_tw: 'zh-hant',
 };
 
 // =====================================================================================================================

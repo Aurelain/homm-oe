@@ -24,8 +24,8 @@ const TRANSLATIONS = {
         es: '',
         tr: '',
         uk: '',
-        zh_hans: '',
-        zh_hant: '',
+        ['zh-hans']: '',
+        ['zh-hant']: '',
     },
     heroes: {
         pt_br: '',
@@ -42,14 +42,14 @@ const TRANSLATIONS = {
         es: '',
         tr: '',
         uk: '',
-        zh_hans: '',
-        zh_hant: '',
+        ['zh-hans']: '',
+        ['zh-hant']: '',
     },
 };
 
 const TARGET_LANGUAGES = new Set([
     'en',
-    // 'zh_hans',
+    // 'zh-hans',
     // 'es',
     // 'fr',
     // 'pt_br',
@@ -59,7 +59,7 @@ const TARGET_LANGUAGES = new Set([
     // 'tr',
     // 'ko',
     // 'it',
-    // 'zh_hant',
+    // 'zh-hant',
     // 'pl',
     // 'uk',
     // 'hu',
