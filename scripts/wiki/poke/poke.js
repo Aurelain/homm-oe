@@ -20,7 +20,7 @@ const POKE_LIST = join(import.meta.dirname, '/poke.json');
  *
  */
 async function poke() {
-    const titles = getTitles('Data', '/Unit~', 'UnitAbilityPassiveDef');
+    const titles = getTitles('Data', '/MapObject~');
 
     // Call `poke` from `mirror-wiki`:
     fs.writeFileSync(POKE_LIST, JSON.stringify(titles, null, 4));
@@ -40,7 +40,7 @@ function getTitles(dir, filePattern, contentPattern) {
     const output = [];
     for (const path of paths) {
         const content = fs.readFileSync(path, 'utf8');
-        if (content.includes(contentPattern)) {
+        if (!contentPattern || content.includes(contentPattern)) {
             const short = path.substring(WIKI_DIR.length + 1);
             let title = convertFileNameToWikiUrl(short);
             if (dir === 'Main') {
