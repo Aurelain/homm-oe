@@ -6,7 +6,8 @@ import {CF_CLEARANCE, USER_AGENT} from '../volatile/CF.js';
 // =====================================================================================================================
 const DEBUG = false;
 // const DEBUG = true;
-let cookies = `cf_clearance=${CF_CLEARANCE}`;
+const cookieJar = new Map();
+cookieJar.set('cf_clearance', CF_CLEARANCE);
 
 // =====================================================================================================================
 //  P U B L I C
@@ -19,7 +20,7 @@ async function requestFromApi(params, method = 'GET', formData = null) {
     const options = {
         method,
         headers: {
-            Cookie: cookies,
+            Cookie: getCookies(),
             'User-Agent': USER_AGENT,
         },
     };
@@ -36,11 +37,7 @@ async function requestFromApi(params, method = 'GET', formData = null) {
     const response = await fetch(url, options);
 
     // Parse and store Set-Cookie headers for the session
-    const setCookie = response.headers.getSetCookie();
-    if (setCookie && setCookie.length > 0) {
-        const newCookies = setCookie.map((c) => c.split(';')[0]).join('; ');
-        cookies = cookies ? `${cookies}; ${newCookies}` : newCookies;
-    }
+    updateCookies(response);
 
     const text = await response.text();
     DEBUG && console.log(`    Response was: ${previewText(text)}`);
@@ -49,13 +46,40 @@ async function requestFromApi(params, method = 'GET', formData = null) {
 }
 
 // =====================================================================================================================
-//  P U B L I C
+//  P R I V A T E
 // =====================================================================================================================
 /**
  *
  */
 function previewText(text) {
     return text.substring(0, 100).replaceAll(/\s/g, ' ');
+}
+
+/**
+ *
+ */
+function getCookies() {
+    return Array.from(cookieJar.entries())
+        .map(([key, value]) => `${key}=${value}`)
+        .join('; ');
+}
+
+/**
+ *
+ */
+function updateCookies(response) {
+    const cookiesList = response.headers.getSetCookie();
+    if (cookiesList && cookiesList.length > 0) {
+        cookiesList.forEach((cookieStr) => {
+            const firstPart = cookieStr.split(';')[0];
+            const separatorIndex = firstPart.indexOf('=');
+            if (separatorIndex !== -1) {
+                const key = firstPart.substring(0, separatorIndex).trim();
+                const value = firstPart.substring(separatorIndex + 1).trim();
+                cookieJar.set(key, value);
+            }
+        });
+    }
 }
 
 // =====================================================================================================================
