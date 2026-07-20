@@ -20,7 +20,8 @@
         "obelisk": "node scripts/wiki/obelisk/obelisk",
         "translations": "node scripts/wiki/translations/translations",
         "preparePurge": "node scripts/wiki/preparePurge/preparePurge",
-        "purgeSpells": "node scripts/wiki/purgeSpells/purgeSpells"
+        "purgeSpells": "node scripts/wiki/purgeSpells/purgeSpells",
+        "poke": "node scripts/wiki/poke/poke"
     },
     "dependencies": {
         "fflate": "^0.8.2",

@@ -1,16 +1,17 @@
-import suggestFileNames from './suggestFileNames.js';
-import fs from 'node:fs';
+import walk from '../../utils/walk.js';
 import {WIKI_DIR} from '../SETTINGS.js';
-import convertFileNameToWikiUrl from './convertFileNameToWikiUrl.js';
+import filter from '../../utils/filter.js';
+import fs from 'node:fs';
+import convertFileNameToWikiUrl from '../helpers/convertFileNameToWikiUrl.js';
 import {join} from 'node:path';
 import {spawn} from 'node:child_process';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
-const EXTERNAL_SCRIPT = join(import.meta.dirname, '../../../../mirror-wiki/scripts/purge/purge.js');
+const EXTERNAL_SCRIPT = join(import.meta.dirname, '../../../../mirror-wiki/scripts/poke/poke.js');
 const SETTINGS_PATH = join(import.meta.dirname, '../../../../oe-wiki/WIKI.json');
-const PURGE_LIST = join(import.meta.dirname, '/purge.json');
+const POKE_LIST = join(import.meta.dirname, '/poke.json');
 
 // =====================================================================================================================
 //  P U B L I C
@@ -18,23 +19,12 @@ const PURGE_LIST = join(import.meta.dirname, '/purge.json');
 /**
  *
  */
-function purge(items, targetLanguages = null, switcheroos = {}) {
-    if (targetLanguages) {
-        items = filterItemsByLanguage(items, targetLanguages);
-    }
+async function poke() {
+    const titles = getTitles('Data', '/Unit~', 'UnitAbilityPassiveDef');
 
-    const fileNames = suggestFileNames(items, switcheroos);
-
-    const titles = [];
-    for (const key in fileNames) {
-        const value = fileNames[key];
-        if (fs.existsSync(WIKI_DIR + '/Main/' + value)) {
-            const title = convertFileNameToWikiUrl(fileNames[key]);
-            titles.push(title);
-        }
-    }
-    fs.writeFileSync(PURGE_LIST, JSON.stringify(titles, null, 4));
-    const child = spawn('node', [EXTERNAL_SCRIPT, SETTINGS_PATH, PURGE_LIST], {stdio: 'inherit'});
+    // Call `poke` from `mirror-wiki`:
+    fs.writeFileSync(POKE_LIST, JSON.stringify(titles, null, 4));
+    const child = spawn('node', [EXTERNAL_SCRIPT, SETTINGS_PATH, POKE_LIST], {stdio: 'inherit'});
     child.on('close', (code) => process.exit(code));
 }
 
@@ -44,17 +34,27 @@ function purge(items, targetLanguages = null, switcheroos = {}) {
 /**
  *
  */
-function filterItemsByLanguage(items, targetLanguages) {
-    return items.map((item) => {
-        const nameHub = {};
-        for (const lang of targetLanguages) {
-            nameHub[lang] = item.name[lang];
+function getTitles(dir, filePattern, contentPattern) {
+    let paths = walk(WIKI_DIR + '/' + dir);
+    paths = filter(paths, filePattern);
+    const output = [];
+    for (const path of paths) {
+        const content = fs.readFileSync(path, 'utf8');
+        if (content.includes(contentPattern)) {
+            const short = path.substring(WIKI_DIR.length + 1);
+            let title = convertFileNameToWikiUrl(short);
+            if (dir === 'Main') {
+                title = title.substring('Main'.length);
+            } else {
+                title = title.replace('/', ':');
+            }
+            output.push(title);
         }
-        return {name: nameHub};
-    });
+    }
+    return output;
 }
 
 // =====================================================================================================================
-//  E X P O R T
+//  R U N
 // =====================================================================================================================
-export default purge;
+await poke();

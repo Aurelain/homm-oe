@@ -4,3 +4,4 @@ node_modules/
 **/volatile/*.js
 /scripts/editWiki/wiki/Files
 purge.json
+poke.json
