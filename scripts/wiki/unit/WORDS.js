@@ -81,7 +81,7 @@ const WORDS = {
         it: '',
         ja: 'Temple Units/ja',
         ko: '',
-        pl: 'Temple Units/pl',
+        pl: 'Jednostki Świątyni',
         ru: 'Существа Храма',
         es: '',
         tr: '',

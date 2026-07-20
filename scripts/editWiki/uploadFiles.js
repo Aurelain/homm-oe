@@ -91,7 +91,7 @@ async function uploadFiles() {
  */
 function getCategories(fileName) {
     const categories = [];
-    categories.push('Active Ability Icons');
+    categories.push('Passive Ability Icons');
     const clothed = categories.map((category) => `[[Category:${category}]]`);
     return clothed.join(' ');
 }

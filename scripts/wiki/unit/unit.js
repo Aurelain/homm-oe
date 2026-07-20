@@ -39,7 +39,7 @@ const SWITCHEROOS = {
         en: 'unit',
         fr: 'unité',
         ja: 'unit',
-        pl: 'unit',
+        pl: 'jednostka',
     },
 };
 
