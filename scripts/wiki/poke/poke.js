@@ -20,7 +20,8 @@ const POKE_LIST = join(import.meta.dirname, '/poke.json');
  *
  */
 async function poke() {
-    const titles = getTitles('Data', '/MapObject~');
+    // const titles = getTitles('Data', '/MapObject~');
+    const titles = getTitles('Data', '/Unit~', 'UnitAbilityActiveDef');
 
     // Call `poke` from `mirror-wiki`:
     fs.writeFileSync(POKE_LIST, JSON.stringify(titles, null, 4));

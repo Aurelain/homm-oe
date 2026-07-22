@@ -102,9 +102,11 @@ function createHierarchy() {
 function writeHierarchyToFile(hierarchy, path, hub) {
     const lines = [];
     lines.push('{{Loc}}');
-    const lang = path.match(/~(\w+)/)[1];
+    const lang = path.split('~').pop().replace('.wiki', '');
     for (const {category, ids} of hierarchy) {
+        lines.push('');
         lines.push('<!--############################################-->');
+        lines.push('');
         lines.push(`== ${category} ==`);
         for (const id of ids) {
             const entry = hub[id];
