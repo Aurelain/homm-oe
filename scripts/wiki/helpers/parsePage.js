@@ -10,35 +10,63 @@ import match from '../../utils/match.js';
 /**
  *
  */
-function parsePage(content, zones) {
-    let [, header] = match(content, /([\s\S]*?)==/);
-    if (header === undefined) {
-        return {header: '', zones: [], footer: content};
-    }
+function parsePage(content) {
+    content = content.trim();
+    let [, header] = match(content, /^([\s\S]*?)==/);
+    header = header === undefined ? content : header;
     let rest = content.substring(header.length);
-    rest += '=='; // so the last zone matches something
 
-    const outputZones = {};
-    for (const id in zones) {
-        const title = zones[id];
-        outputZones[id] = '';
-        rest = rest.replace(new RegExp('==\\s*' + title + '.*?==+([\\s\\S]*?)(==+)', 'i'), (all, captured, last) => {
-            outputZones[id] = captured.trim();
-            return last;
-        });
+    let footer = '';
+    const footerSeparatorIndex = rest.lastIndexOf('\n\n');
+    if (footerSeparatorIndex < 0) {
+        footer = rest;
+        rest = '';
+    } else {
+        footer = rest.substring(footerSeparatorIndex + 2);
+        rest = rest.substring(0, footerSeparatorIndex);
     }
-    rest = rest.replace(/=+$/, '');
 
     return {
         header: header.trim(),
-        zones: outputZones,
-        footer: rest.trim(),
+        sections: parseSection(rest),
+        ids: parseIds(rest),
+        footer: footer.trim(),
     };
 }
 
 // =====================================================================================================================
 //  P R I V A T E
 // =====================================================================================================================
+/**
+ *
+ */
+function parseSection(text) {
+    let draft = text + '§';
+    draft = draft.replace(/==+ *(.*?)==/g, '§$1¶');
+    const sections = draft.split('§');
+    const output = {};
+    for (const section of sections) {
+        let [title = '', body = ''] = section.split('¶');
+        title = title.trim();
+        body = body.trim();
+        if (title || body) {
+            output[title] = body;
+        }
+    }
+    return output;
+}
+
+/**
+ *
+ */
+function parseIds(text) {
+    const found = match(text, /\|\s*id\s*=\s*(\w+)[\s\S]*?}}([^{]*)/g);
+    const output = {};
+    for (const pair of found) {
+        output[pair[1]] = pair[2];
+    }
+    return output;
+}
 
 // =====================================================================================================================
 //  E X P O R T

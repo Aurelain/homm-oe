@@ -1,4 +1,4 @@
-<meta charset="UTF-8" />
+<meta charset='UTF-8'/>
 <script type='module'>
     import parsePage from './parsePage.js';
     import focus from '../../utils/focus.js';
@@ -7,90 +7,91 @@
         // -------------------------------------------------------------------------------------------------------------
         {
             name: 'basic',
-            input: {
-                content: ``,
-                zones: {},
-            },
+            input: '',
             output: {
-                header:'',
-                zones: {},
-                footer:'',
+                header: '',
+                sections: {},
+                ids: {},
+                footer: '',
             },
         },
         // -------------------------------------------------------------------------------------------------------------
         {
-            name: 'just footer',
-            input: {
-                content: `foo`,
-                zones: {},
-            },
+            name: 'just header',
+            input: 'foo',
             output: {
-                header:'',
-                zones: {},
-                footer:'foo',
+                header: 'foo',
+                sections: {},
+                ids: {},
+                footer: '',
             },
         },
         // -------------------------------------------------------------------------------------------------------------
         {
-            name: 'header',
-            input: {
-                content: `foo==`,
-                zones: {},
-            },
+            name: 'header and footer',
+            input: 'foo==',
             output: {
-                header:'foo',
-                zones: {},
-                footer:'==',
+                header: 'foo',
+                sections: {},
+                ids: {},
+                footer: '==',
             },
         },
         // -------------------------------------------------------------------------------------------------------------
         {
-            name: 'zones',
-            input: {
-                content: `
-                ==Foo==
-                Bar
-                ==Hello
-                `,
-                zones: {
-                    id1: 'Foo'
-                },
-            },
+            name: 'header and footer 2',
+            input: 'foo==bar',
             output: {
-                header:'',
-                zones: {
-                    id1: 'Bar'
-                },
-                footer:`==Hello`,
+                header: 'foo',
+                sections: {},
+                ids: {},
+                footer: '==bar',
             },
         },
         // -------------------------------------------------------------------------------------------------------------
         {
-            name: 'all',
-            input: {
-                content: `
-                lorem
-                ==Hello==
-                ==Foo==
-                Bar
-                ==World==
-                `,
-                zones: {
-                    id1: 'Foo'
-                },
-            },
+            name: 'header and footer 3',
+            input: 'foo==\n\nbar',
             output: {
-                header:'lorem',
-                zones: {
-                    id1: 'Bar'
+                header: 'foo',
+                sections: {},
+                ids: {},
+                footer: 'bar',
+            },
+        },
+        // -------------------------------------------------------------------------------------------------------------
+        {
+            name: 'header, section and footer',
+            input: 'foo==hello==world==lorem==ipsum\n\nbar',
+            output: {
+                header: 'foo',
+                sections: {
+                    hello: 'world',
+                    lorem: 'ipsum'
                 },
-                footer:`==Hello==
-                ==World==`,
+                ids: {},
+                footer: 'bar',
+            },
+        },
+        // -------------------------------------------------------------------------------------------------------------
+        {
+            name: '+ids',
+            input: 'header==section=={{|id=foo}}bar{{|id=hello}}world\n\nfooter',
+            output: {
+                header: 'header',
+                sections: {
+                    'section': '{{|id=foo}}bar{{|id=hello}}world'
+                },
+                ids: {
+                    foo: 'bar',
+                    hello: 'world'
+                },
+                footer: 'footer',
             },
         },
     ];
 
     await focus(parsePage, TESTS, {
-        sendInputAsArguments: true,
+        // sendInputAsArguments: true,
     });
 </script>
