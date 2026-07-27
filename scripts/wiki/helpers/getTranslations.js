@@ -46,7 +46,6 @@ function getTranslations(filePattern, structure, fileBlacklist = null) {
             }
             return true;
         });
-        console.log('targetDefinitions:', targetDefinitions);
         assume(targetDefinitions.length === 1, path, 'Expecting only one result from a file!');
         const definition = targetDefinitions[0];
         const payload = Object.values(definition).find((value) => typeof value === 'object');

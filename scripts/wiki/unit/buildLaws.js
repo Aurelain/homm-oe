@@ -1,7 +1,6 @@
 import joinLines from '../../utils/joinLines.js';
 import buildHeading from '../helpers/buildHeading.js';
 import getWords from '../helpers/getWords.js';
-import getLawsDescriptions from '../helpers/getLawsDescriptions.js';
 
 // =====================================================================================================================
 //  P U B L I C
@@ -10,8 +9,6 @@ import getLawsDescriptions from '../helpers/getLawsDescriptions.js';
  *
  */
 function buildLaws(info, translations) {
-    const laws = getLawsDescriptions();
-    console.log('laws:', laws);
     const {lang} = info;
     const lines = [];
     lines.push('');
@@ -28,9 +25,46 @@ function buildLaws(info, translations) {
  *
  */
 function enumerateLawsFor(info) {
-    const {tier} = info;
-    // console.log('info:', info);
-    return '';
+    const {name, tier, faction, context, lang} = info;
+    const nameEn = name.en;
+    const laws = context.laws;
+    const relevantLaws = [];
+    relevantLaws.push(...findByGrowth(nameEn, laws));
+    relevantLaws.push(...findByTier(tier, laws));
+    if (faction !== 'neutral') {
+        relevantLaws.push(...findInCitiesByTier(tier, laws));
+    }
+
+    const templates = [];
+    for (const law of relevantLaws) {
+        templates.push(`{{LawSummary|lang=${lang}|id=${law.target_id}}}`);
+    }
+
+    return templates.join('\n');
+}
+
+/**
+ *
+ */
+function findByGrowth(nameEn, laws) {
+    const re = new RegExp(`${nameEn} growth`, 'i');
+    return laws.filter((law) => !!law.description.en.match(re));
+}
+
+/**
+ *
+ */
+function findByTier(tier, laws) {
+    const re = new RegExp(`Tier.${tier}.*?creatures`, 'i');
+    return laws.filter((law) => !!law.description.en.match(re));
+}
+
+/**
+ *
+ */
+function findInCitiesByTier(tier, laws) {
+    const re = new RegExp(`Tier.${tier}.*?creature.*?cities`, 'i');
+    return laws.filter((law) => !!law.description.en.match(re));
 }
 
 // =====================================================================================================================

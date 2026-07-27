@@ -7,6 +7,7 @@ import fattenUnits from './fattenUnits.js';
 import getUnits from './getUnits.js';
 import WORDS from './WORDS.js';
 import purge from '../helpers/purge.js';
+import getTranslations from '../helpers/getTranslations.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -64,6 +65,8 @@ async function unit() {
     units = fattenUnits(units);
     units = units.filter((item) => FACTIONS.has(item.faction));
 
+    const laws = getTranslations('/Law~', {type: 'law_level', variant: '1'}, null);
+
     const payloads = generatePayloads({
         items: units,
         fileNames,
@@ -71,11 +74,12 @@ async function unit() {
         translations: WORDS,
         handleFresh: handleFreshUnit,
         handleOld: handleOldUnit,
+        context: {laws},
     });
-    console.log('payloads:', payloads);
+    // console.log('payloads:', payloads);
 
     for (const {path, content} of payloads) {
-        // content && fs.writeFileSync(path, content);
+        content && fs.writeFileSync(path, content);
     }
 }
 

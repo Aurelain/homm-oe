@@ -8,7 +8,7 @@ import convertFileNameToWikiUrl from './convertFileNameToWikiUrl.js';
 /**
  *
  */
-function generatePayloads({items, fileNames, languages, translations, handleFresh, handleOld}) {
+function generatePayloads({items, fileNames, languages, translations, handleFresh, handleOld, context}) {
     const payloads = [];
     for (const item of items) {
         for (const lang of languages) {
@@ -20,10 +20,11 @@ function generatePayloads({items, fileNames, languages, translations, handleFres
             const info = {
                 ...item,
                 lang,
-                name: titleX,
+                // name: titleX,
                 id: item['target_id'],
                 fileNameX,
                 fileNameXRobotic,
+                context,
             };
             payloads.push({
                 path: pathX,
