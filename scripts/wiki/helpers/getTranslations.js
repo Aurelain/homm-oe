@@ -22,7 +22,11 @@ import assume from '../../utils/assume.js';
  *     }
  * ]
  */
-function getTranslations(filePattern, type, fileBlacklist = null) {
+function getTranslations(filePattern, structure, fileBlacklist = null) {
+    if (typeof structure === 'string') {
+        structure = {type: structure};
+    }
+
     const dataPaths = walk(WIKI_DIR + '/Data');
     let paths = filter(dataPaths, filePattern);
     if (fileBlacklist) {
@@ -34,11 +38,19 @@ function getTranslations(filePattern, type, fileBlacklist = null) {
         if (!definitions) {
             continue;
         }
-        const targetDefinitions = definitions.filter((item) => item.type === type);
+        const targetDefinitions = definitions.filter((item) => {
+            for (const key in structure) {
+                if (item[key] !== structure[key]) {
+                    return false;
+                }
+            }
+            return true;
+        });
+        console.log('targetDefinitions:', targetDefinitions);
         assume(targetDefinitions.length === 1, path, 'Expecting only one result from a file!');
         const definition = targetDefinitions[0];
-        const names = Object.values(definition.name);
-        assume(names.length === LANG_COUNT, names, 'Unexpected languages count!');
+        const payload = Object.values(definition).find((value) => typeof value === 'object');
+        assume(Object.keys(payload).length === LANG_COUNT, payload, 'Unexpected languages count!');
         items.push({
             path,
             ...definition,

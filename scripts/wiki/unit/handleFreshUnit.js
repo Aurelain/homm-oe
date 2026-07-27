@@ -2,10 +2,7 @@ import buildLoc from '../helpers/buildLoc.js';
 import joinLines from '../../utils/joinLines.js';
 import buildInfoBox from './buildInfoBox.js';
 import buildFooter from './buildFooter.js';
-import buildStinger from './buildStinger.js';
-import buildStrategy from './buildStrategy.js';
-import buildInteractions from './buildInteractions.js';
-import buildSpecialist from './buildSpecialist.js';
+import buildLaws from './buildLaws.js';
 
 // =====================================================================================================================
 //  P U B L I C
@@ -19,6 +16,9 @@ function handleFreshUnit(info, translations) {
     // Header
     lines.push(buildLoc(info));
     lines.push(buildInfoBox(info));
+
+    // Laws
+    buildLaws(info, translations);
 
     // Footer
     lines.push('');

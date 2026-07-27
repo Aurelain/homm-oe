@@ -1,6 +1,4 @@
-import joinLines from '../../utils/joinLines.js';
-import buildHeading from '../helpers/buildHeading.js';
-import getWords from '../helpers/getWords.js';
+import getTranslations from './getTranslations.js';
 
 // =====================================================================================================================
 //  P U B L I C
@@ -8,16 +6,12 @@ import getWords from '../helpers/getWords.js';
 /**
  *
  */
-function buildStrategy({lang, id}, translations) {
-    const lines = [];
-    lines.push('');
-    lines.push(buildHeading('Interactions', translations, lang));
-    lines.push(`''${getWords('Interactions_text', translations, lang)}''`);
-    lines.push('');
-    return joinLines(lines);
+function getLawsDescriptions() {
+    let laws = getTranslations('/Law~', {type: 'law_level', variant: '1'}, null);
+    return laws;
 }
 
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default buildStrategy;
+export default getLawsDescriptions;

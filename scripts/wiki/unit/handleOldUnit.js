@@ -1,15 +1,9 @@
 import buildLoc from '../helpers/buildLoc.js';
 import buildFooter from './buildFooter.js';
 import joinLines from '../../utils/joinLines.js';
-import getWords from '../helpers/getWords.js';
 import parsePage from '../helpers/parsePage.js';
 import buildInfoBox from './buildInfoBox.js';
-import buildStinger from './buildStinger.js';
-import buildStrategy from './buildStrategy.js';
-import buildHeading from '../helpers/buildHeading.js';
-import buildInteractions from './buildInteractions.js';
-import buildSpecialist from './buildSpecialist.js';
-import match from '../../utils/match.js';
+import buildLaws from './buildLaws.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -24,7 +18,11 @@ import match from '../../utils/match.js';
 function handleOldUnit(info, translations, existingContent) {
     const {lang} = info;
     const cleanedContent = cleanContent(existingContent);
-    const parsed = parsePage(cleanedContent, {});
+    const parsed = parsePage(cleanedContent);
+    console.log('parsed:', parsed);
+
+    // Remove the Laws section because we're rebuilding it completely:
+    delete parsed.sections[translations.Laws[lang]];
 
     const lines = [];
 
@@ -36,12 +34,18 @@ function handleOldUnit(info, translations, existingContent) {
         lines.push(parsed.header);
     }
 
-    // Footer
-    if (parsed.footer) {
+    // Unrecognized sections:
+    for (const key in parsed.sections) {
+        const value = parsed.sections[key];
         lines.push('');
-        lines.push(parsed.footer);
+        lines.push(`==${key}==`);
+        lines.push(value);
     }
 
+    // Laws
+    lines.push(buildLaws(info, translations));
+
+    // Footer
     lines.push('');
     lines.push(buildFooter(info, translations));
 
@@ -53,13 +57,15 @@ function handleOldUnit(info, translations, existingContent) {
 //  P R I V A T E
 // =====================================================================================================================
 function cleanContent(content) {
-    content = content.replaceAll(/\{\{Unit.?Infobox[\s\S]*?}}/gi, '');
-    content = content.replaceAll(/\{\{UnitsNavbox[\s\S]*?}}/gi, '');
-    content = content.replaceAll(/\{\{#invoke:LocUnitData\|navBox[\s\S]*?}}/gi, '');
-    content = content.replaceAll(/\[\[Category.*?]]/gi, '');
-    content = content.replaceAll('__NOTOC__', '');
-    content = content.replaceAll(/\{\{clear}}/gi, '');
+    content = content.replaceAll(/<!--[\s\S]*?-->/g, ''); // TODO: remove this
+
     content = content.replaceAll(/\{\{loc.*?}}/gi, '');
+    content = content.replaceAll(/\{\{Unit.?Infobox[\s\S]*?}}/gi, '');
+    // content = content.replaceAll(/\{\{UnitsNavbox[\s\S]*?}}/gi, '');
+    // content = content.replaceAll(/\{\{#invoke:LocUnitData\|navBox[\s\S]*?}}/gi, '');
+    // content = content.replaceAll(/\[\[Category.*?]]/gi, '');
+    // content = content.replaceAll('__NOTOC__', '');
+    // content = content.replaceAll(/\{\{clear}}/gi, '');
     content = content.trim();
     return content;
 }

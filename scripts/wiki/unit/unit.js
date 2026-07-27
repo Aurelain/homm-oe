@@ -32,7 +32,10 @@ const TARGET_LANGUAGES = new Set([
 
 const FACTIONS = new Set(['human', 'undead', 'nature', 'demon', 'unfrozen', 'dungeon', 'neutral']);
 
-const IDS = ['angel'];
+const IDS = [
+    'esquire',
+    // 'angel'
+];
 
 const SWITCHEROOS = {
     Stinger: {
@@ -57,7 +60,7 @@ async function unit() {
 
     const fileNames = suggestFileNames(units, SWITCHEROOS);
 
-    // units = units.filter((item) => IDS.includes(item.target_id));
+    units = IDS.length ? units.filter((item) => IDS.includes(item.target_id)) : units;
     units = fattenUnits(units);
     units = units.filter((item) => FACTIONS.has(item.faction));
 
@@ -69,10 +72,10 @@ async function unit() {
         handleFresh: handleFreshUnit,
         handleOld: handleOldUnit,
     });
-    // console.log('payloads:', payloads);
+    console.log('payloads:', payloads);
 
     for (const {path, content} of payloads) {
-        content && fs.writeFileSync(path, content);
+        // content && fs.writeFileSync(path, content);
     }
 }
 

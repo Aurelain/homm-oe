@@ -23,7 +23,10 @@ function parseTranslationFile(path) {
         return;
     }
     const definitionsFound = match(content, /\{\{TranslationDef[\s\S]*?}}/g);
-    assume(definitionsFound.length > 1, path, 'Unexpected results!');
+    if (!definitionsFound.length) {
+        console.log(`No translations in "${path}"! Skipping it.`);
+        return;
+    }
     const hub = {};
     for (const definitionFound of definitionsFound) {
         const [definitionText] = definitionFound;
