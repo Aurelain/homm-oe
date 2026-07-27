@@ -19,7 +19,6 @@ function handleOldUnit(info, translations, existingContent) {
     const {lang} = info;
     const cleanedContent = cleanContent(existingContent);
     const parsed = parsePage(cleanedContent);
-    console.log('parsed:', parsed);
 
     // Remove the Laws section because we're rebuilding it completely:
     delete parsed.sections[translations.Laws[lang]];
@@ -43,7 +42,7 @@ function handleOldUnit(info, translations, existingContent) {
     }
 
     // Laws
-    lines.push(buildLaws(info, translations));
+    lines.push(buildLaws(info, translations, parsed.ids));
 
     // Footer
     lines.push('');

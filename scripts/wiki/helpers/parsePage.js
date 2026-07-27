@@ -63,7 +63,11 @@ function parseIds(text) {
     const found = match(text, /\|\s*id\s*=\s*(\w+)[\s\S]*?}}([^{]*)/g);
     const output = {};
     for (const pair of found) {
-        output[pair[1]] = pair[2];
+        const id = pair[1].trim();
+        const extra = pair[2].trim();
+        if (id && extra) {
+            output[id] = extra;
+        }
     }
     return output;
 }

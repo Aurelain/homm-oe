@@ -34,8 +34,12 @@ const TARGET_LANGUAGES = new Set([
 const FACTIONS = new Set(['human', 'undead', 'nature', 'demon', 'unfrozen', 'dungeon', 'neutral']);
 
 const IDS = [
-    'esquire',
+    // 'esquire',
     // 'angel'
+    // 'frostworm_rider',
+    // 'frostworm_rider_upg',
+    // 'assassin',
+    // 'assassin_upg_alt',
 ];
 
 const SWITCHEROOS = {
@@ -74,7 +78,7 @@ async function unit() {
         translations: WORDS,
         handleFresh: handleFreshUnit,
         handleOld: handleOldUnit,
-        context: {laws},
+        context: {laws, units},
     });
     // console.log('payloads:', payloads);
 
