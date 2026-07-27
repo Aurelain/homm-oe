@@ -3,6 +3,15 @@ import buildHeading from '../helpers/buildHeading.js';
 import getWords from '../helpers/getWords.js';
 import assume from '../../utils/assume.js';
 
+const FACTION_ORDER = {
+    human: 1,
+    undead: 2,
+    nature: 3,
+    demon: 4,
+    unfrozen: 5,
+    dungeon: 6,
+};
+
 // =====================================================================================================================
 //  P U B L I C
 // =====================================================================================================================
@@ -46,7 +55,7 @@ function enumerateLawsFor(info, ids) {
     relevantLaws.push(...findByName(nameEn, laws));
     relevantLaws.push(...findByPossession(nameEn, laws));
     relevantLaws.push(...findByTier(tier, laws));
-    if (faction !== 'neutral') {
+    if (faction !== 'neutral' && id !== 'lava_larva') {
         relevantLaws.push(...findInCitiesByTier(tier, laws));
     }
     relevantLaws = removeDuplicates(relevantLaws);
@@ -68,12 +77,14 @@ function enumerateLawsFor(info, ids) {
         expectedLength = 4;
     }
     if (id === 'lava_larva') {
-        expectedLength = 5;
+        expectedLength = 4;
     }
     if (id.match('vampir')) {
         expectedLength = 4;
     }
     assume(templates.length === expectedLength, id, templates, 'Unexpected laws count!');
+
+    templates.sort(compare);
 
     return templates.join('\n');
 }
@@ -135,6 +146,22 @@ function removeDuplicates(list) {
         }
     }
     return output;
+}
+
+/**
+ *
+ */
+function compare(a, b) {
+    const [, aFaction] = a.match(/_law_([a-z]+)/);
+    const [, bFaction] = b.match(/_law_([a-z]+)/);
+    const aRank = FACTION_ORDER[aFaction];
+    const bRank = FACTION_ORDER[bFaction];
+    if (aRank < bRank) {
+        return -1;
+    } else if (aRank > bRank) {
+        return 1;
+    }
+    return a.localeCompare(b, undefined, {numeric: true, sensitivity: 'base'});
 }
 
 // =====================================================================================================================

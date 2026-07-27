@@ -40,6 +40,7 @@ const IDS = [
     // 'frostworm_rider_upg',
     // 'assassin',
     // 'assassin_upg_alt',
+    // 'lava_larva',
 ];
 
 const SWITCHEROOS = {
