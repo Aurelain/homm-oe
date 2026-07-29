@@ -17,6 +17,8 @@ const ATTACK_TYPES = {
     range: 'remote_attack',
 };
 
+const FACTIONS = new Set(['human', 'undead', 'nature', 'demon', 'unfrozen', 'dungeon', 'neutral']);
+
 // =====================================================================================================================
 //  P U B L I C
 // =====================================================================================================================
@@ -107,6 +109,7 @@ function spawnUnitDef(logic, view, path, translations) {
 
     add(unitDef, 'creature_type', getCreatureType(logic));
     add(unitDef, 'immunities', getImmunities(logic));
+    add(unitDef, 'shared_abilities', getSharedAbilities(view));
 
     add(unitDef, 'gold_cost', getCost(logic, 'gold'));
     add(unitDef, 'wood_cost', getCost(logic, 'wood'));
@@ -115,8 +118,8 @@ function spawnUnitDef(logic, view, path, translations) {
     add(unitDef, 'dust_cost', getCost(logic, 'dust'));
     add(unitDef, 'crystal_cost', getCost(logic, 'crystals'));
     add(unitDef, 'gemstone_cost', getCost(logic, 'gemstones'));
-    add(unitDef, 'native_biome', getCost(logic, 'nativeBiome'));
 
+    add(unitDef, 'native_biome', logic.nativeBiome);
     add(unitDef, 'ai_archetype', logic.ai);
     add(unitDef, 'tags', logic.tags);
     add(unitDef, 'squad_value', logic.squadValue);
@@ -173,6 +176,29 @@ function getImmunities(logic) {
 /**
  *
  */
+function getSharedAbilities(view) {
+    const names = [];
+    names.push(...view.passives.map((ability) => ability.name));
+    names.push(...view.alternativeAttacks.map((ability) => ability.name));
+    names.push(...view.abilities.map((ability) => ability.name));
+
+    const shared = [];
+    for (const name of names) {
+        if (name.startsWith('base_')) {
+            shared.push(name);
+        } else {
+            const first = name.split('_').shift();
+            if (FACTIONS.has(first)) {
+                shared.push(name);
+            }
+        }
+    }
+    return shared;
+}
+
+/**
+ *
+ */
 function getCost(logic, name) {
     const {costResArray = []} = logic.unitCost || {};
     for (const item of costResArray) {
@@ -201,8 +227,8 @@ function spawnUnitAbilityActiveDef(logic, view, prop, translations) {
         add(def, 'ordinal', ordinal);
         add(def, 'name_sid', viewItem.name);
         add(def, 'desc_sid', viewItem.description);
-        add(def, 'active_type', viewItem.abilityType); // BONUS!
-        add(def, 'info_description', viewItem.infoDescription); // BONUS!
+        // add(def, 'active_type', viewItem.abilityType); // BONUS!
+        // add(def, 'info_description', viewItem.infoDescription); // BONUS!
         add(def, 'attack_type', logicItem.attackType_);
         add(def, 'rank', logicItem.rank);
         add(def, 'cd', logicItem.cd);
