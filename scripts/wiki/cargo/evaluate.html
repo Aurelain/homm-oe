@@ -1,0 +1,71 @@
+<meta charset='UTF-8'/>
+<script type='module'>
+    import evaluate from './evaluate.js';
+    import compile from './compile.js';
+    import focus from '../../utils/focus.js';
+
+    const REPOSITORY = compile(`
+        int current_unit_ability_summon_count
+        {
+            CurrentUnitData ( fullStacksBase, "fullStacks" )
+            CurrentUnitData ( fullStacksTemp, "tempFullStacks" )
+            Add ( fullStacks, fullStacksBase, fullStacksTemp )
+            CurrentUnitData ( startStacks, "startBattleFullStacks" )
+
+            Add ( currentStacks, fullStacks, 1 )
+            Add ( maxStacks, startStacks, 1 )
+
+            CurrentAbility( baseSummon, "damageDealer.targetMechanics[0].values[2]" )
+            CurrentAbility( unitsCount, "damageDealer.targetMechanics[0].values[3]" )
+            CurrentAbility( unitsBonusSummon, "damageDealer.targetMechanics[0].values[4]" )
+
+            Mul ( fullStacksMul, currentStacks, unitsBonusSummon )
+            Div ( fullStacksDiv, fullStacksMul, unitsCount )
+            Floor ( fullStacksDivFloor, fullStacksDiv )
+            Add ( fullStacksSummon, baseSummon, fullStacksDivFloor )
+
+            CurrentUnitData ( finalSummonBonusPercent, "unit.stats.finalSummonBonusPercent" )
+            Mul ( finalSummonBonusPercentAmount, fullStacksSummon, finalSummonBonusPercent )
+            Add ( finalSummon, fullStacksSummon, finalSummonBonusPercentAmount )
+
+            Text( return, finalSummon )
+        }
+    `);
+
+    const TESTS = [
+        // -------------------------------------------------------------------------------------------------------------
+        {
+            name: 'many lines',
+            input: {
+                functionName: 'current_unit_ability_summon_count',
+                repository: REPOSITORY,
+                data: {
+                    currentUnitData: {
+                        fullStacks: 1,
+                        tempFullStacks: 2,
+                        startBattleFullStacks: 3,
+                        unit: {
+                            stats: {
+                                finalSummonBonusPercent: 4,
+                            }
+                        },
+                    },
+                    currentAbility: {
+                        damageDealer: {
+                            targetMechanics: [
+                                {
+                                    values: [100, 101, 102, 103, 104],
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            output: '102',
+        },
+    ];
+
+    await focus(evaluate, TESTS, {
+        sendInputAsArguments: true,
+    });
+</script>

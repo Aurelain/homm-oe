@@ -7,18 +7,18 @@ import assume from '../../utils/assume.js';
  *
  */
 function compile(text) {
-    const output = [];
+    const output = {};
     const functions = text.split('}');
     functions.pop();
     assume(functions.length > 0, 'No function!');
     for (const functionText of functions) {
-        output.push(compileFunction(functionText));
+        Object.assign(output, compileFunction(functionText));
     }
     return output;
 }
 
 // =====================================================================================================================
-//  P U B L I C
+//  P R I V A T E
 // =====================================================================================================================
 /**
  *
@@ -31,9 +31,10 @@ function compileFunction(functionText) {
     assume(headerParts.length === 2, functionText, 'Header must have 2 parts!');
     const name = headerParts[1];
     return {
-        name,
-        type: headerParts[0],
-        body: compileBody(parts[1], name),
+        [name]: {
+            type: headerParts[0],
+            body: compileBody(parts[1], name),
+        },
     };
 }
 

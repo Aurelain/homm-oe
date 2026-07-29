@@ -16,9 +16,8 @@ int current_unit_ability_buff_duration
 Text(return, unitsCount)
 }
             `,
-            output: [
-                {
-                    name: 'current_unit_ability_buff_duration',
+            output: {
+                current_unit_ability_buff_duration: {
                     type: 'int',
                     body: [
                         {
@@ -43,7 +42,7 @@ Text(return, unitsCount)
                         },
                     ],
                 }
-            ]
+            }
         },
     ];
 
