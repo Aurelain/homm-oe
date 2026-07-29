@@ -1,0 +1,53 @@
+<meta charset='UTF-8'/>
+<script type='module'>
+    import compile from './compile.js';
+    import focus from '../../utils/focus.js';
+
+    const TESTS = [
+        // -------------------------------------------------------------------------------------------------------------
+        {
+            name: 'simple',
+            input: `
+int current_unit_ability_buff_duration
+{
+\tCurrentUnitData ( fullStacksBase, "fullStacks" )
+\tAdd ( currentStacks, fullStacks, 1 )
+\tCurrentAbility( unitsCount, "damageDealer.buff.durationPerStack[0]" )
+Text(return, unitsCount)
+}
+            `,
+            output: [
+                {
+                    name: 'current_unit_ability_buff_duration',
+                    type: 'int',
+                    body: [
+                        {
+                            variable: 'fullStacksBase',
+                            action: 'CurrentUnitData',
+                            params: ['fullStacks'],
+                        },
+                        {
+                            variable: 'currentStacks',
+                            action: 'Add',
+                            params: ['#fullStacks', 1],
+                        },
+                        {
+                            variable: 'unitsCount',
+                            action: 'CurrentAbility',
+                            params: ['damageDealer.buff.durationPerStack[0]'],
+                        },
+                        {
+                            variable: 'return',
+                            action: 'Text',
+                            params: ['#unitsCount'],
+                        },
+                    ],
+                }
+            ]
+        },
+    ];
+
+    await focus(compile, TESTS, {
+        // sendInputAsArguments: true,
+    });
+</script>
