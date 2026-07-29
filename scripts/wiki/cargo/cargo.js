@@ -1,36 +1,32 @@
-import assume from '../utils/assume.js';
+import unzipCore from '../../helpers/unzipCore.js';
+import unit from './unit.js';
+import {WIKI_DIR} from '../SETTINGS.js';
+import fs from 'node:fs';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
-const decoder = new TextDecoder();
-
+const parsers = [unit];
 // =====================================================================================================================
 //  P U B L I C
 // =====================================================================================================================
 /**
  *
  */
-function collectByPattern(hub, pattern, exclude) {
-    const output = [];
-    for (const key in hub) {
-        if (key.match(pattern)) {
-            if (exclude && key.match(exclude)) {
-                continue;
-            }
-            const fileData = hub[key];
-            const content = decoder.decode(fileData);
-            const json = JSON.parse(content);
-            assume(Object.keys(json).length === 1, Object.keys(json), 'Unexpected keys!');
-            const list = json.array || json.tokens;
-            assume(Array.isArray(list), key, json, 'Array required!');
-            output.push(...list);
-        }
+function cargo() {
+    const zipHub = unzipCore();
+
+    const definitions = {};
+    parsers.forEach((parser) => Object.assign(definitions, parser(zipHub)));
+
+    console.log('definitions:', definitions);
+    for (const key in definitions) {
+        const path = WIKI_DIR + '/' + key + '.wiki';
+        // fs.writeFileSync(path, definitions[key]);
     }
-    return output;
 }
 
 // =====================================================================================================================
-//  E X P O R T
+//  R U N
 // =====================================================================================================================
-export default collectByPattern;
+cargo();

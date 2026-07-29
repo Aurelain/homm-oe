@@ -11,8 +11,8 @@ const decoder = new TextDecoder();
 /**
  *
  */
-function collectByPattern(hub, pattern, exclude) {
-    const output = [];
+function filterHub(hub, pattern, exclude) {
+    const output = {};
     for (const key in hub) {
         if (key.match(pattern)) {
             if (exclude && key.match(exclude)) {
@@ -24,7 +24,7 @@ function collectByPattern(hub, pattern, exclude) {
             assume(Object.keys(json).length === 1, Object.keys(json), 'Unexpected keys!');
             const list = json.array || json.tokens;
             assume(Array.isArray(list), key, json, 'Array required!');
-            output.push(...list);
+            output[key] = list;
         }
     }
     return output;
@@ -33,4 +33,4 @@ function collectByPattern(hub, pattern, exclude) {
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default collectByPattern;
+export default filterHub;

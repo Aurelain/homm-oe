@@ -21,7 +21,8 @@
         "translations": "node scripts/wiki/translations/translations",
         "preparePurge": "node scripts/wiki/preparePurge/preparePurge",
         "purgeSpells": "node scripts/wiki/purgeSpells/purgeSpells",
-        "poke": "node scripts/wiki/poke/poke"
+        "poke": "node scripts/wiki/poke/poke",
+        "cargo": "node scripts/wiki/cargo/cargo"
     },
     "dependencies": {
         "fflate": "^0.8.2",
