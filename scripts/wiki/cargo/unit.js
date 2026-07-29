@@ -40,7 +40,7 @@ function unit(zipHub) {
 
         const result = parseUnit(logic[0], view[0], path);
         if (result) {
-            output['Data~' + result.id] = {
+            output['Unit~' + result.id] = {
                 defs: result.defs,
                 footer: '[[Category:Game Data Import]]',
             };
@@ -59,9 +59,9 @@ function parseUnit(logic, view, path) {
     const translations = [];
 
     defs.push(spawnUnitDef(logic, view, path, translations));
-    defs.push(...parseActive(logic, view, 'alternativeAttacks', translations));
-    defs.push(...parseActive(logic, view, 'abilities', translations));
-    defs.push(parseAttack(logic, view, translations));
+    defs.push(...spawnUnitAbilityActiveDef(logic, view, 'alternativeAttacks', translations));
+    defs.push(...spawnUnitAbilityActiveDef(logic, view, 'abilities', translations));
+    defs.push(spawnUnitAttackDef(logic, view, translations));
 
     defs.push(...translate(translations));
 
@@ -185,7 +185,7 @@ function getCost(logic, name) {
 /**
  *
  */
-function parseActive(logic, view, prop) {
+function spawnUnitAbilityActiveDef(logic, view, prop, translations) {
     const defs = [];
     const list = logic[prop]; // e.g. `logic.alternativeAttacks`
     for (let i = 0; i < list.length; i++) {
@@ -233,6 +233,14 @@ function parseActive(logic, view, prop) {
         add(def, 'affect_target_tags', logicItem.damageDealer.affectTargetParams.targetTags);
 
         defs.push(def);
+
+        // Mutation:
+        translations.push({
+            target_id: def.ability_id,
+            type: 'unit_ability',
+            name: def.name_sid,
+            description: def.desc_sid,
+        });
     }
     return defs;
 }
@@ -240,7 +248,7 @@ function parseActive(logic, view, prop) {
 /**
  * Useless, but we'll add it for parity with obelisk.
  */
-function parseAttack(logic) {
+function spawnUnitAttackDef(logic) {
     const def = {_type: 'UnitAttackDef'};
 
     add(def, 'unit_id', logic.id);

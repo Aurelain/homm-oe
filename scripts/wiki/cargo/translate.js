@@ -6,6 +6,7 @@ import assume from '../../utils/assume.js';
 //  D E C L A R A T I O N S
 // =====================================================================================================================
 let cache;
+let args;
 const LANGUAGES = {
     en: 'english',
     pt_br: 'BRportugese',
@@ -21,8 +22,10 @@ const LANGUAGES = {
     es: 'spanish',
     tr: 'turkish',
     uk: 'ukrainian',
-    'zh-hans': 'zhCN',
-    'zh-hant': 'zhTW',
+    // 'zh-hans': 'zhCN',
+    zh_cn: 'zhCN',
+    // 'zh-hant': 'zhTW',
+    zh_tw: 'zhTW',
 };
 
 // =====================================================================================================================
@@ -31,7 +34,7 @@ const LANGUAGES = {
 /**
  *
  */
-function translate(list) {
+function translate(translationRequests) {
     if (!cache) {
         console.log('Please first build the cache!');
         return;
@@ -39,21 +42,18 @@ function translate(list) {
 
     const defs = [];
 
-    for (const item of list) {
+    for (const request of translationRequests) {
         for (const lang in LANGUAGES) {
             const langMap = cache[lang];
             const def = {_type: 'TranslationDef'};
-            add(def, 'target_id', item.target_id);
-            add(def, 'type', item.type);
-            add(def, 'subtype', item.subtype);
-            add(def, 'variant', item.variant);
+            add(def, 'target_id', request.target_id);
+            add(def, 'type', request.type);
+            add(def, 'subtype', request.subtype);
+            add(def, 'variant', request.variant);
             add(def, 'language', lang);
-            add(def, 'name', langMap.get(item.name));
-            add(def, 'description', langMap.get(item.description));
-            add(def, 'bonus_description', langMap.get(item.bonus_description));
-            assume(!('name' in item) || langMap.has(item.name), item.name, 'Missing name id!');
-            assume(!('description' in item) || langMap.has(item.description), item, 'Missing desc id!');
-            assume(!('bonus_description' in item) || langMap.has(item.bonus_description), item, 'Missing bonus id!');
+            add(def, 'name', adaptTranslation(request, 'name', langMap));
+            add(def, 'description', adaptTranslation(request, 'description', langMap));
+            add(def, 'bonus_description', adaptTranslation(request, 'bonus_description', langMap));
             defs.push(def);
         }
     }
@@ -78,6 +78,54 @@ function buildCache(zipHub) {
         }
         cache[key] = langMap;
     }
+    buildArgs(zipHub);
+}
+
+// =====================================================================================================================
+//  P R I V A T E
+// =====================================================================================================================
+/**
+ *
+ */
+function buildArgs(zipHub) {
+    const argsHub = filterHub(zipHub, new RegExp('Lang/args/'));
+    args = new Map();
+    for (const path in argsHub) {
+        const tokens = argsHub[path];
+        for (const token of tokens) {
+            assume(Object.keys(token).toString() === 'sid,args', token, 'Unexpected args item structure!');
+            args.set(token.sid, token.args);
+        }
+    }
+}
+
+/**
+ *
+ */
+function resolveArg(textId, nr, langMap, request) {
+    const argsList = args.get(textId);
+    assume(argsList, request, textId, 'No args found!');
+    const island = argsList[nr];
+    return island;
+}
+
+/**
+ *
+ */
+function adaptTranslation(request, prop, langMap) {
+    if (!(prop in request)) {
+        return;
+    }
+    const textId = request[prop];
+    assume(langMap.has(textId), request, `Cannot find "${prop}" in translation cache!`);
+    let text = langMap.get(textId);
+    if (text.includes('{')) {
+        text = text.replace(/\{(\d)}/g, (all, nr) => {
+            return resolveArg(textId, nr, langMap);
+        });
+        assume(!text.includes('{'), request, text, 'Still has braces!');
+    }
+    return text;
 }
 
 // =====================================================================================================================

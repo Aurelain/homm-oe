@@ -21,9 +21,10 @@ function filterHub(hub, pattern, exclude) {
             const fileData = hub[key];
             const content = decoder.decode(fileData);
             const json = JSON.parse(content);
-            assume(Object.keys(json).length === 1, Object.keys(json), 'Unexpected keys!');
-            const list = json.array || json.tokens;
-            assume(Array.isArray(list), key, json, 'Array required!');
+            const topKeys = Object.keys(json);
+            assume(topKeys.length === 1, Object.keys(json), 'Unexpected keys!');
+            const list = json[topKeys[0]];
+            assume(Array.isArray(list), key, 'Array required!');
             output[key] = list;
         }
     }
