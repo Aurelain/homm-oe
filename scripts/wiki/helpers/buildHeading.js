@@ -7,7 +7,7 @@ import getWords from './getWords.js';
  *
  */
 function buildHeading(key, translations, lang) {
-    return `===${getWords(key, translations, lang)}===`;
+    return `==${getWords(key, translations, lang)}==`;
 }
 
 // =====================================================================================================================
