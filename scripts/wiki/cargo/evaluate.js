@@ -14,6 +14,7 @@ const ACTIONS = {
     Div: [Div, 2],
     Floor: [Floor, 1],
     Text: [Text, 1],
+    DbBuff: [DbBuff, 2],
 };
 
 // =====================================================================================================================
@@ -34,11 +35,12 @@ function evaluate(functionName, repository, data) {
             about: action + '@' + functionName,
         };
         const [actionFunction, paramCount] = ACTIONS[action] || [];
-        assume(actionFunction, context.about, 'Unknown action!');
+        assume(actionFunction, step, context.about, 'Unknown action!');
         assume(paramCount === -1 || step.params.length === paramCount, context.about, 'Mismatched param count!');
         const params = resolveParams(step.params, vars, context.about);
         params.push(context);
         vars[step.variable] = actionFunction.apply(null, params);
+        // console.log(context.about, JSON.stringify(vars, null, 4));
     }
     return vars.return;
 }
@@ -78,7 +80,7 @@ function resolveValue(origin, path, about) {
  */
 function CurrentUnitData(path, context) {
     const json = context.data.currentUnitData;
-    assume(json, context.functionName, context.about, 'Missing json "currentUnitData"!');
+    assume(json, context.about, 'Missing "currentUnitData"!');
     const value = resolveValue(json, path, context);
     return value;
 }
@@ -88,7 +90,7 @@ function CurrentUnitData(path, context) {
  */
 function CurrentAbility(path, context) {
     const json = context.data.currentAbility;
-    assume(json, context.functionName, context.about, 'Missing json "currentAbility"!');
+    assume(json, context.about, 'Missing "currentAbility"!');
     const value = resolveValue(json, path, context);
     return value;
 }
@@ -100,8 +102,9 @@ function Add(...members) {
     const {about} = members.pop(); // context
     let result = 0;
     for (const member of members) {
-        assume(typeof member === 'number', about, member, 'Expecting number!');
-        result += member;
+        const nr = Number(member);
+        assume(checkNumber(nr), about, member, 'Expecting number!');
+        result += nr;
     }
     return result;
 }
@@ -111,10 +114,11 @@ function Add(...members) {
  */
 function Mul(...members) {
     const {about} = members.pop(); // context
-    let result = 0;
+    let result = 1;
     for (const member of members) {
-        assume(typeof member === 'number', about, member, 'Expecting number!');
-        result *= member;
+        const nr = Number(member);
+        assume(checkNumber(nr), about, member, 'Expecting number!');
+        result *= nr;
     }
     return result;
 }
@@ -123,6 +127,8 @@ function Mul(...members) {
  *
  */
 function Div(numerator, denominator, {about}) {
+    numerator = Number(numerator);
+    denominator = Number(denominator);
     assume(checkNumber(numerator), about, numerator, 'Invalid numerator!');
     assume(denominator && checkNumber(denominator), about, denominator, 'Invalid denominator!');
     return numerator / denominator;
@@ -132,6 +138,7 @@ function Div(numerator, denominator, {about}) {
  *
  */
 function Floor(target, {about}) {
+    target = Number(target);
     assume(typeof target === 'number', about, target, 'Invalid target!');
     return Math.floor(target);
 }
@@ -141,6 +148,20 @@ function Floor(target, {about}) {
  */
 function Text(payload) {
     return payload.toString();
+}
+
+/**
+ *
+ */
+function DbBuff(buffSid, path, context) {
+    const {buffs} = context.data;
+    assume(buffs, context.about, 'Missing "buffs"!');
+
+    const buff = buffs[buffSid];
+    assume(buff, context.about, buffSid, 'No such buff!');
+
+    const value = resolveValue(buff, path, context);
+    return value;
 }
 
 // =====================================================================================================================

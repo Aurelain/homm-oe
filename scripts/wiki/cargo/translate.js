@@ -1,12 +1,17 @@
 import add from './add.js';
 import filterHub from '../../helpers/filterHub.js';
 import assume from '../../utils/assume.js';
+import compile from './compile.js';
+import evaluate from './evaluate.js';
+import objectify from '../../utils/objectify.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
-let cache;
+let words;
 let args;
+let scripts;
+let buffs;
 const LANGUAGES = {
     en: 'english',
     pt_br: 'BRportugese',
@@ -35,7 +40,7 @@ const LANGUAGES = {
  *
  */
 function translate(translationRequests) {
-    if (!cache) {
+    if (!words) {
         console.log('Please first build the cache!');
         return;
     }
@@ -43,17 +48,18 @@ function translate(translationRequests) {
     const defs = [];
 
     for (const request of translationRequests) {
+        const data = generateData(request);
         for (const lang in LANGUAGES) {
-            const langMap = cache[lang];
+            const langMap = words[lang];
             const def = {_type: 'TranslationDef'};
             add(def, 'target_id', request.target_id);
             add(def, 'type', request.type);
             add(def, 'subtype', request.subtype);
             add(def, 'variant', request.variant);
             add(def, 'language', lang);
-            add(def, 'name', adaptTranslation(request, 'name', langMap));
-            add(def, 'description', adaptTranslation(request, 'description', langMap));
-            add(def, 'bonus_description', adaptTranslation(request, 'bonus_description', langMap));
+            add(def, 'name', adaptTranslation(request, 'name', langMap, data));
+            add(def, 'description', adaptTranslation(request, 'description', langMap, data));
+            add(def, 'bonus_description', adaptTranslation(request, 'bonus_description', langMap, data));
             defs.push(def);
         }
     }
@@ -65,7 +71,7 @@ function translate(translationRequests) {
  *
  */
 function buildCache(zipHub) {
-    cache = {};
+    words = {};
     for (const key in LANGUAGES) {
         const langHub = filterHub(zipHub, new RegExp('Lang/' + LANGUAGES[key] + '/'));
         const langMap = new Map();
@@ -76,9 +82,11 @@ function buildCache(zipHub) {
                 langMap.set(token.sid, token.text);
             }
         }
-        cache[key] = langMap;
+        words[key] = langMap;
     }
     buildArgs(zipHub);
+    buildScripts(zipHub);
+    buildBuffs(zipHub);
 }
 
 // =====================================================================================================================
@@ -102,17 +110,61 @@ function buildArgs(zipHub) {
 /**
  *
  */
-function resolveArg(textId, nr, langMap, request) {
-    const argsList = args.get(textId);
-    assume(argsList, request, textId, 'No args found!');
-    const island = argsList[nr];
-    return island;
+function buildScripts(zipHub) {
+    const scriptsHub = filterHub(zipHub, new RegExp('DB/info/.*script$'));
+    const allScripts = Object.values(scriptsHub).join('\n/**/\n');
+    scripts = compile(allScripts);
+    // fs.writeFileSync('allScripts.json', JSON.stringify(scripts, null, 4));
 }
 
 /**
  *
  */
-function adaptTranslation(request, prop, langMap) {
+function buildBuffs(zipHub) {
+    const buffsHub = filterHub(zipHub, 'DB/buffs');
+    const list = Object.values(buffsHub).flat();
+    buffs = objectify(list, 'id');
+}
+
+/**
+ *
+ */
+function generateData(request) {
+    return {
+        currentUnitData: {
+            fullStacks: 0,
+            tempFullStacks: 0,
+            startBattleFullStacks: 0,
+            unit: {
+                stats: {
+                    finalSummonBonusPercent: 0,
+                },
+            },
+        },
+        buffs,
+        ...request._data,
+    };
+}
+
+/**
+ *
+ */
+function resolveArg(textId, nr, langMap, request, data) {
+    const argsList = args.get(textId);
+    assume(argsList, request, textId, 'No args found!');
+    const island = argsList[nr];
+    const [main, redirect] = island.split('|');
+    assume(!redirect || langMap.get(redirect), textId, redirect, 'Redirect not found!');
+    let text = redirect ? langMap.get(redirect) : '{0}';
+    const evaluated = evaluate(main, scripts, data);
+    text = text.replace('{0}', evaluated);
+    return text;
+}
+
+/**
+ *
+ */
+function adaptTranslation(request, prop, langMap, data) {
     if (!(prop in request)) {
         return;
     }
@@ -121,7 +173,7 @@ function adaptTranslation(request, prop, langMap) {
     let text = langMap.get(textId);
     if (text.includes('{')) {
         text = text.replace(/\{(\d)}/g, (all, nr) => {
-            return resolveArg(textId, nr, langMap);
+            return resolveArg(textId, nr, langMap, request, data);
         });
         assume(!text.includes('{'), request, text, 'Still has braces!');
     }

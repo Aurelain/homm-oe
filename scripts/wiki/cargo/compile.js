@@ -7,6 +7,8 @@ import assume from '../../utils/assume.js';
  *
  */
 function compile(text) {
+    text = text.replace(/\/\/.*/g, '');
+    text = text.replace(/\/\*[\s\S]*?\*\//g, '');
     const output = {};
     const functions = text.split('}');
     functions.pop();
@@ -30,6 +32,7 @@ function compileFunction(functionText) {
     const headerParts = header.split(' ');
     assume(headerParts.length === 2, functionText, 'Header must have 2 parts!');
     const name = headerParts[1];
+    assume(checkIdentifier(name), functionText, 'Invalid function name!');
     return {
         [name]: {
             type: headerParts[0],
@@ -59,10 +62,10 @@ function compileLine(line, functionName) {
     const parts = line.split('(');
     assume(parts.length === 2, functionName, line, 'Invalid line!');
     const action = parts[0].trim();
-    assume(checkLetters(action), functionName, line, 'Invalid action!');
+    assume(checkIdentifier(action), functionName, line, 'Invalid action!');
     const parameters = parts[1].split(',');
     const variable = parameters.shift().trim();
-    assume(checkLetters(variable), functionName, line, 'Invalid variable!');
+    assume(checkIdentifier(variable), functionName, line, 'Invalid variable!');
     return {
         variable,
         action,
@@ -80,11 +83,10 @@ function compileParams(parameters, functionName, line) {
         if (value.startsWith('"')) {
             assume(value.endsWith('"'), functionName, line, 'Unexpected quotes!');
             value = value.substring(1, value.length - 1);
-            assume(value.match(/^[a-zA-Z\[\]0-9.]+$/), functionName, line, value, 'Invalid accessor!');
         } else if (value.match(/^\d+$/)) {
             value = Number(value);
         } else {
-            assume(checkLetters(value), functionName, line, 'Invalid variable!');
+            assume(checkIdentifier(value), functionName, line, 'Invalid variable!');
             value = '#' + value;
         }
         output.push(value);
@@ -95,8 +97,8 @@ function compileParams(parameters, functionName, line) {
 /**
  *
  */
-function checkLetters(text) {
-    return !!text.match(/^[A-Za-z]+$/);
+function checkIdentifier(text) {
+    return !!text.match(/^[A-Za-z][A-Za-z0-9_]*$/);
 }
 
 // =====================================================================================================================

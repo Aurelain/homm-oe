@@ -266,6 +266,9 @@ function spawnUnitAbilityActiveDef(logic, view, prop, translations) {
             type: 'unit_ability',
             name: def.name_sid,
             description: def.desc_sid,
+            _data: {
+                currentAbility: logicItem,
+            },
         });
     }
     return defs;
