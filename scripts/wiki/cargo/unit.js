@@ -14,6 +14,7 @@ const IDS = new Set([
     'black_dragon_upg_alt',
     'hive_queen_upg',
     'lava_larva',
+    'inquisitor_upg_alt',
 ]);
 
 const ATTACK_TYPES = {
@@ -254,6 +255,8 @@ function spawnUnitAbilityActiveDef(logic, view, translations) {
         add(def, 'multitarget_type', dd.multitargetType);
         add(def, 'min_base_dmg', dd.minBaseDmg);
         add(def, 'max_base_dmg', dd.maxBaseDmg);
+        add(def, 'min_stack_dmg', dd.minStackDmg);
+        add(def, 'max_stack_dmg', dd.maxStackDmg);
         add(def, 'damage_multipler_per_hero_level', addUselessZero(dd.damageMultiplerPerHeroLevel));
         add(def, 'shoot_range', dd.shootRange);
         add(def, 'buff_sid', dd.buff?.sid);

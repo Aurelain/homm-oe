@@ -11,8 +11,10 @@ import mergeDeep from '../../utils/mergeDeep.js';
 // =====================================================================================================================
 const DEBUG = new Set([
     // -- Uncomment any target_id you want to focus on:
+    // 'black_dragon_upg_alt_3',
     // 'hive_queen_upg_3',
     // 'lava_larva_1',
+    // 'inquisitor_upg_alt_2',
 ]);
 
 const LANGUAGES = {
@@ -43,6 +45,7 @@ const DEFAULT_DATA = {
             stats: {
                 finalSummonBonusPercent: 0,
                 outComingBuffDuration: 0,
+                finalAbilityDamageBonusPercent: 0,
             },
         },
     },
@@ -77,7 +80,7 @@ let words;
 let args;
 let scripts;
 let buffs;
-let history = new Map();
+let history;
 
 // =====================================================================================================================
 //  P U B L I C
@@ -91,8 +94,8 @@ function translate(translationRequests) {
         return;
     }
 
+    history = new Map();
     const defs = [];
-
     for (const request of translationRequests) {
         const data = generateData(request);
         for (const lang in LANGUAGES) {
@@ -104,15 +107,16 @@ function translate(translationRequests) {
             add(def, 'variant', request.variant);
             add(def, 'language', lang);
 
-            const name = adaptTranslation(request, 'name', langMap, data);
+            const name = adaptTranslation(request.name, request, langMap, data);
             add(def, 'name', normalizeName(name, lang));
-            add(def, 'description', adaptTranslation(request, 'description', langMap, data));
-            add(def, 'bonus_description', adaptTranslation(request, 'bonus_description', langMap, data));
+            add(def, 'description', adaptTranslation(request.description, request, langMap, data));
+            add(def, 'bonus_description', adaptTranslation(request.bonus_description, request, langMap, data));
 
             // if (def.name || def.description || def.bonus_description) {
             defs.push(def);
         }
     }
+    history = null;
 
     return defs;
 }
@@ -199,39 +203,15 @@ function generateData(request) {
 /**
  *
  */
-function resolveArg(textId, nr, langMap, request, data, isDebug) {
-    const argsList = args.get(textId);
-    assume(argsList, request, textId, 'No args found!');
-    const island = argsList[nr];
-    const [main, redirect] = island.split('|');
-    assume(!redirect || langMap.get(redirect), textId, redirect, 'Redirect not found!');
-    let text = redirect ? langMap.get(redirect) : '{0}';
-
-    const fingerprint = textId + '_' + nr;
-    let evaluated = history.get(fingerprint);
-    if (!history.has(fingerprint)) {
-        evaluated = evaluate(main, scripts, data, isDebug);
-        isDebug && console.log('evaluated:', evaluated);
-        history.set(fingerprint, evaluated);
-    }
-
-    text = text.replace('{0}', evaluated);
-    return text;
-}
-
-/**
- *
- */
-function adaptTranslation(request, prop, langMap, data) {
-    if (!(prop in request)) {
+function adaptTranslation(textId, request, langMap, data, isDebug = false) {
+    if (!textId) {
         return;
     }
-    const textId = request[prop];
     if (!langMap.has(textId)) {
         console.log(`Cannot find "${textId}" in translation cache!`);
         return;
     }
-    const isDebug = DEBUG.size && DEBUG.has(request.target_id) && langMap._lang === 'en';
+    isDebug = isDebug || (DEBUG.size && DEBUG.has(request.target_id) && langMap._lang === 'en');
 
     const text = langMap.get(textId);
     isDebug && console.log('===========' + textId);
@@ -247,6 +227,31 @@ function adaptTranslation(request, prop, langMap, data) {
 
     isDebug && console.log('After:', output);
     return output;
+}
+
+/**
+ *
+ */
+function resolveArg(textId, nr, langMap, request, data, isDebug) {
+    const argsList = args.get(textId);
+    assume(argsList, request, textId, 'No args found!');
+    const island = argsList[nr];
+
+    const [functionName, redirect] = island.split('|');
+    if (redirect) {
+        assume(langMap.get(redirect), textId, redirect, 'Redirect not found!');
+        return adaptTranslation(redirect, request, langMap, data, isDebug);
+    }
+
+    const fingerprint = textId + '_' + nr;
+    let evaluated = history.get(fingerprint);
+    if (!history.has(fingerprint)) {
+        evaluated = evaluate(functionName, scripts, data, isDebug);
+        isDebug && console.log('evaluated:', evaluated);
+        history.set(fingerprint, evaluated);
+    }
+
+    return evaluated;
 }
 
 /**
