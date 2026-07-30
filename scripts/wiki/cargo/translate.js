@@ -60,6 +60,7 @@ function translate(translationRequests) {
             add(def, 'name', adaptTranslation(request, 'name', langMap, data));
             add(def, 'description', adaptTranslation(request, 'description', langMap, data));
             add(def, 'bonus_description', adaptTranslation(request, 'bonus_description', langMap, data));
+            // if (def.name || def.description || def.bonus_description) {
             defs.push(def);
         }
     }
@@ -88,6 +89,13 @@ function buildCache(zipHub) {
     buildArgs(zipHub);
     buildScripts(zipHub);
     buildBuffs(zipHub);
+}
+
+/**
+ *
+ */
+function checkExists(id) {
+    return words.en.has(id);
 }
 
 // =====================================================================================================================
@@ -170,7 +178,10 @@ function adaptTranslation(request, prop, langMap, data) {
         return;
     }
     const textId = request[prop];
-    assume(langMap.has(textId), request, `Cannot find "${prop}" in translation cache!`);
+    if (!langMap.has(textId)) {
+        console.log(`Cannot find "${textId}" in translation cache!`);
+        return;
+    }
     let text = langMap.get(textId);
     if (text.includes('{')) {
         text = text.replace(/\{(\d)}/g, (all, nr) => {
@@ -195,4 +206,4 @@ function normalizeText(text) {
 //  E X P O R T
 // =====================================================================================================================
 export default translate;
-export {buildCache};
+export {buildCache, checkExists};

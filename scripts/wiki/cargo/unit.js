@@ -1,16 +1,17 @@
 import filterHub from '../../helpers/filterHub.js';
 import assume from '../../utils/assume.js';
 import add from './add.js';
-import translate from './translate.js';
+import translate, {checkExists} from './translate.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
 const IDS = new Set([
     // -- Test ids:
+    'dragon',
     // 'black_dragon',
     // 'black_dragon_upg',
-    'black_dragon_upg_alt',
+    // 'black_dragon_upg_alt',
 ]);
 
 const ATTACK_TYPES = {
@@ -65,7 +66,8 @@ function parseUnit(logic, view, path) {
     const defs = [];
     const translations = [];
 
-    defs.push(spawnUnitDef(logic, view, path, translations));
+    const unitDef = spawnUnitDef(logic, view, path, translations);
+    defs.push(unitDef);
     defs.push(...spawnUnitAbilityActiveDef(logic, view, 'alternativeAttacks', translations));
     defs.push(...spawnUnitAbilityActiveDef(logic, view, 'abilities', translations));
     defs.push(...spawnUnitAbilityGlobalDef(logic)); // useless
@@ -73,7 +75,9 @@ function parseUnit(logic, view, path) {
     defs.push(...spawnUnitAbilityPassiveDef(logic, view, translations)); // useless
     defs.push(spawnUnitAttackDef(logic)); // useless
 
-    defs.push(...translate(translations));
+    if (!unitDef.unused) {
+        defs.push(...translate(translations));
+    }
 
     return {
         id: logic.id,
@@ -87,8 +91,10 @@ function parseUnit(logic, view, path) {
 function spawnUnitDef(logic, view, path, translations) {
     const unitDef = {_type: 'UnitDef'};
     const baseId = logic.id.replace(/_upg$|_alt$/, '');
+    const isUnused = !checkExists(logic.id + '_name');
 
     add(unitDef, 'id', logic.id);
+    add(unitDef, 'unused', isUnused ? true : null);
     add(unitDef, 'faction', logic.fraction);
     add(unitDef, 'tier', logic.tier);
     add(unitDef, 'source_path', path);
@@ -223,10 +229,10 @@ function getCost(logic, name) {
  */
 function spawnUnitAbilityActiveDef(logic, view, prop, translations) {
     const defs = [];
-    const list = logic[prop]; // e.g. `logic.alternativeAttacks`
+    const list = view[prop] || []; // e.g. `logic.alternativeAttacks`
     for (let i = 0; i < list.length; i++) {
-        const logicItem = list[i];
-        const viewItem = view[prop][i];
+        const logicItem = logic[prop][i] || {};
+        const viewItem = list[i];
         const ordinal = viewItem.name.match(/\d+/) || viewItem.animationIndex;
 
         const def = {_type: 'UnitAbilityActiveDef'};
@@ -247,28 +253,28 @@ function spawnUnitAbilityActiveDef(logic, view, prop, translations) {
         add(def, 'move_type_active', logicItem.moveType);
         add(def, 'action_cost', logicItem.actionCost);
 
-        add(def, 'instacast', logicItem.damageDealer.instacast);
-        add(def, 'attack_pattern_sid', logicItem.damageDealer.attackPatternSid);
-        add(def, 'damage_target', logicItem.damageDealer.damageTarget_);
-        add(def, 'damage_type', logicItem.damageDealer.damageType_);
-        add(def, 'stat_dmg_mult', logicItem.damageDealer.statDmgMult);
-        add(def, 'trigger_counter', logicItem.damageDealer.triggerCounter);
-        add(def, 'shoot_range', logicItem.damageDealer.shootRange);
+        add(def, 'instacast', logicItem.damageDealer?.instacast);
+        add(def, 'attack_pattern_sid', logicItem.damageDealer?.attackPatternSid);
+        add(def, 'damage_target', logicItem.damageDealer?.damageTarget_);
+        add(def, 'damage_type', logicItem.damageDealer?.damageType_);
+        add(def, 'stat_dmg_mult', logicItem.damageDealer?.statDmgMult);
+        add(def, 'trigger_counter', logicItem.damageDealer?.triggerCounter);
+        add(def, 'shoot_range', logicItem.damageDealer?.shootRange);
 
-        add(def, 'multitarget_type', logicItem.damageDealer.multitargetType);
-        add(def, 'buff_sid', logicItem.damageDealer.buff?.sid);
-        add(def, 'buff_target', logicItem.damageDealer.buffTarget_);
-        add(def, 'buff_duration', logicItem.damageDealer.buff?.duration);
+        add(def, 'multitarget_type', logicItem.damageDealer?.multitargetType);
+        add(def, 'buff_sid', logicItem.damageDealer?.buff?.sid);
+        add(def, 'buff_target', logicItem.damageDealer?.buffTarget_);
+        add(def, 'buff_duration', logicItem.damageDealer?.buff?.duration);
 
-        add(def, 'cast_target', logicItem.damageDealer.castTargetParams.castTarget_);
-        add(def, 'cast_selection', logicItem.damageDealer.castTargetParams.selection);
-        add(def, 'cast_target_condition', logicItem.damageDealer.castTargetParams.targetCondition_);
-        add(def, 'cast_target_tags', logicItem.damageDealer.castTargetParams.targetTags);
+        add(def, 'cast_target', logicItem.damageDealer?.castTargetParams.castTarget_);
+        add(def, 'cast_selection', logicItem.damageDealer?.castTargetParams.selection);
+        add(def, 'cast_target_condition', logicItem.damageDealer?.castTargetParams.targetCondition_);
+        add(def, 'cast_target_tags', logicItem.damageDealer?.castTargetParams.targetTags);
 
-        add(def, 'affect_target', logicItem.damageDealer.affectTargetParams.castTarget_);
-        add(def, 'affect_selection', logicItem.damageDealer.affectTargetParams.selection);
-        add(def, 'affect_target_condition', logicItem.damageDealer.affectTargetParams.targetCondition_);
-        add(def, 'affect_target_tags', logicItem.damageDealer.affectTargetParams.targetTags);
+        add(def, 'affect_target', logicItem.damageDealer?.affectTargetParams.castTarget_);
+        add(def, 'affect_selection', logicItem.damageDealer?.affectTargetParams.selection);
+        add(def, 'affect_target_condition', logicItem.damageDealer?.affectTargetParams.targetCondition_);
+        add(def, 'affect_target_tags', logicItem.damageDealer?.affectTargetParams.targetTags);
 
         defs.push(def);
 
@@ -401,22 +407,25 @@ function spawnUnitAttackDef(logic) {
 
     add(def, 'unit_id', logic.id);
 
-    add(def, 'default_attack_type', ATTACK_TYPES[logic.defaultAttacks[0].attackType_]);
-    add(def, 'default_damage_target', logic.defaultAttacks[0].damageDealer.damageTarget_);
-    add(def, 'default_affect_target', logic.defaultAttacks[0].damageDealer.affectTargetParams.castTarget_);
+    const defaultAttack = logic.defaultAttacks?.[0] || {};
+    add(def, 'default_attack_type', ATTACK_TYPES[defaultAttack.attackType_]);
+    add(def, 'default_damage_target', defaultAttack.damageDealer?.damageTarget_);
+    add(def, 'default_affect_target', defaultAttack.damageDealer?.affectTargetParams.castTarget_);
 
-    add(def, 'counter_attack_type', ATTACK_TYPES[logic.counterAttacks[0].attackType_]);
-    add(def, 'counter_damage_target', logic.counterAttacks[0].damageDealer.damageTarget_);
-    add(def, 'counter_affect_target', logic.counterAttacks[0].damageDealer.affectTargetParams.castTarget_);
+    const counterAttack = logic.counterAttacks?.[0] || {};
+    add(def, 'counter_attack_type', ATTACK_TYPES[counterAttack.attackType_]);
+    add(def, 'counter_damage_target', counterAttack.damageDealer?.damageTarget_);
+    add(def, 'counter_affect_target', counterAttack.damageDealer?.affectTargetParams.castTarget_);
 
-    add(def, 'alt_attack_type', ATTACK_TYPES[logic.alternativeAttacks[0].attackType_]);
-    add(def, 'alt_damage_target', logic.alternativeAttacks[0].damageDealer.damageTarget_);
-    add(def, 'alt_affect_target', logic.alternativeAttacks[0].damageDealer.affectTargetParams.castTarget_);
+    const alternativeAttack = logic.alternativeAttacks?.[0] || {};
+    add(def, 'alt_attack_type', ATTACK_TYPES[alternativeAttack.attackType_]);
+    add(def, 'alt_damage_target', alternativeAttack.damageDealer?.damageTarget_);
+    add(def, 'alt_affect_target', alternativeAttack.damageDealer?.affectTargetParams.castTarget_);
 
-    add(def, 'alt_trigger_counter', logic.alternativeAttacks[0].damageDealer.triggerCounter);
-    add(def, 'alt_cd', logic.alternativeAttacks[0].cd);
-    add(def, 'alt_dont_use_energy', logic.alternativeAttacks[0].dontUseEnergy);
-    add(def, 'alt_is_armed_ability', getIsArmed(logic.alternativeAttacks[0].damageDealer.tags));
+    add(def, 'alt_trigger_counter', alternativeAttack.damageDealer?.triggerCounter);
+    add(def, 'alt_cd', alternativeAttack.cd);
+    add(def, 'alt_dont_use_energy', alternativeAttack.dontUseEnergy);
+    add(def, 'alt_is_armed_ability', getIsArmed(alternativeAttack.damageDealer?.tags));
 
     return def;
 }
@@ -425,12 +434,15 @@ function spawnUnitAttackDef(logic) {
  * Useless, but we'll add it for parity with obelisk.
  */
 function getIsArmed(tags) {
+    if (!Array.isArray(tags)) {
+        return;
+    }
     for (const tag of tags) {
         if (tag.startsWith('armed_ability')) {
             return true;
         }
     }
-    return false;
+    return;
 }
 
 // =====================================================================================================================
