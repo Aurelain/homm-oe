@@ -270,6 +270,7 @@ function spawnUnitAbilityActiveDef(logic, view, translations) {
         add(def, 'dont_use_energy', logicItem.dontUseEnergy);
         add(def, 'disable_for_ai', logicItem.disableForAi);
         add(def, 'charges', logicItem.charges);
+        add(def, 'use_all_energy_levels', logicItem.useAllEnergyLevels);
         add(def, 'never_disable', logicItem.neverDisable);
 
         const dd = logicItem.damageDealer || {};
@@ -288,11 +289,14 @@ function spawnUnitAbilityActiveDef(logic, view, translations) {
         add(def, 'min_stack_dmg', dd.minStackDmg);
         add(def, 'max_stack_dmg', dd.maxStackDmg);
         add(def, 'damage_multipler_per_hero_level', dd.damageMultiplerPerHeroLevel);
-        add(def, 'shoot_range', dd.shootRange);
         add(def, 'buff_sid', dd.buff?.sid);
         add(def, 'buff_target', dd.buffTarget_);
         add(def, 'buff_duration', dd.buff?.duration);
         add(def, 'buff_charges', dd.buff?.charges);
+        add(def, 'shoot_range', dd.shootRange);
+        add(def, 'shoot_threshold', dd.shootThreshold);
+        add(def, 'shoot_red_count', dd.shootRedCount);
+        add(def, 'shoot_dmg_buff', dd.shootDmgBuff);
 
         add(def, 'cast_target', dd.castTargetParams?.castTarget_);
         add(def, 'cast_selection', dd.castTargetParams?.selection);
@@ -471,11 +475,12 @@ function spawnUnitAttackDef(logic, unitDef) {
 
     const defaultAttack = logic.defaultAttacks?.[0] || {};
     add(def, 'default_attack_type', clarifyAttack(defaultAttack.attackType_, unitDef));
+    add(def, 'default_damage_target', defaultAttack.damageDealer?.damageTarget_, 'enemy');
+    add(def, 'default_affect_target', defaultAttack.damageDealer?.affectTargetParams.castTarget_, 'enemy');
+    add(def, 'default_trigger_counter', defaultAttack.damageDealer?.triggerCounter, true);
     add(def, 'default_buff_sid', defaultAttack.damageDealer?.buff?.sid);
     add(def, 'default_buff_target', defaultAttack.damageDealer?.buffTarget_);
     add(def, 'default_buff_duration', defaultAttack.damageDealer?.buff?.duration);
-    add(def, 'default_damage_target', defaultAttack.damageDealer?.damageTarget_, 'enemy');
-    add(def, 'default_affect_target', defaultAttack.damageDealer?.affectTargetParams.castTarget_, 'enemy');
 
     const counterAttack = logic.counterAttacks?.[0] || {};
     add(def, 'counter_attack_type', clarifyAttack(counterAttack.attackType_, unitDef));
@@ -491,17 +496,31 @@ function spawnUnitAttackDef(logic, unitDef) {
     add(def, 'alt_stat_dmg_mult', alternativeAttack.damageDealer?.statDmgMult, 0.5);
     add(def, 'alt_damage_target', alternativeAttack.damageDealer?.damageTarget_, 'enemy');
     add(def, 'alt_affect_target', alternativeAttack.damageDealer?.affectTargetParams.castTarget_, 'enemy');
-    add(def, 'alt_trigger_counter', alternativeAttack.damageDealer?.triggerCounter);
+    add(def, 'alt_trigger_counter', alternativeAttack.damageDealer?.triggerCounter, false);
     add(def, 'alt_buff_sid', alternativeAttack.damageDealer?.buff?.sid);
     add(def, 'alt_buff_target', alternativeAttack.damageDealer?.buffTarget_);
     add(def, 'alt_buff_duration', alternativeAttack.damageDealer?.buff?.duration);
-
     add(def, 'alt_cd', alternativeAttack.cd);
     add(def, 'alt_dont_use_energy', alternativeAttack.dontUseEnergy);
     add(def, 'alt_never_disable', alternativeAttack.neverDisable);
     add(def, 'alt_return_to_start_after_attack', alternativeAttack.returnToStartAfterAttack);
     add(def, 'alt_temp_self_buff', alternativeAttack.damageDealer?.tempSelfBuff);
     add(def, 'alt_is_armed_ability', getIsArmed(alternativeAttack.damageDealer?.tags));
+
+    const alt2 = logic.alternativeAttacks?.[1] || {};
+    add(def, 'alt2_attack_type', clarifyAttack(alt2.attackType_, unitDef));
+    add(def, 'alt2_buff_sid', alt2.damageDealer?.buff?.sid);
+    add(def, 'alt2_buff_target', alt2.damageDealer?.buffTarget_);
+    add(def, 'alt2_buff_duration', alt2.damageDealer?.buff?.duration);
+    add(def, 'alt2_cd', alt2.cd);
+    add(def, 'alt2_dont_use_energy', alt2.dontUseEnergy);
+    add(def, 'alt2_multitarget_type', alt2.damageDealer?.multitargetType);
+    add(def, 'alt2_num_targets', alt2.damageDealer?.numTargets);
+    add(def, 'alt2_is_armed_ability', getIsArmed(alt2.damageDealer?.tags));
+
+    if (logic.id === 'blade_dancer_upg') {
+        add(def, 'alt2_attack_type', 'ranged_attack'); // TODO: investigate
+    }
 
     return def;
 }
