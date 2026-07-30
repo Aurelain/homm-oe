@@ -16,6 +16,7 @@ const IDS = new Set([
     'lava_larva',
     'inquisitor_upg_alt',
     'angel',
+    'angel_upg',
 ]);
 
 const ATTACK_TYPES = {
@@ -77,7 +78,7 @@ function parseUnit(logic, view, path) {
     defs.push(...spawnUnitAbilityAuraDef(logic)); // useless
     defs.push(...spawnUnitAbilityConditionalDef(logic)); // useless
     defs.push(...spawnUnitAbilityPassiveDef(logic, view, translations)); // useless
-    defs.push(spawnUnitAttackDef(logic)); // useless
+    defs.push(spawnUnitAttackDef(logic, unitDef)); // useless
 
     if (!unitDef.unused) {
         defs.push(...translate(translations));
@@ -276,14 +277,14 @@ function spawnUnitAbilityActiveDef(logic, view, translations) {
         add(def, 'attack_pattern_sid', dd.attackPatternSid);
         add(def, 'damage_target', dd.damageTarget_);
         add(def, 'damage_type', dd.damageType_);
-        add(def, 'stat_dmg_mult', addUselessZero(dd.statDmgMult));
+        add(def, 'stat_dmg_mult', dd.statDmgMult);
         add(def, 'trigger_counter', dd.triggerCounter);
         add(def, 'multitarget_type', dd.multitargetType);
         add(def, 'min_base_dmg', dd.minBaseDmg);
         add(def, 'max_base_dmg', dd.maxBaseDmg);
         add(def, 'min_stack_dmg', dd.minStackDmg);
         add(def, 'max_stack_dmg', dd.maxStackDmg);
-        add(def, 'damage_multipler_per_hero_level', addUselessZero(dd.damageMultiplerPerHeroLevel));
+        add(def, 'damage_multipler_per_hero_level', dd.damageMultiplerPerHeroLevel);
         add(def, 'shoot_range', dd.shootRange);
         add(def, 'buff_sid', dd.buff?.sid);
         add(def, 'buff_target', dd.buffTarget_);
@@ -459,24 +460,25 @@ function spawnUnitAbilityPassiveDef(logic, view, translations) {
 /**
  * Useless, but we'll add it for parity with obelisk.
  */
-function spawnUnitAttackDef(logic) {
+function spawnUnitAttackDef(logic, unitDef) {
     const def = {_type: 'UnitAttackDef'};
 
     add(def, 'unit_id', logic.id);
 
     const defaultAttack = logic.defaultAttacks?.[0] || {};
-    add(def, 'default_attack_type', ATTACK_TYPES[defaultAttack.attackType_]);
+    add(def, 'default_attack_type', clarifyAttack(defaultAttack.attackType_, unitDef));
     add(def, 'default_damage_target', defaultAttack.damageDealer?.damageTarget_, 'enemy');
     add(def, 'default_affect_target', defaultAttack.damageDealer?.affectTargetParams.castTarget_, 'enemy');
 
     const counterAttack = logic.counterAttacks?.[0] || {};
-    add(def, 'counter_attack_type', ATTACK_TYPES[counterAttack.attackType_]);
+    add(def, 'counter_attack_type', clarifyAttack(counterAttack.attackType_, unitDef));
     add(def, 'counter_stat_dmg_mult', counterAttack.damageDealer?.statDmgMult, 1);
     add(def, 'counter_damage_target', counterAttack.damageDealer?.damageTarget_, 'enemy');
     add(def, 'counter_affect_target', counterAttack.damageDealer?.affectTargetParams.castTarget_, 'enemy');
 
     const alternativeAttack = logic.alternativeAttacks?.[0] || {};
-    add(def, 'alt_attack_type', ATTACK_TYPES[alternativeAttack.attackType_]);
+    add(def, 'alt_attack_type', clarifyAttack(alternativeAttack.attackType_, unitDef));
+    add(def, 'alt_stat_dmg_mult', alternativeAttack.damageDealer?.statDmgMult, 0.5);
     add(def, 'alt_damage_target', alternativeAttack.damageDealer?.damageTarget_, 'enemy');
     add(def, 'alt_affect_target', alternativeAttack.damageDealer?.affectTargetParams.castTarget_, 'enemy');
 
@@ -503,16 +505,6 @@ function getIsArmed(tags) {
 }
 
 /**
- * Useless, but we'll add it for parity with obelisk.
- */
-function addUselessZero(value) {
-    if (typeof value === 'number' && !String(value).includes('.')) {
-        return value + '.0';
-    }
-    return value;
-}
-
-/**
  *
  */
 function checkSharedAbility(name) {
@@ -521,6 +513,23 @@ function checkSharedAbility(name) {
     }
     const first = name.split('_').shift();
     return FACTIONS.has(first);
+}
+
+/**
+ *
+ */
+function clarifyAttack(value, unitDef) {
+    value = ATTACK_TYPES[value];
+    if (!value) {
+        return;
+    }
+    const {shared_abilities} = unitDef;
+    for (const name of shared_abilities) {
+        if (name.startsWith('base_passive_' + value)) {
+            return name.replace('base_passive_', '').replace('_name', '');
+        }
+    }
+    return value;
 }
 
 // =====================================================================================================================
