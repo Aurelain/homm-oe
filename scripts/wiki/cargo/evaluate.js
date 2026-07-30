@@ -8,6 +8,7 @@ import checkNumber from '../../utils/checkNumber.js';
 const ACTIONS = {
     // key: [function, how many parameters it expects]
     CurrentUnitData: [CurrentUnitData, 1],
+    CurrentUnitConfig: [CurrentUnitConfig, 1],
     CurrentAbility: [CurrentAbility, 1],
     Add: [Add, -1],
     Mul: [Mul, -1],
@@ -81,6 +82,16 @@ function resolveValue(origin, path, about) {
 function CurrentUnitData(path, context) {
     const json = context.data.currentUnitData;
     assume(json, context.about, 'Missing "currentUnitData"!');
+    const value = resolveValue(json, path, context);
+    return value;
+}
+
+/**
+ *
+ */
+function CurrentUnitConfig(path, context) {
+    const json = context.data.currentUnitConfig;
+    assume(json, context.about, 'Missing "currentUnitConfig"!');
     const value = resolveValue(json, path, context);
     return value;
 }

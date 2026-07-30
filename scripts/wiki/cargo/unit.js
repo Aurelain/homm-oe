@@ -6,10 +6,11 @@ import translate from './translate.js';
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
-const IDS = [
+const IDS = new Set([
     // -- Test ids:
-    'black_dragon',
-];
+    // 'black_dragon',
+    'black_dragon_upg',
+]);
 
 const ATTACK_TYPES = {
     melee: 'melee_attack',
@@ -30,7 +31,8 @@ function unit(zipHub) {
     const logics = filterHub(zipHub, /units_logics/);
     const views = filterHub(zipHub, /units_views/);
     for (const path in logics) {
-        if (IDS.length && !path.endsWith(IDS[0] + '_l.json')) {
+        const id = logics[path][0].id;
+        if (IDS.size && !IDS.has(id)) {
             continue;
         }
         const viewsPath = path.replace('_logics/', '_views/').replace('_l.', '_v.');
@@ -63,7 +65,9 @@ function parseUnit(logic, view, path) {
     defs.push(spawnUnitDef(logic, view, path, translations));
     defs.push(...spawnUnitAbilityActiveDef(logic, view, 'alternativeAttacks', translations));
     defs.push(...spawnUnitAbilityActiveDef(logic, view, 'abilities', translations));
-    defs.push(spawnUnitAttackDef(logic, view, translations));
+    defs.push(...spawnUnitAbilityGlobalDef(logic)); // useless
+    defs.push(...spawnUnitAbilityPassiveDef(logic, view, translations)); // useless
+    defs.push(spawnUnitAttackDef(logic)); // useless
 
     defs.push(...translate(translations));
 
@@ -78,6 +82,7 @@ function parseUnit(logic, view, path) {
  */
 function spawnUnitDef(logic, view, path, translations) {
     const unitDef = {_type: 'UnitDef'};
+    const baseId = logic.id.replace(/_upg$|_alt$/, '');
 
     add(unitDef, 'id', logic.id);
     add(unitDef, 'faction', logic.fraction);
@@ -85,6 +90,7 @@ function spawnUnitDef(logic, view, path, translations) {
     add(unitDef, 'source_path', path);
     add(unitDef, 'name_sid', logic.id + '_name');
     add(unitDef, 'desc_sid', logic.id + '_narrativeDescription');
+    add(unitDef, 'base_sid', baseId === logic.id ? null : baseId);
     add(unitDef, 'upgrade_sid', logic.upgradeSid);
 
     add(unitDef, 'hp', logic.stats.hp);
@@ -268,6 +274,77 @@ function spawnUnitAbilityActiveDef(logic, view, prop, translations) {
             description: def.desc_sid,
             _data: {
                 currentAbility: logicItem,
+            },
+        });
+    }
+    return defs;
+}
+
+/**
+ * Useless, but we'll add it for parity with obelisk.
+ */
+function spawnUnitAbilityGlobalDef(logic) {
+    const defs = [];
+    const list = logic.globalPassives;
+    for (let i = 0; i < list.length; i++) {
+        const logicItem = list[i];
+        const ordinal = i + 1;
+
+        const def = {_type: 'UnitAbilityGlobalDef'};
+
+        add(def, 'ability_id', logic.id + '_global_passive_' + ordinal);
+        add(def, 'unit_id', logic.id);
+        add(def, 'ability_type', 'global_passive');
+        add(def, 'ordinal', ordinal);
+        add(def, 'name_sid', def.ability_id + '_name');
+
+        add(def, 'global_target', logicItem.target);
+        add(def, 'global_power', logicItem.power);
+        add(def, 'global_tag', logicItem.tag);
+
+        add(def, 'affected_stat', Object.keys(logicItem.data?.stats || {})[0]); // absurd to only get the first!
+        add(def, 'affected_stat_amount', logicItem.data?.stats?.[def.affected_stat]);
+        if ('affected_stat_amount' in def) {
+            def.affected_stat_amount += '.0'; // absurd
+        }
+
+        defs.push(def);
+    }
+    return defs;
+}
+
+/**
+ *
+ */
+function spawnUnitAbilityPassiveDef(logic, view, translations) {
+    const defs = [];
+    const list = view.passives;
+    let ordinal = 0;
+    for (let i = 0; i < list.length; i++) {
+        const viewItem = list[i];
+        if (viewItem.name.startsWith('base_')) {
+            continue;
+        }
+        ordinal++;
+
+        const def = {_type: 'UnitAbilityPassiveDef'};
+
+        add(def, 'ability_id', logic.id + '_passive_' + ordinal);
+        add(def, 'unit_id', logic.id);
+        add(def, 'ability_type', 'passive');
+        add(def, 'ordinal', ordinal);
+        add(def, 'name_sid', viewItem.name);
+        add(def, 'desc_sid', viewItem.description);
+
+        defs.push(def);
+
+        translations.push({
+            target_id: def.ability_id,
+            type: 'unit_ability',
+            name: def.name_sid,
+            description: def.desc_sid,
+            _data: {
+                currentUnitConfig: logic,
             },
         });
     }
