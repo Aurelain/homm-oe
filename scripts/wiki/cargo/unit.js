@@ -9,7 +9,8 @@ import translate from './translate.js';
 const IDS = new Set([
     // -- Test ids:
     // 'black_dragon',
-    'black_dragon_upg',
+    // 'black_dragon_upg',
+    'black_dragon_upg_alt',
 ]);
 
 const ATTACK_TYPES = {
@@ -35,6 +36,8 @@ function unit(zipHub) {
         if (IDS.size && !IDS.has(id)) {
             continue;
         }
+        console.log('id:', id);
+
         const viewsPath = path.replace('_logics/', '_views/').replace('_l.', '_v.');
         assume(views[viewsPath], viewsPath, 'Missing path!');
 
@@ -66,6 +69,7 @@ function parseUnit(logic, view, path) {
     defs.push(...spawnUnitAbilityActiveDef(logic, view, 'alternativeAttacks', translations));
     defs.push(...spawnUnitAbilityActiveDef(logic, view, 'abilities', translations));
     defs.push(...spawnUnitAbilityGlobalDef(logic)); // useless
+    defs.push(...spawnUnitAbilityAuraDef(logic)); // useless
     defs.push(...spawnUnitAbilityPassiveDef(logic, view, translations)); // useless
     defs.push(spawnUnitAttackDef(logic)); // useless
 
@@ -184,9 +188,9 @@ function getImmunities(logic) {
  */
 function getSharedAbilities(view) {
     const names = [];
-    names.push(...view.passives.map((ability) => ability.name));
-    names.push(...view.alternativeAttacks.map((ability) => ability.name));
-    names.push(...view.abilities.map((ability) => ability.name));
+    view.passives && names.push(...view.passives.map((ability) => ability.name));
+    view.alternativeAttacks && names.push(...view.alternativeAttacks.map((ability) => ability.name));
+    view.abilities && names.push(...view.abilities.map((ability) => ability.name));
 
     const shared = [];
     for (const name of names) {
@@ -223,7 +227,7 @@ function spawnUnitAbilityActiveDef(logic, view, prop, translations) {
     for (let i = 0; i < list.length; i++) {
         const logicItem = list[i];
         const viewItem = view[prop][i];
-        const ordinal = viewItem.animationIndex;
+        const ordinal = viewItem.name.match(/\d+/) || viewItem.animationIndex;
 
         const def = {_type: 'UnitAbilityActiveDef'};
 
@@ -240,6 +244,7 @@ function spawnUnitAbilityActiveDef(logic, view, prop, translations) {
         add(def, 'cd', logicItem.cd);
         add(def, 'dont_use_energy', logicItem.dontUseEnergy);
         add(def, 'energy_level', logicItem.energyLevel);
+        add(def, 'move_type_active', logicItem.moveType);
         add(def, 'action_cost', logicItem.actionCost);
 
         add(def, 'instacast', logicItem.damageDealer.instacast);
@@ -248,6 +253,7 @@ function spawnUnitAbilityActiveDef(logic, view, prop, translations) {
         add(def, 'damage_type', logicItem.damageDealer.damageType_);
         add(def, 'stat_dmg_mult', logicItem.damageDealer.statDmgMult);
         add(def, 'trigger_counter', logicItem.damageDealer.triggerCounter);
+        add(def, 'shoot_range', logicItem.damageDealer.shootRange);
 
         add(def, 'multitarget_type', logicItem.damageDealer.multitargetType);
         add(def, 'buff_sid', logicItem.damageDealer.buff?.sid);
@@ -274,6 +280,7 @@ function spawnUnitAbilityActiveDef(logic, view, prop, translations) {
             description: def.desc_sid,
             _data: {
                 currentAbility: logicItem,
+                currentUnitConfig: logic,
             },
         });
     }
@@ -285,7 +292,7 @@ function spawnUnitAbilityActiveDef(logic, view, prop, translations) {
  */
 function spawnUnitAbilityGlobalDef(logic) {
     const defs = [];
-    const list = logic.globalPassives;
+    const list = logic.globalPassives || [];
     for (let i = 0; i < list.length; i++) {
         const logicItem = list[i];
         const ordinal = i + 1;
@@ -306,6 +313,41 @@ function spawnUnitAbilityGlobalDef(logic) {
         add(def, 'affected_stat_amount', logicItem.data?.stats?.[def.affected_stat]);
         if ('affected_stat_amount' in def) {
             def.affected_stat_amount += '.0'; // absurd
+        }
+
+        defs.push(def);
+    }
+    return defs;
+}
+
+/**
+ * Useless, but we'll add it for parity with obelisk.
+ */
+function spawnUnitAbilityAuraDef(logic) {
+    const defs = [];
+    const list = logic.aura ? [logic.aura] : [];
+    for (let i = 0; i < list.length; i++) {
+        const logicItem = list[i];
+        const ordinal = i + 1;
+
+        const def = {_type: 'UnitAbilityAuraDef'};
+
+        add(def, 'ability_id', logic.id + '_aura_' + ordinal);
+        add(def, 'unit_id', logic.id);
+        add(def, 'ability_type', 'aura');
+        add(def, 'ordinal', ordinal);
+        add(def, 'name_sid', def.ability_id + '_name');
+
+        add(def, 'aura_target', logicItem.target);
+        add(def, 'aura_power', logicItem.power);
+        add(def, 'aura_radius', logicItem.radius);
+        add(def, 'aura_tag', logicItem.tag);
+
+        const stats = logicItem.data?.stats || {};
+        const affectedStat = Object.keys(stats)[0]; // absurd to only get the first!
+        add(def, 'affected_stat', affectedStat);
+        if (typeof stats[affectedStat] === 'number') {
+            add(def, 'affected_stat_amount', stats[affectedStat] + '.0'); // absurd
         }
 
         defs.push(def);

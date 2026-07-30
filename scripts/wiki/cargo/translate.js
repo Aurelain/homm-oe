@@ -79,7 +79,8 @@ function buildCache(zipHub) {
             const tokens = langHub[path];
             for (const token of tokens) {
                 assume(Object.keys(token).toString() === 'sid,text', token, 'Unexpected token structure!');
-                langMap.set(token.sid, token.text);
+                const text = normalizeText(token.text);
+                langMap.set(token.sid, text);
             }
         }
         words[key] = langMap;
@@ -177,6 +178,16 @@ function adaptTranslation(request, prop, langMap, data) {
         });
         assume(!text.includes('{'), request, text, 'Still has braces!');
     }
+    return text;
+}
+
+/**
+ *
+ */
+function normalizeText(text) {
+    text = text.replace(/\n/g, '<br/>');
+    text = text.replace(/ /g, ' '); // TODO: remove this
+    text = text.replace(/‑/g, '-'); // TODO: remove this
     return text;
 }
 

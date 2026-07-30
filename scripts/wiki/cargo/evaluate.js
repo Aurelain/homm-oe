@@ -9,6 +9,7 @@ const ACTIONS = {
     // key: [function, how many parameters it expects]
     CurrentUnitData: [CurrentUnitData, 1],
     CurrentUnitConfig: [CurrentUnitConfig, 1],
+    CurrentUnitStats: [CurrentUnitStats, 1],
     CurrentAbility: [CurrentAbility, 1],
     Add: [Add, -1],
     Mul: [Mul, -1],
@@ -69,9 +70,12 @@ function resolveParams(params, vars, about) {
 /**
  *
  */
-function resolveValue(origin, path, about) {
+function resolveValue(origin, path, context, defaultValue) {
     const value = fishValue(origin, path);
-    assume(value !== undefined, about, path, 'Unresolved path!');
+    if (value === undefined && defaultValue !== undefined) {
+        return defaultValue;
+    }
+    assume(value !== undefined, origin, context.about, path, 'Unresolved path!');
     return value;
 }
 
@@ -99,10 +103,20 @@ function CurrentUnitConfig(path, context) {
 /**
  *
  */
+function CurrentUnitStats(prop, context) {
+    const json = context.data.currentUnitConfig;
+    assume(json, context.about, 'Missing "currentUnitConfig"!');
+    const value = resolveValue(json, 'stats.' + prop, context);
+    return value;
+}
+
+/**
+ *
+ */
 function CurrentAbility(path, context) {
     const json = context.data.currentAbility;
     assume(json, context.about, 'Missing "currentAbility"!');
-    const value = resolveValue(json, path, context);
+    const value = resolveValue(json, path, context, 1); // TODO: defaultValue needed by black_dragon_upg_alt
     return value;
 }
 
