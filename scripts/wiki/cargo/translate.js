@@ -16,6 +16,8 @@ const DEBUG = new Set([
     // 'lava_larva_1',
     // 'inquisitor_upg_alt_2',
     // 'druid_upg_3',
+    // 'frostworm_rider_upg_alt_1',
+    // 'gorilla_2',
 ]);
 
 const LANGUAGES = {

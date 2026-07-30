@@ -18,6 +18,7 @@ const IDS = new Set([
     // 'angel',
     // 'angel_upg',
     // 'druid_upg',
+    // 'frostworm_rider_upg_alt',
 ]);
 
 const ATTACK_TYPES = {

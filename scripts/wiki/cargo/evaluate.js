@@ -89,7 +89,7 @@ function resolveValue(origin, path, context) {
 function formatValue(value, type) {
     switch (type) {
         case 'int':
-            return Math.round(value);
+            return Math.floor(value); // Note: crossbowman_upg_alt needs a 1-2 interval!
         case 'modInt':
             return Math.abs(Math.round(value));
         case 'modPercentNumeric':
