@@ -93,7 +93,7 @@ function formatValue(value, type) {
         case 'modInt':
             return Math.abs(Math.round(value));
         case 'modPercentNumeric':
-            return Math.abs(value * 100);
+            return Math.round(Math.abs(value * 100));
         case 'string':
             return String(value);
         default:

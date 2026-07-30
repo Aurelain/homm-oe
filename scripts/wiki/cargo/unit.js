@@ -75,9 +75,9 @@ function parseUnit(logic, view, path) {
     const unitDef = spawnUnitDef(logic, view, path, translations);
     defs.push(unitDef);
     defs.push(...spawnUnitAbilityActiveDef(logic, view, translations));
-    defs.push(...spawnUnitAbilityGlobalDef(logic)); // useless
     defs.push(...spawnUnitAbilityAuraDef(logic)); // useless
     defs.push(...spawnUnitAbilityConditionalDef(logic)); // useless
+    defs.push(...spawnUnitAbilityGlobalDef(logic)); // useless
     defs.push(...spawnUnitAbilityPassiveDef(logic, view, translations)); // useless
     defs.push(spawnUnitAttackDef(logic, unitDef)); // useless
 
@@ -217,10 +217,10 @@ function getSharedAbilities(view) {
     const allAbilities = [
         //
         ...(view.alternativeAttacks || []),
-        ...(view.passives || []),
         ...(view.abilities || []),
+        ...(view.passives || []),
     ];
-    const shared = allAbilities.filter((ability) => checkSharedAbility(ability.name));
+    const shared = allAbilities.filter((ability) => checkSharedAbility(ability.name, view.id));
     return shared.map((item) => item.name);
 }
 
@@ -247,7 +247,7 @@ function spawnUnitAbilityActiveDef(logic, view, translations) {
     for (let i = 0; i < viewList.length; i++) {
         const logicItem = logicList[i] || {};
         const viewItem = viewList[i];
-        if (checkSharedAbility(viewItem.name)) {
+        if (checkSharedAbility(viewItem.name, logic.id)) {
             continue;
         }
         ordinal++;
@@ -267,10 +267,10 @@ function spawnUnitAbilityActiveDef(logic, view, translations) {
         add(def, 'cd', logicItem.cd);
         add(def, 'energy_level', logicItem.energyLevel);
         add(def, 'action_cost', logicItem.actionCost);
+        add(def, 'charges', logicItem.charges);
         add(def, 'move_type_active', logicItem.moveType);
         add(def, 'dont_use_energy', logicItem.dontUseEnergy);
         add(def, 'disable_for_ai', logicItem.disableForAi);
-        add(def, 'charges', logicItem.charges);
         add(def, 'use_all_energy_levels', logicItem.useAllEnergyLevels);
         add(def, 'never_disable', logicItem.neverDisable);
 
@@ -282,6 +282,9 @@ function spawnUnitAbilityActiveDef(logic, view, translations) {
         add(def, 'damage_type', dd.damageType_);
         add(def, 'stat_dmg_mult', dd.statDmgMult);
         add(def, 'trigger_counter', dd.triggerCounter);
+        add(def, 'min_damage_per_energy_level', dd.minDamagePerEnergyLevel);
+        add(def, 'max_damage_per_energy_level', dd.maxDamagePerEnergyLevel);
+        add(def, 'use_speed_as_shoot_range', dd.useSpeedAsShootRange);
         add(def, 'temp_self_buff', dd.tempSelfBuff);
         add(def, 'multitarget_type', dd.multitargetType);
         add(def, 'num_targets', dd.numTargets);
@@ -437,7 +440,7 @@ function spawnUnitAbilityPassiveDef(logic, view, translations) {
     let ordinal = 0;
     for (let i = 0; i < list.length; i++) {
         const viewItem = list[i];
-        if (checkSharedAbility(viewItem.name)) {
+        if (checkSharedAbility(viewItem.name, logic.id)) {
             continue;
         }
         ordinal++;
@@ -479,21 +482,24 @@ function spawnUnitAttackDef(logic, unitDef) {
     add(def, 'default_damage_target', defaultAttack.damageDealer?.damageTarget_, 'enemy');
     add(def, 'default_affect_target', defaultAttack.damageDealer?.affectTargetParams.castTarget_, 'enemy');
     add(def, 'default_trigger_counter', defaultAttack.damageDealer?.triggerCounter, true);
+    add(def, 'default_dont_trigger_energy_regen', defaultAttack.damageDealer?.dontTriggerEnergyRegen);
     add(def, 'default_buff_sid', defaultAttack.damageDealer?.buff?.sid);
     add(def, 'default_buff_target', defaultAttack.damageDealer?.buffTarget_);
     add(def, 'default_buff_duration', defaultAttack.damageDealer?.buff?.duration);
 
     const counterAttack = logic.counterAttacks?.[0] || {};
-    add(def, 'counter_attack_type', clarifyAttack(counterAttack.attackType_, unitDef));
+    add(def, 'counter_attack_type', ATTACK_TYPES[counterAttack.attackType_]);
     add(def, 'counter_stat_dmg_mult', counterAttack.damageDealer?.statDmgMult, 1);
     add(def, 'counter_buff_sid', counterAttack.damageDealer?.buff?.sid);
     add(def, 'counter_buff_target', counterAttack.damageDealer?.buffTarget_);
     add(def, 'counter_buff_duration', counterAttack.damageDealer?.buff?.duration);
     add(def, 'counter_damage_target', counterAttack.damageDealer?.damageTarget_, 'enemy');
     add(def, 'counter_affect_target', counterAttack.damageDealer?.affectTargetParams.castTarget_, 'enemy');
+    add(def, 'counter_dont_trigger_energy_regen', counterAttack.damageDealer?.dontTriggerEnergyRegen);
+    add(def, 'counter_is_armed_ability', getIsArmed(counterAttack.damageDealer?.tags));
 
     const alternativeAttack = logic.alternativeAttacks?.[0] || {};
-    add(def, 'alt_attack_type', clarifyAttack(alternativeAttack.attackType_, unitDef));
+    add(def, 'alt_attack_type', ATTACK_TYPES[alternativeAttack.attackType_]);
     add(def, 'alt_stat_dmg_mult', alternativeAttack.damageDealer?.statDmgMult, 0.5);
     add(def, 'alt_damage_target', alternativeAttack.damageDealer?.damageTarget_, 'enemy');
     add(def, 'alt_affect_target', alternativeAttack.damageDealer?.affectTargetParams.castTarget_, 'enemy');
@@ -509,7 +515,9 @@ function spawnUnitAttackDef(logic, unitDef) {
     add(def, 'alt_is_armed_ability', getIsArmed(alternativeAttack.damageDealer?.tags));
 
     const alt2 = logic.alternativeAttacks?.[1] || {};
-    add(def, 'alt2_attack_type', clarifyAttack(alt2.attackType_, unitDef));
+    add(def, 'alt2_attack_type', ATTACK_TYPES[alt2.attackType_]);
+    add(def, 'alt2_stat_dmg_mult', alt2.damageDealer?.statDmgMult, 0.5);
+    add(def, 'alt2_trigger_counter', alt2.damageDealer?.triggerCounter, false);
     add(def, 'alt2_buff_sid', alt2.damageDealer?.buff?.sid);
     add(def, 'alt2_buff_target', alt2.damageDealer?.buffTarget_);
     add(def, 'alt2_buff_duration', alt2.damageDealer?.buff?.duration);
@@ -518,10 +526,6 @@ function spawnUnitAttackDef(logic, unitDef) {
     add(def, 'alt2_multitarget_type', alt2.damageDealer?.multitargetType);
     add(def, 'alt2_num_targets', alt2.damageDealer?.numTargets);
     add(def, 'alt2_is_armed_ability', getIsArmed(alt2.damageDealer?.tags));
-
-    if (logic.id === 'blade_dancer_upg') {
-        add(def, 'alt2_attack_type', 'ranged_attack'); // TODO: investigate
-    }
 
     return def;
 }
@@ -543,11 +547,14 @@ function getIsArmed(tags) {
 /**
  *
  */
-function checkSharedAbility(name) {
+function checkSharedAbility(name, id) {
     if (name.startsWith('base_') || name.startsWith('common_')) {
         return true;
     }
     const first = name.split('_').shift();
+    if (id.startsWith(first)) {
+        return false; // unfrozen_cultist
+    }
     return FACTIONS.has(first);
 }
 

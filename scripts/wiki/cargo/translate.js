@@ -260,6 +260,9 @@ function normalizeText(text) {
     text = text.replace(/‑/g, '-'); // TODO: remove this
     text = text.replace(/<b>/g, "'''"); // TODO: remove this
     text = text.replace(/<\/b>/g, "'''"); // TODO: remove this
+    text = text.replace(/<i>/g, "''"); // TODO: remove this
+    text = text.replace(/<\/i>/g, "''"); // TODO: remove this
+    text = text.replace(/​/g, ''); // TODO: remove this
     return text;
 }
 
