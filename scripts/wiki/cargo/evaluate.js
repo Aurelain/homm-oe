@@ -30,6 +30,7 @@ const ACTIONS = {
  *
  */
 function evaluate(functionName, repository, data, isDebug = false) {
+    isDebug && console.log(`${functionName}():`);
     assume(functionName in repository, functionName, 'Unknown function!');
     const compiled = repository[functionName];
     assume(compiled.body.at(-1).variable === 'return', compiled, 'Must end with return variable!');
@@ -38,7 +39,7 @@ function evaluate(functionName, repository, data, isDebug = false) {
         const action = step.action;
         const context = {
             data,
-            about: action + '@' + functionName,
+            about: action,
             repository,
             isDebug,
         };

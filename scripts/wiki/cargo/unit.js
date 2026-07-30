@@ -17,6 +17,7 @@ const IDS = new Set([
     // 'inquisitor_upg_alt',
     // 'angel',
     // 'angel_upg',
+    // 'druid_upg',
 ]);
 
 const ATTACK_TYPES = {

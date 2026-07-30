@@ -15,6 +15,7 @@ const DEBUG = new Set([
     // 'hive_queen_upg_3',
     // 'lava_larva_1',
     // 'inquisitor_upg_alt_2',
+    // 'druid_upg_3',
 ]);
 
 const LANGUAGES = {
@@ -80,7 +81,6 @@ let words;
 let args;
 let scripts;
 let buffs;
-let history;
 
 // =====================================================================================================================
 //  P U B L I C
@@ -94,7 +94,6 @@ function translate(translationRequests) {
         return;
     }
 
-    history = new Map();
     const defs = [];
     for (const request of translationRequests) {
         const data = generateData(request);
@@ -120,7 +119,6 @@ function translate(translationRequests) {
             defs.push(def);
         }
     }
-    history = null;
 
     return defs;
 }
@@ -247,13 +245,8 @@ function resolveArg(textId, nr, langMap, request, data, isDebug) {
         return adaptTranslation(redirect, request, langMap, data, isDebug);
     }
 
-    const fingerprint = textId + '_' + nr;
-    let evaluated = history.get(fingerprint);
-    if (!history.has(fingerprint)) {
-        evaluated = evaluate(functionName, scripts, data, isDebug);
-        isDebug && console.log('evaluated:', evaluated);
-        history.set(fingerprint, evaluated);
-    }
+    const evaluated = evaluate(functionName, scripts, data, isDebug);
+    isDebug && console.log('evaluated:', evaluated);
 
     return evaluated;
 }
