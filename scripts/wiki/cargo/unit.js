@@ -15,6 +15,7 @@ const IDS = new Set([
     'hive_queen_upg',
     'lava_larva',
     'inquisitor_upg_alt',
+    'angel',
 ]);
 
 const ATTACK_TYPES = {
@@ -128,6 +129,7 @@ function spawnUnitDef(logic, view, path, translations) {
 
     add(unitDef, 'creature_type', getCreatureType(logic));
     add(unitDef, 'immunities', getImmunities(logic));
+    add(unitDef, 'disablers', getDisablers(logic));
     add(unitDef, 'shared_abilities', getSharedAbilities(view));
 
     add(unitDef, 'gold_cost', getCost(logic, 'gold'));
@@ -196,8 +198,28 @@ function getImmunities(logic) {
 /**
  *
  */
+function getDisablers(logic) {
+    const output = [];
+    const {passives = []} = logic;
+    for (const item of passives) {
+        const disablers = item?.data?.disablers || [];
+        for (const disabler of disablers) {
+            disabler.mech && output.push(disabler.mech);
+        }
+    }
+    return output;
+}
+
+/**
+ *
+ */
 function getSharedAbilities(view) {
-    const allAbilities = [...(view.passives || []), ...(view.alternativeAttacks || []), ...(view.abilities || [])];
+    const allAbilities = [
+        //
+        ...(view.alternativeAttacks || []),
+        ...(view.passives || []),
+        ...(view.abilities || []),
+    ];
     const shared = allAbilities.filter((ability) => checkSharedAbility(ability.name));
     return shared.map((item) => item.name);
 }
@@ -225,6 +247,9 @@ function spawnUnitAbilityActiveDef(logic, view, translations) {
     for (let i = 0; i < viewList.length; i++) {
         const logicItem = logicList[i] || {};
         const viewItem = viewList[i];
+        if (checkSharedAbility(viewItem.name)) {
+            continue;
+        }
         ordinal++;
 
         const def = {_type: 'UnitAbilityActiveDef'};
@@ -242,6 +267,7 @@ function spawnUnitAbilityActiveDef(logic, view, translations) {
         add(def, 'cd', logicItem.cd);
         add(def, 'dont_use_energy', logicItem.dontUseEnergy);
         add(def, 'energy_level', logicItem.energyLevel);
+        add(def, 'disable_for_ai', logicItem.disableForAi);
         add(def, 'move_type_active', logicItem.moveType);
         add(def, 'action_cost', logicItem.actionCost);
 
@@ -445,6 +471,7 @@ function spawnUnitAttackDef(logic) {
 
     const counterAttack = logic.counterAttacks?.[0] || {};
     add(def, 'counter_attack_type', ATTACK_TYPES[counterAttack.attackType_]);
+    add(def, 'counter_stat_dmg_mult', counterAttack.damageDealer?.statDmgMult, 1);
     add(def, 'counter_damage_target', counterAttack.damageDealer?.damageTarget_, 'enemy');
     add(def, 'counter_affect_target', counterAttack.damageDealer?.affectTargetParams.castTarget_, 'enemy');
 
@@ -489,7 +516,7 @@ function addUselessZero(value) {
  *
  */
 function checkSharedAbility(name) {
-    if (name.startsWith('base_')) {
+    if (name.startsWith('base_') || name.startsWith('common_')) {
         return true;
     }
     const first = name.split('_').shift();
