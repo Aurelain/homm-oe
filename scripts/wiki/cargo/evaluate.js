@@ -11,12 +11,16 @@ const ACTIONS = {
     CurrentUnitConfig: [CurrentUnitConfig, 1],
     CurrentUnitStats: [CurrentUnitStats, 1],
     CurrentAbility: [CurrentAbility, 1],
-    Add: [Add, -1],
-    Mul: [Mul, -1],
+    CurrentHero: [CurrentHero, 1],
+    Add: [Add, 2],
+    Sub: [Sub, 2],
+    Mul: [Mul, 2],
     Div: [Div, 2],
+    Avg: [Avg, 2],
     Floor: [Floor, 1],
     Text: [Text, 1],
     DbBuff: [DbBuff, 2],
+    Invoke: [Invoke, 1],
 };
 
 // =====================================================================================================================
@@ -35,6 +39,8 @@ function evaluate(functionName, repository, data, isDebug = false) {
         const context = {
             data,
             about: action + '@' + functionName,
+            repository,
+            isDebug,
         };
         const [actionFunction, paramCount] = ACTIONS[action] || [];
         assume(actionFunction, step, context.about, 'Unknown action!');
@@ -138,6 +144,16 @@ function CurrentAbility(path, context) {
 /**
  *
  */
+function CurrentHero(path, context) {
+    const json = context.data.currentHero;
+    assume(json, context.about, 'Missing "currentHero"!');
+    const value = resolveValue(json, path, context);
+    return value;
+}
+
+/**
+ *
+ */
 function Add(...members) {
     const {about} = members.pop(); // context
     let result = 0;
@@ -145,6 +161,20 @@ function Add(...members) {
         const nr = Number(member);
         assume(checkNumber(nr), about, member, 'Expecting number!');
         result += nr;
+    }
+    return result;
+}
+
+/**
+ *
+ */
+function Sub(...members) {
+    const {about} = members.pop(); // context
+    let result = 0;
+    for (const member of members) {
+        const nr = Number(member);
+        assume(checkNumber(nr), about, member, 'Expecting number!');
+        result -= nr;
     }
     return result;
 }
@@ -180,6 +210,20 @@ function Div(numerator, denominator, {about}) {
 /**
  *
  */
+function Avg(...members) {
+    const {about} = members.pop(); // context
+    let result = 0;
+    for (const member of members) {
+        const nr = Number(member);
+        assume(checkNumber(nr), about, member, 'Expecting number!');
+        result += nr;
+    }
+    return result / members.length;
+}
+
+/**
+ *
+ */
 function Floor(target, {about}) {
     target = Number(target);
     assume(typeof target === 'number', about, target, 'Invalid target!');
@@ -205,6 +249,15 @@ function DbBuff(buffSid, path, context) {
 
     const value = resolveValue(buff, path, context);
     return value;
+}
+
+/**
+ *
+ */
+function Invoke(functionName, context) {
+    const {repository, data, isDebug} = context;
+    assume(repository[functionName], context.about, functionName, 'No such function to invoke!');
+    return evaluate(functionName, repository, data, isDebug);
 }
 
 // =====================================================================================================================

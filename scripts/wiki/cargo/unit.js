@@ -13,6 +13,7 @@ const IDS = new Set([
     'black_dragon_upg',
     'black_dragon_upg_alt',
     'hive_queen_upg',
+    'lava_larva',
 ]);
 
 const ATTACK_TYPES = {
@@ -139,6 +140,7 @@ function spawnUnitDef(logic, view, path, translations) {
     add(unitDef, 'native_biome', logic.nativeBiome);
     add(unitDef, 'ai_archetype', logic.ai);
     add(unitDef, 'tags', logic.tags);
+    add(unitDef, 'leave_corpse', logic.leaveCorpse === false ? false : null);
     add(unitDef, 'squad_value', logic.squadValue);
     add(unitDef, 'exp_bonus', logic.expBonus);
 
@@ -242,28 +244,31 @@ function spawnUnitAbilityActiveDef(logic, view, translations) {
         add(def, 'move_type_active', logicItem.moveType);
         add(def, 'action_cost', logicItem.actionCost);
 
-        add(def, 'instacast', logicItem.damageDealer?.instacast);
-        add(def, 'attack_pattern_sid', logicItem.damageDealer?.attackPatternSid);
-        add(def, 'damage_target', logicItem.damageDealer?.damageTarget_);
-        add(def, 'damage_type', logicItem.damageDealer?.damageType_);
-        add(def, 'stat_dmg_mult', addUselessZero(logicItem.damageDealer?.statDmgMult));
-        add(def, 'trigger_counter', logicItem.damageDealer?.triggerCounter);
-        add(def, 'shoot_range', logicItem.damageDealer?.shootRange);
+        const dd = logicItem.damageDealer || {};
+        add(def, 'instacast', dd.instacast);
+        add(def, 'attack_pattern_sid', dd.attackPatternSid);
+        add(def, 'damage_target', dd.damageTarget_);
+        add(def, 'damage_type', dd.damageType_);
+        add(def, 'stat_dmg_mult', addUselessZero(dd.statDmgMult));
+        add(def, 'trigger_counter', dd.triggerCounter);
+        add(def, 'multitarget_type', dd.multitargetType);
+        add(def, 'min_base_dmg', dd.minBaseDmg);
+        add(def, 'max_base_dmg', dd.maxBaseDmg);
+        add(def, 'damage_multipler_per_hero_level', addUselessZero(dd.damageMultiplerPerHeroLevel));
+        add(def, 'shoot_range', dd.shootRange);
+        add(def, 'buff_sid', dd.buff?.sid);
+        add(def, 'buff_target', dd.buffTarget_);
+        add(def, 'buff_duration', dd.buff?.duration);
 
-        add(def, 'multitarget_type', logicItem.damageDealer?.multitargetType);
-        add(def, 'buff_sid', logicItem.damageDealer?.buff?.sid);
-        add(def, 'buff_target', logicItem.damageDealer?.buffTarget_);
-        add(def, 'buff_duration', logicItem.damageDealer?.buff?.duration);
+        add(def, 'cast_target', dd.castTargetParams?.castTarget_);
+        add(def, 'cast_selection', dd.castTargetParams?.selection);
+        add(def, 'cast_target_condition', dd.castTargetParams?.targetCondition_);
+        add(def, 'cast_target_tags', dd.castTargetParams?.targetTags);
 
-        add(def, 'cast_target', logicItem.damageDealer?.castTargetParams.castTarget_);
-        add(def, 'cast_selection', logicItem.damageDealer?.castTargetParams.selection);
-        add(def, 'cast_target_condition', logicItem.damageDealer?.castTargetParams.targetCondition_);
-        add(def, 'cast_target_tags', logicItem.damageDealer?.castTargetParams.targetTags);
-
-        add(def, 'affect_target', logicItem.damageDealer?.affectTargetParams.castTarget_);
-        add(def, 'affect_selection', logicItem.damageDealer?.affectTargetParams.selection);
-        add(def, 'affect_target_condition', logicItem.damageDealer?.affectTargetParams.targetCondition_);
-        add(def, 'affect_target_tags', logicItem.damageDealer?.affectTargetParams.targetTags);
+        add(def, 'affect_target', dd.affectTargetParams?.castTarget_);
+        add(def, 'affect_selection', dd.affectTargetParams?.selection);
+        add(def, 'affect_target_condition', dd.affectTargetParams?.targetCondition_);
+        add(def, 'affect_target_tags', dd.affectTargetParams?.targetTags);
 
         defs.push(def);
 

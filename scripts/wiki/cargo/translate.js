@@ -10,8 +10,9 @@ import mergeDeep from '../../utils/mergeDeep.js';
 //  D E C L A R A T I O N S
 // =====================================================================================================================
 const DEBUG = new Set([
-    // Uncomment any target_id you want to focus on:
+    // -- Uncomment any target_id you want to focus on:
     // 'hive_queen_upg_3',
+    // 'lava_larva_1',
 ]);
 
 const LANGUAGES = {
@@ -45,6 +46,20 @@ const DEFAULT_DATA = {
             },
         },
     },
+    currentUnitConfig: {
+        passives: [
+            {
+                actions: [
+                    {
+                        damageDealer: {
+                            minStackDmg: 0,
+                            maxStackDmg: 0,
+                        },
+                    },
+                ],
+            },
+        ],
+    },
     currentAbility: {
         damageDealer: {
             statDmgMult: 1,
@@ -52,6 +67,9 @@ const DEFAULT_DATA = {
                 durationPerStack: [0, 0],
             },
         },
+    },
+    currentHero: {
+        level: 1,
     },
 };
 
@@ -216,6 +234,7 @@ function adaptTranslation(request, prop, langMap, data) {
     const isDebug = DEBUG.size && DEBUG.has(request.target_id) && langMap._lang === 'en';
 
     const text = langMap.get(textId);
+    isDebug && console.log('===========' + textId);
     isDebug && console.log('Before:', text);
 
     let output = text;
