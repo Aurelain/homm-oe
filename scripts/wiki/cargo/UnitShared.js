@@ -19,12 +19,12 @@ const FACTIONS = new Set(['human', 'undead', 'nature', 'demon', 'unfrozen', 'dun
 /**
  *
  */
-function UnitAbility(zipHub) {
+function UnitShared(zipHub) {
     const output = {};
 
     const abilities = collectAllShared(zipHub);
     for (const id in abilities) {
-        output['UnitAbility~' + id] = generateDefs(id, abilities[id]);
+        output['UnitShared~' + id] = generateDefs(id, abilities[id]);
     }
 
     return output;
@@ -44,7 +44,7 @@ function collectAllShared(zipHub) {
         if (IDS.size && !IDS.has(id)) {
             continue;
         }
-        console.log('id:', id);
+        // console.log('id:', id);
 
         const viewsPath = path.replace('_logics/', '_views/').replace('_l.', '_v.');
 
@@ -111,7 +111,6 @@ function checkInterestingAbility(name) {
  *
  */
 function generateDefs(id, {name, description, logic}) {
-    console.log('generateDefs:', id);
     const defs = [];
 
     const def = {_type: 'UnitAbilityPassiveDef'};
@@ -139,4 +138,4 @@ function generateDefs(id, {name, description, logic}) {
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default UnitAbility;
+export default UnitShared;

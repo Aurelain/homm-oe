@@ -45,7 +45,7 @@ function Unit(zipHub) {
         if (IDS.size && !IDS.has(id)) {
             continue;
         }
-        console.log('id:', id);
+        // console.log('id:', id);
 
         const viewsPath = path.replace('_logics/', '_views/').replace('_l.', '_v.');
         assume(views[viewsPath], viewsPath, 'Missing path!');

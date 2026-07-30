@@ -4,7 +4,7 @@ import {WIKI_DIR} from '../SETTINGS.js';
 import {buildCache} from './translate.js';
 import fs from 'node:fs';
 import assume from '../../utils/assume.js';
-import UnitAbility from './UnitAbility.js';
+import UnitShared from './UnitShared.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -12,7 +12,7 @@ import UnitAbility from './UnitAbility.js';
 const parsers = [
     //
     Unit,
-    UnitAbility,
+    UnitShared,
 ];
 
 // =====================================================================================================================

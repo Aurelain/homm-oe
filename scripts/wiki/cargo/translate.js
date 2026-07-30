@@ -249,8 +249,7 @@ function resolveArg(textId, nr, langMap, request, data, isDebug) {
     }
 
     const evaluated = evaluate(functionName, scripts, data, isDebug);
-    //isDebug &&
-    console.log('evaluated:', evaluated);
+    isDebug && console.log('evaluated:', evaluated);
 
     return evaluated;
 }
