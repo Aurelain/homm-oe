@@ -107,6 +107,10 @@ function translate(translationRequests) {
             add(def, 'variant', request.variant);
             add(def, 'language', lang);
 
+            if (!langMap.has(request.name)) {
+                continue;
+            }
+
             const name = adaptTranslation(request.name, request, langMap, data);
             add(def, 'name', normalizeName(name, lang));
             add(def, 'description', adaptTranslation(request.description, request, langMap, data));

@@ -8,15 +8,15 @@ import translate, {checkExists} from './translate.js';
 // =====================================================================================================================
 const IDS = new Set([
     // -- Test ids:
-    'dragon',
-    'black_dragon',
-    'black_dragon_upg',
-    'black_dragon_upg_alt',
-    'hive_queen_upg',
-    'lava_larva',
-    'inquisitor_upg_alt',
-    'angel',
-    'angel_upg',
+    // 'dragon',
+    // 'black_dragon',
+    // 'black_dragon_upg',
+    // 'black_dragon_upg_alt',
+    // 'hive_queen_upg',
+    // 'lava_larva',
+    // 'inquisitor_upg_alt',
+    // 'angel',
+    // 'angel_upg',
 ]);
 
 const ATTACK_TYPES = {
@@ -80,9 +80,7 @@ function parseUnit(logic, view, path) {
     defs.push(...spawnUnitAbilityPassiveDef(logic, view, translations)); // useless
     defs.push(spawnUnitAttackDef(logic, unitDef)); // useless
 
-    if (!unitDef.unused) {
-        defs.push(...translate(translations));
-    }
+    defs.push(...translate(translations));
 
     return {
         id: logic.id,
@@ -187,7 +185,7 @@ function getImmunities(logic) {
         for (const immunity of immunities) {
             const {tags = []} = immunity;
             for (const tag of tags) {
-                if (!tag.endsWith('_immunities')) {
+                if (tag === 'avatar_immunities' || !tag.endsWith('_immunities')) {
                     output.push(tag);
                 }
             }
@@ -266,20 +264,25 @@ function spawnUnitAbilityActiveDef(logic, view, translations) {
         add(def, 'attack_type', logicItem.attackType_);
         add(def, 'rank', logicItem.rank);
         add(def, 'cd', logicItem.cd);
-        add(def, 'dont_use_energy', logicItem.dontUseEnergy);
         add(def, 'energy_level', logicItem.energyLevel);
-        add(def, 'disable_for_ai', logicItem.disableForAi);
-        add(def, 'move_type_active', logicItem.moveType);
         add(def, 'action_cost', logicItem.actionCost);
+        add(def, 'move_type_active', logicItem.moveType);
+        add(def, 'dont_use_energy', logicItem.dontUseEnergy);
+        add(def, 'disable_for_ai', logicItem.disableForAi);
+        add(def, 'charges', logicItem.charges);
+        add(def, 'never_disable', logicItem.neverDisable);
 
         const dd = logicItem.damageDealer || {};
+        add(def, 'untargeted_cast', dd.untargetedCast);
         add(def, 'instacast', dd.instacast);
         add(def, 'attack_pattern_sid', dd.attackPatternSid);
         add(def, 'damage_target', dd.damageTarget_);
         add(def, 'damage_type', dd.damageType_);
         add(def, 'stat_dmg_mult', dd.statDmgMult);
         add(def, 'trigger_counter', dd.triggerCounter);
+        add(def, 'temp_self_buff', dd.tempSelfBuff);
         add(def, 'multitarget_type', dd.multitargetType);
+        add(def, 'num_targets', dd.numTargets);
         add(def, 'min_base_dmg', dd.minBaseDmg);
         add(def, 'max_base_dmg', dd.maxBaseDmg);
         add(def, 'min_stack_dmg', dd.minStackDmg);
@@ -289,6 +292,7 @@ function spawnUnitAbilityActiveDef(logic, view, translations) {
         add(def, 'buff_sid', dd.buff?.sid);
         add(def, 'buff_target', dd.buffTarget_);
         add(def, 'buff_duration', dd.buff?.duration);
+        add(def, 'buff_charges', dd.buff?.charges);
 
         add(def, 'cast_target', dd.castTargetParams?.castTarget_);
         add(def, 'cast_selection', dd.castTargetParams?.selection);
@@ -467,12 +471,18 @@ function spawnUnitAttackDef(logic, unitDef) {
 
     const defaultAttack = logic.defaultAttacks?.[0] || {};
     add(def, 'default_attack_type', clarifyAttack(defaultAttack.attackType_, unitDef));
+    add(def, 'default_buff_sid', defaultAttack.damageDealer?.buff?.sid);
+    add(def, 'default_buff_target', defaultAttack.damageDealer?.buffTarget_);
+    add(def, 'default_buff_duration', defaultAttack.damageDealer?.buff?.duration);
     add(def, 'default_damage_target', defaultAttack.damageDealer?.damageTarget_, 'enemy');
     add(def, 'default_affect_target', defaultAttack.damageDealer?.affectTargetParams.castTarget_, 'enemy');
 
     const counterAttack = logic.counterAttacks?.[0] || {};
     add(def, 'counter_attack_type', clarifyAttack(counterAttack.attackType_, unitDef));
     add(def, 'counter_stat_dmg_mult', counterAttack.damageDealer?.statDmgMult, 1);
+    add(def, 'counter_buff_sid', counterAttack.damageDealer?.buff?.sid);
+    add(def, 'counter_buff_target', counterAttack.damageDealer?.buffTarget_);
+    add(def, 'counter_buff_duration', counterAttack.damageDealer?.buff?.duration);
     add(def, 'counter_damage_target', counterAttack.damageDealer?.damageTarget_, 'enemy');
     add(def, 'counter_affect_target', counterAttack.damageDealer?.affectTargetParams.castTarget_, 'enemy');
 
@@ -481,10 +491,16 @@ function spawnUnitAttackDef(logic, unitDef) {
     add(def, 'alt_stat_dmg_mult', alternativeAttack.damageDealer?.statDmgMult, 0.5);
     add(def, 'alt_damage_target', alternativeAttack.damageDealer?.damageTarget_, 'enemy');
     add(def, 'alt_affect_target', alternativeAttack.damageDealer?.affectTargetParams.castTarget_, 'enemy');
-
     add(def, 'alt_trigger_counter', alternativeAttack.damageDealer?.triggerCounter);
+    add(def, 'alt_buff_sid', alternativeAttack.damageDealer?.buff?.sid);
+    add(def, 'alt_buff_target', alternativeAttack.damageDealer?.buffTarget_);
+    add(def, 'alt_buff_duration', alternativeAttack.damageDealer?.buff?.duration);
+
     add(def, 'alt_cd', alternativeAttack.cd);
     add(def, 'alt_dont_use_energy', alternativeAttack.dontUseEnergy);
+    add(def, 'alt_never_disable', alternativeAttack.neverDisable);
+    add(def, 'alt_return_to_start_after_attack', alternativeAttack.returnToStartAfterAttack);
+    add(def, 'alt_temp_self_buff', alternativeAttack.damageDealer?.tempSelfBuff);
     add(def, 'alt_is_armed_ability', getIsArmed(alternativeAttack.damageDealer?.tags));
 
     return def;
