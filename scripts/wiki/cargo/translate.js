@@ -4,14 +4,16 @@ import assume from '../../utils/assume.js';
 import compile from './compile.js';
 import evaluate from './evaluate.js';
 import objectify from '../../utils/objectify.js';
+import mergeDeep from '../../utils/mergeDeep.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
-let words;
-let args;
-let scripts;
-let buffs;
+const DEBUG = new Set([
+    // Uncomment any target_id you want to focus on:
+    // 'hive_queen_upg_3',
+]);
+
 const LANGUAGES = {
     en: 'english',
     pt_br: 'BRportugese',
@@ -27,11 +29,37 @@ const LANGUAGES = {
     es: 'spanish',
     tr: 'turkish',
     uk: 'ukrainian',
-    // 'zh-hans': 'zhCN',
-    zh_cn: 'zhCN',
-    // 'zh-hant': 'zhTW',
-    zh_tw: 'zhTW',
+    'zh-hans': 'zhCN',
+    'zh-hant': 'zhTW',
 };
+
+const DEFAULT_DATA = {
+    currentUnitData: {
+        fullStacks: 0,
+        tempFullStacks: 0,
+        startBattleFullStacks: 0,
+        unit: {
+            stats: {
+                finalSummonBonusPercent: 0,
+                outComingBuffDuration: 0,
+            },
+        },
+    },
+    currentAbility: {
+        damageDealer: {
+            statDmgMult: 1,
+            buff: {
+                durationPerStack: [0, 0],
+            },
+        },
+    },
+};
+
+let words;
+let args;
+let scripts;
+let buffs;
+let history = new Map();
 
 // =====================================================================================================================
 //  P U B L I C
@@ -57,9 +85,12 @@ function translate(translationRequests) {
             add(def, 'subtype', request.subtype);
             add(def, 'variant', request.variant);
             add(def, 'language', lang);
-            add(def, 'name', adaptTranslation(request, 'name', langMap, data));
+
+            const name = adaptTranslation(request, 'name', langMap, data);
+            add(def, 'name', normalizeName(name, lang));
             add(def, 'description', adaptTranslation(request, 'description', langMap, data));
             add(def, 'bonus_description', adaptTranslation(request, 'bonus_description', langMap, data));
+
             // if (def.name || def.description || def.bonus_description) {
             defs.push(def);
         }
@@ -76,11 +107,12 @@ function buildCache(zipHub) {
     for (const key in LANGUAGES) {
         const langHub = filterHub(zipHub, new RegExp('Lang/' + LANGUAGES[key] + '/'));
         const langMap = new Map();
+        langMap._lang = key; // parasite
         for (const path in langHub) {
             const tokens = langHub[path];
             for (const token of tokens) {
                 assume(Object.keys(token).toString() === 'sid,text', token, 'Unexpected token structure!');
-                const text = normalizeText(token.text);
+                const text = normalizeText(token.text, token.sid);
                 langMap.set(token.sid, text);
             }
         }
@@ -139,33 +171,32 @@ function buildBuffs(zipHub) {
  *
  */
 function generateData(request) {
-    return {
-        currentUnitData: {
-            fullStacks: 0,
-            tempFullStacks: 0,
-            startBattleFullStacks: 0,
-            unit: {
-                stats: {
-                    finalSummonBonusPercent: 0,
-                },
-            },
-        },
-        buffs,
-        ...request._data,
-    };
+    let output = {};
+    output = mergeDeep(output, DEFAULT_DATA);
+    output = mergeDeep(output, {buffs});
+    output = mergeDeep(output, request._data);
+    return output;
 }
 
 /**
  *
  */
-function resolveArg(textId, nr, langMap, request, data) {
+function resolveArg(textId, nr, langMap, request, data, isDebug) {
     const argsList = args.get(textId);
     assume(argsList, request, textId, 'No args found!');
     const island = argsList[nr];
     const [main, redirect] = island.split('|');
     assume(!redirect || langMap.get(redirect), textId, redirect, 'Redirect not found!');
     let text = redirect ? langMap.get(redirect) : '{0}';
-    const evaluated = evaluate(main, scripts, data);
+
+    const fingerprint = textId + '_' + nr;
+    let evaluated = history.get(fingerprint);
+    if (!history.has(fingerprint)) {
+        evaluated = evaluate(main, scripts, data, isDebug);
+        isDebug && console.log('evaluated:', evaluated);
+        history.set(fingerprint, evaluated);
+    }
+
     text = text.replace('{0}', evaluated);
     return text;
 }
@@ -182,14 +213,21 @@ function adaptTranslation(request, prop, langMap, data) {
         console.log(`Cannot find "${textId}" in translation cache!`);
         return;
     }
-    let text = langMap.get(textId);
-    if (text.includes('{')) {
-        text = text.replace(/\{(\d)}/g, (all, nr) => {
-            return resolveArg(textId, nr, langMap, request, data);
+    const isDebug = DEBUG.size && DEBUG.has(request.target_id) && langMap._lang === 'en';
+
+    const text = langMap.get(textId);
+    isDebug && console.log('Before:', text);
+
+    let output = text;
+    if (output.includes('{')) {
+        output = output.replace(/\{(\d)}/g, (all, nr) => {
+            return resolveArg(textId, nr, langMap, request, data, isDebug);
         });
-        assume(!text.includes('{'), request, text, 'Still has braces!');
+        assume(!output.includes('{'), request, output, 'Still has braces!');
     }
-    return text;
+
+    isDebug && console.log('After:', output);
+    return output;
 }
 
 /**
@@ -199,7 +237,16 @@ function normalizeText(text) {
     text = text.replace(/\n/g, '<br/>');
     text = text.replace(/ /g, ' '); // TODO: remove this
     text = text.replace(/‑/g, '-'); // TODO: remove this
+    text = text.replace(/<b>/g, "'''"); // TODO: remove this
+    text = text.replace(/<\/b>/g, "'''"); // TODO: remove this
     return text;
+}
+
+/**
+ *
+ */
+function normalizeName(value, lang) {
+    return lang === 'en' ? value.replaceAll('’', "'") : value; // TODO: remove this
 }
 
 // =====================================================================================================================

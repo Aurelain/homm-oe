@@ -9,9 +9,10 @@ import translate, {checkExists} from './translate.js';
 const IDS = new Set([
     // -- Test ids:
     'dragon',
-    // 'black_dragon',
-    // 'black_dragon_upg',
-    // 'black_dragon_upg_alt',
+    'black_dragon',
+    'black_dragon_upg',
+    'black_dragon_upg_alt',
+    'hive_queen_upg',
 ]);
 
 const ATTACK_TYPES = {
@@ -68,10 +69,10 @@ function parseUnit(logic, view, path) {
 
     const unitDef = spawnUnitDef(logic, view, path, translations);
     defs.push(unitDef);
-    defs.push(...spawnUnitAbilityActiveDef(logic, view, 'alternativeAttacks', translations));
-    defs.push(...spawnUnitAbilityActiveDef(logic, view, 'abilities', translations));
+    defs.push(...spawnUnitAbilityActiveDef(logic, view, translations));
     defs.push(...spawnUnitAbilityGlobalDef(logic)); // useless
     defs.push(...spawnUnitAbilityAuraDef(logic)); // useless
+    defs.push(...spawnUnitAbilityConditionalDef(logic)); // useless
     defs.push(...spawnUnitAbilityPassiveDef(logic, view, translations)); // useless
     defs.push(spawnUnitAttackDef(logic)); // useless
 
@@ -121,7 +122,7 @@ function spawnUnitDef(logic, view, path, translations) {
     add(unitDef, 'morale_max', logic.stats.moralMax);
     add(unitDef, 'luck_min', logic.stats.luckMin);
     add(unitDef, 'luck_max', logic.stats.luckMax);
-    add(unitDef, 'move_type', logic.stats.moveType);
+    add(unitDef, 'move_type', logic.stats.moveType || 'ground');
 
     add(unitDef, 'creature_type', getCreatureType(logic));
     add(unitDef, 'immunities', getImmunities(logic));
@@ -193,23 +194,9 @@ function getImmunities(logic) {
  *
  */
 function getSharedAbilities(view) {
-    const names = [];
-    view.passives && names.push(...view.passives.map((ability) => ability.name));
-    view.alternativeAttacks && names.push(...view.alternativeAttacks.map((ability) => ability.name));
-    view.abilities && names.push(...view.abilities.map((ability) => ability.name));
-
-    const shared = [];
-    for (const name of names) {
-        if (name.startsWith('base_')) {
-            shared.push(name);
-        } else {
-            const first = name.split('_').shift();
-            if (FACTIONS.has(first)) {
-                shared.push(name);
-            }
-        }
-    }
-    return shared;
+    const allAbilities = [...(view.passives || []), ...(view.alternativeAttacks || []), ...(view.abilities || [])];
+    const shared = allAbilities.filter((ability) => checkSharedAbility(ability.name));
+    return shared.map((item) => item.name);
 }
 
 /**
@@ -227,13 +214,15 @@ function getCost(logic, name) {
 /**
  *
  */
-function spawnUnitAbilityActiveDef(logic, view, prop, translations) {
+function spawnUnitAbilityActiveDef(logic, view, translations) {
     const defs = [];
-    const list = view[prop] || []; // e.g. `logic.alternativeAttacks`
-    for (let i = 0; i < list.length; i++) {
-        const logicItem = logic[prop][i] || {};
-        const viewItem = list[i];
-        const ordinal = viewItem.name.match(/\d+/) || viewItem.animationIndex;
+    const logicList = [...(logic.alternativeAttacks || []), ...(logic.abilities || [])];
+    const viewList = [...(view.alternativeAttacks || []), ...(view.abilities || [])];
+    let ordinal = 0;
+    for (let i = 0; i < viewList.length; i++) {
+        const logicItem = logicList[i] || {};
+        const viewItem = viewList[i];
+        ordinal++;
 
         const def = {_type: 'UnitAbilityActiveDef'};
 
@@ -257,7 +246,7 @@ function spawnUnitAbilityActiveDef(logic, view, prop, translations) {
         add(def, 'attack_pattern_sid', logicItem.damageDealer?.attackPatternSid);
         add(def, 'damage_target', logicItem.damageDealer?.damageTarget_);
         add(def, 'damage_type', logicItem.damageDealer?.damageType_);
-        add(def, 'stat_dmg_mult', logicItem.damageDealer?.statDmgMult);
+        add(def, 'stat_dmg_mult', addUselessZero(logicItem.damageDealer?.statDmgMult));
         add(def, 'trigger_counter', logicItem.damageDealer?.triggerCounter);
         add(def, 'shoot_range', logicItem.damageDealer?.shootRange);
 
@@ -362,6 +351,40 @@ function spawnUnitAbilityAuraDef(logic) {
 }
 
 /**
+ * Useless, but we'll add it for parity with obelisk.
+ */
+function spawnUnitAbilityConditionalDef(logic) {
+    const defs = [];
+    const list = logic.conditionalPassives || [];
+    for (let i = 0; i < list.length; i++) {
+        const logicItem = list[i];
+        const ordinal = i + 1;
+
+        const def = {_type: 'UnitAbilityConditionalDef'};
+
+        add(def, 'ability_id', logic.id + '_conditional_passive_' + ordinal);
+        add(def, 'unit_id', logic.id);
+        add(def, 'ability_type', 'conditional_passive');
+        add(def, 'ordinal', ordinal);
+        add(def, 'name_sid', def.ability_id + '_name');
+
+        add(def, 'condition_check', logicItem.condition?.[0]);
+        add(def, 'condition_target', logicItem.condition?.[1]);
+        add(def, 'condition_value', logicItem.condition?.[2]);
+
+        const stats = logicItem.stats || {};
+        const affectedStat = Object.keys(stats)[0]; // absurd to only get the first!
+        add(def, 'affected_stat', affectedStat);
+        if (typeof stats[affectedStat] === 'number') {
+            add(def, 'affected_stat_amount', stats[affectedStat] + '.0'); // absurd
+        }
+
+        defs.push(def);
+    }
+    return defs;
+}
+
+/**
  *
  */
 function spawnUnitAbilityPassiveDef(logic, view, translations) {
@@ -370,7 +393,7 @@ function spawnUnitAbilityPassiveDef(logic, view, translations) {
     let ordinal = 0;
     for (let i = 0; i < list.length; i++) {
         const viewItem = list[i];
-        if (viewItem.name.startsWith('base_')) {
+        if (checkSharedAbility(viewItem.name)) {
             continue;
         }
         ordinal++;
@@ -409,18 +432,18 @@ function spawnUnitAttackDef(logic) {
 
     const defaultAttack = logic.defaultAttacks?.[0] || {};
     add(def, 'default_attack_type', ATTACK_TYPES[defaultAttack.attackType_]);
-    add(def, 'default_damage_target', defaultAttack.damageDealer?.damageTarget_);
-    add(def, 'default_affect_target', defaultAttack.damageDealer?.affectTargetParams.castTarget_);
+    add(def, 'default_damage_target', defaultAttack.damageDealer?.damageTarget_, 'enemy');
+    add(def, 'default_affect_target', defaultAttack.damageDealer?.affectTargetParams.castTarget_, 'enemy');
 
     const counterAttack = logic.counterAttacks?.[0] || {};
     add(def, 'counter_attack_type', ATTACK_TYPES[counterAttack.attackType_]);
-    add(def, 'counter_damage_target', counterAttack.damageDealer?.damageTarget_);
-    add(def, 'counter_affect_target', counterAttack.damageDealer?.affectTargetParams.castTarget_);
+    add(def, 'counter_damage_target', counterAttack.damageDealer?.damageTarget_, 'enemy');
+    add(def, 'counter_affect_target', counterAttack.damageDealer?.affectTargetParams.castTarget_, 'enemy');
 
     const alternativeAttack = logic.alternativeAttacks?.[0] || {};
     add(def, 'alt_attack_type', ATTACK_TYPES[alternativeAttack.attackType_]);
-    add(def, 'alt_damage_target', alternativeAttack.damageDealer?.damageTarget_);
-    add(def, 'alt_affect_target', alternativeAttack.damageDealer?.affectTargetParams.castTarget_);
+    add(def, 'alt_damage_target', alternativeAttack.damageDealer?.damageTarget_, 'enemy');
+    add(def, 'alt_affect_target', alternativeAttack.damageDealer?.affectTargetParams.castTarget_, 'enemy');
 
     add(def, 'alt_trigger_counter', alternativeAttack.damageDealer?.triggerCounter);
     add(def, 'alt_cd', alternativeAttack.cd);
@@ -442,7 +465,27 @@ function getIsArmed(tags) {
             return true;
         }
     }
-    return;
+}
+
+/**
+ * Useless, but we'll add it for parity with obelisk.
+ */
+function addUselessZero(value) {
+    if (typeof value === 'number' && !String(value).includes('.')) {
+        return value + '.0';
+    }
+    return value;
+}
+
+/**
+ *
+ */
+function checkSharedAbility(name) {
+    if (name.startsWith('base_')) {
+        return true;
+    }
+    const first = name.split('_').shift();
+    return FACTIONS.has(first);
 }
 
 // =====================================================================================================================

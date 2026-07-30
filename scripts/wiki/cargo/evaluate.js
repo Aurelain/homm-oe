@@ -25,7 +25,7 @@ const ACTIONS = {
 /**
  *
  */
-function evaluate(functionName, repository, data) {
+function evaluate(functionName, repository, data, isDebug = false) {
     assume(functionName in repository, functionName, 'Unknown function!');
     const compiled = repository[functionName];
     assume(compiled.body.at(-1).variable === 'return', compiled, 'Must end with return variable!');
@@ -42,9 +42,9 @@ function evaluate(functionName, repository, data) {
         const params = resolveParams(step.params, vars, context.about);
         params.push(context);
         vars[step.variable] = actionFunction.apply(null, params);
-        // console.log(context.about, JSON.stringify(vars, null, 4));
+        isDebug && console.log(context.about, step.params, JSON.stringify(vars, null, 4));
     }
-    return vars.return;
+    return formatValue(vars.return, compiled.type);
 }
 
 // =====================================================================================================================
@@ -70,13 +70,28 @@ function resolveParams(params, vars, about) {
 /**
  *
  */
-function resolveValue(origin, path, context, defaultValue) {
+function resolveValue(origin, path, context) {
     const value = fishValue(origin, path);
-    if (value === undefined && defaultValue !== undefined) {
-        return defaultValue;
-    }
     assume(value !== undefined, origin, context.about, path, 'Unresolved path!');
     return value;
+}
+
+/**
+ *
+ */
+function formatValue(value, type) {
+    switch (type) {
+        case 'int':
+            return Math.round(value);
+        case 'modInt':
+            return Math.abs(Math.round(value));
+        case 'modPercentNumeric':
+            return Math.abs(value * 100);
+        case 'string':
+            return String(value);
+        default:
+            assume(false, type, 'Unknown type!');
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -116,7 +131,7 @@ function CurrentUnitStats(prop, context) {
 function CurrentAbility(path, context) {
     const json = context.data.currentAbility;
     assume(json, context.about, 'Missing "currentAbility"!');
-    const value = resolveValue(json, path, context, 1); // TODO: defaultValue needed by black_dragon_upg_alt
+    const value = resolveValue(json, path, context);
     return value;
 }
 
@@ -153,6 +168,9 @@ function Mul(...members) {
  */
 function Div(numerator, denominator, {about}) {
     numerator = Number(numerator);
+    if (numerator === 0) {
+        return 0;
+    }
     denominator = Number(denominator);
     assume(checkNumber(numerator), about, numerator, 'Invalid numerator!');
     assume(denominator && checkNumber(denominator), about, denominator, 'Invalid denominator!');
