@@ -18,6 +18,7 @@ const DEBUG = new Set([
     // 'druid_upg_3',
     // 'frostworm_rider_upg_alt_1',
     // 'gorilla_2',
+    // 'demon_passive_2',
 ]);
 
 const LANGUAGES = {
@@ -248,7 +249,8 @@ function resolveArg(textId, nr, langMap, request, data, isDebug) {
     }
 
     const evaluated = evaluate(functionName, scripts, data, isDebug);
-    isDebug && console.log('evaluated:', evaluated);
+    //isDebug &&
+    console.log('evaluated:', evaluated);
 
     return evaluated;
 }

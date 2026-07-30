@@ -1,16 +1,18 @@
 import unzipCore from '../../helpers/unzipCore.js';
-import unit from './unit.js';
+import Unit from './Unit.js';
 import {WIKI_DIR} from '../SETTINGS.js';
 import {buildCache} from './translate.js';
 import fs from 'node:fs';
 import assume from '../../utils/assume.js';
+import UnitAbility from './UnitAbility.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
 const parsers = [
     //
-    unit,
+    Unit,
+    UnitAbility,
 ];
 
 // =====================================================================================================================
@@ -29,7 +31,7 @@ function cargo() {
     for (const key in results) {
         const path = WIKI_DIR + '/Data/' + key + '.wiki';
         const content = prepareContent(results[key]);
-        // console.log('content:', content);
+        // console.log('========\n' + path + '\n' + content);
         fs.writeFileSync(path, content);
     }
 }
@@ -43,10 +45,10 @@ function cargo() {
 function prepareContent(parsingResult) {
     const parts = [];
     parts.push(`<!-- Bot-managed page. Edit the source in obelisk-bot, not here. -->`);
-    for (const def of parsingResult.defs) {
+    for (const def of parsingResult) {
         parts.push(convertDefinitionToTemplate(def));
     }
-    parts.push(parsingResult.footer);
+    parts.push(`[[Category:Game Data Import]]`);
     return parts.join('\n\n').trim();
 }
 

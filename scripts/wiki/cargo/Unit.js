@@ -19,6 +19,7 @@ const IDS = new Set([
     // 'angel_upg',
     // 'druid_upg',
     // 'frostworm_rider_upg_alt',
+    // 'olgoi_upg_alt',
 ]);
 
 const ATTACK_TYPES = {
@@ -35,7 +36,7 @@ const FACTIONS = new Set(['human', 'undead', 'nature', 'demon', 'unfrozen', 'dun
 /**
  *
  */
-function unit(zipHub) {
+function Unit(zipHub) {
     const output = {};
     const logics = filterHub(zipHub, /units_logics/);
     const views = filterHub(zipHub, /units_views/);
@@ -53,13 +54,7 @@ function unit(zipHub) {
         const view = views[viewsPath];
         assume(logic.length === 1 && view.length === 1, path, 'Too many items!');
 
-        const result = parseUnit(logic[0], view[0], path);
-        if (result) {
-            output['Unit~' + result.id] = {
-                defs: result.defs,
-                footer: '[[Category:Game Data Import]]',
-            };
-        }
+        output['Unit~' + id] = parseUnit(logic[0], view[0], path);
     }
     return output;
 }
@@ -79,15 +74,12 @@ function parseUnit(logic, view, path) {
     defs.push(...spawnUnitAbilityAuraDef(logic)); // useless
     defs.push(...spawnUnitAbilityConditionalDef(logic)); // useless
     defs.push(...spawnUnitAbilityGlobalDef(logic)); // useless
-    defs.push(...spawnUnitAbilityPassiveDef(logic, view, translations)); // useless
+    defs.push(...spawnUnitAbilityPassiveDef(logic, view, translations));
     defs.push(spawnUnitAttackDef(logic, unitDef)); // useless
 
     defs.push(...translate(translations));
 
-    return {
-        id: logic.id,
-        defs,
-    };
+    return defs;
 }
 
 /**
@@ -567,7 +559,7 @@ function clarifyAttack(value, unitDef) {
     if (!value) {
         return;
     }
-    const {shared_abilities} = unitDef;
+    const {shared_abilities = []} = unitDef;
     for (const name of shared_abilities) {
         if (name.startsWith('base_passive_' + value)) {
             return name.replace('base_passive_', '').replace('_name', '');
@@ -579,4 +571,4 @@ function clarifyAttack(value, unitDef) {
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default unit;
+export default Unit;
