@@ -72,7 +72,7 @@ function getAttackTypeId(sharedAbilities) {
     const ids = sharedAbilities.split(',');
     const attackId = ids.find((id) => id.match(/^base_passive_[a-z]+_attack/));
     assume(attackId, sharedAbilities, 'Cannot find attack type!');
-    return attackId.match(/^base_passive_([a-z]+_attack)/)[1];
+    return attackId.replace(/^base_passive_/, '').replace(/_name$/, '');
 }
 
 /**
@@ -86,17 +86,40 @@ function getMoveTypeId(moveType) {
  *
  */
 function getAbilitiesFromZip(id, zipHub) {
-    const viewsHub = filterHub(zipHub, `units_views.*${id}_v.json`);
+    const viewsHub = filterHub(zipHub, `units_views.*/${id}_v.json$`);
     const values = Object.values(viewsHub);
     assume(values.length === 1, id, values.length, 'Unexpected views count!');
+    const view = values[0][0];
+    assume(view.id === id, id, view.id, 'Id mismatch!');
 
     const ids = [];
-    const {passives = []} = values[0][0];
+    let ordinal;
+
+    // Passives:
+    const {passives = []} = view;
+    ordinal = 0;
     for (const {name} of passives) {
-        if (checkSharedAbility(name, id) && checkInterestingAbility(name)) {
-            ids.push(name.replace('_name', ''));
+        if (checkSharedAbility(name, id)) {
+            if (checkInterestingAbility(name)) {
+                ids.push(name.replace('_name', ''));
+            }
+        } else {
+            ordinal++;
+            ids.push(id + '_passive_' + ordinal);
         }
     }
+
+    // Actives:
+    const actives = [...(view.alternativeAttacks || []), ...(view.abilities || [])];
+    ordinal = 0;
+    for (const {name} of actives) {
+        if (checkSharedAbility(name, id)) {
+            continue;
+        }
+        ordinal++;
+        ids.push(id + '_' + ordinal);
+    }
+
     return ids;
 }
 

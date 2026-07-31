@@ -32,10 +32,20 @@ const TARGET_LANGUAGES = new Set([
     // 'cs',
 ]);
 
-const FACTIONS = new Set(['human', 'undead', 'nature', 'demon', 'unfrozen', 'dungeon', 'neutral']);
+const FACTIONS = new Set([
+    // -- Note: if all items are disabled, all factions are allowed
+    'human',
+    // 'undead',
+    // 'nature',
+    // 'demon',
+    // 'unfrozen',
+    // 'dungeon',
+    // 'neutral',
+]);
 
 const IDS = [
-    'esquire',
+    // -- Note: if all items are disabled, all ids are allowed
+    // 'esquire',
     // 'angel'
     // 'frostworm_rider',
     // 'frostworm_rider_upg',
@@ -67,9 +77,9 @@ async function unit() {
 
     const fileNames = suggestFileNames(units, SWITCHEROOS);
 
-    units = IDS.length ? units.filter((item) => IDS.includes(item.target_id)) : units;
+    units = IDS.size ? units.filter((item) => IDS.has(item.target_id)) : units;
     units = fattenUnits(units);
-    units = units.filter((item) => FACTIONS.has(item.faction));
+    units = FACTIONS.size ? units.filter((item) => FACTIONS.has(item.faction)) : units;
 
     const laws = getTranslations('/Law~', {type: 'law_level', variant: '1'}, '~test_');
     const zipHub = unzipCore();
