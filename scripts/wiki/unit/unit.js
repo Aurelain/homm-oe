@@ -8,6 +8,7 @@ import getUnits from './getUnits.js';
 import WORDS from './WORDS.js';
 import purge from '../helpers/purge.js';
 import getTranslations from '../helpers/getTranslations.js';
+import unzipCore from '../../helpers/unzipCore.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -34,7 +35,7 @@ const TARGET_LANGUAGES = new Set([
 const FACTIONS = new Set(['human', 'undead', 'nature', 'demon', 'unfrozen', 'dungeon', 'neutral']);
 
 const IDS = [
-    // 'esquire',
+    'esquire',
     // 'angel'
     // 'frostworm_rider',
     // 'frostworm_rider_upg',
@@ -70,7 +71,8 @@ async function unit() {
     units = fattenUnits(units);
     units = units.filter((item) => FACTIONS.has(item.faction));
 
-    const laws = getTranslations('/Law~', {type: 'law_level', variant: '1'}, null);
+    const laws = getTranslations('/Law~', {type: 'law_level', variant: '1'}, '~test_');
+    const zipHub = unzipCore();
 
     const payloads = generatePayloads({
         items: units,
@@ -79,12 +81,12 @@ async function unit() {
         translations: WORDS,
         handleFresh: handleFreshUnit,
         handleOld: handleOldUnit,
-        context: {laws, units},
+        context: {laws, units, zipHub},
     });
-    // console.log('payloads:', payloads);
 
     for (const {path, content} of payloads) {
-        content && fs.writeFileSync(path, content);
+        console.log('========\n' + path + '\n' + content);
+        // content && fs.writeFileSync(path, content);
     }
 }
 

@@ -18,8 +18,8 @@ const FACTION_ORDER = {
 /**
  *
  */
-function buildLaws(info, translations, ids = {}) {
-    const enumeration = enumerateLawsFor(info, ids);
+function buildLaws(info, translations, context, ids = {}) {
+    const enumeration = enumerateLawsFor(info, context, ids);
     if (!enumeration) {
         return '';
     }
@@ -39,8 +39,8 @@ function buildLaws(info, translations, ids = {}) {
 /**
  *
  */
-function enumerateLawsFor(info, ids) {
-    const {tier, faction, context, lang, id} = info;
+function enumerateLawsFor(info, context, ids) {
+    const {tier, faction, lang, id} = info;
     const baseId = id.replace('_alt', '').replace('_upg', '');
     let baseUnit = context.units.find((item) => item.id === baseId);
     if (!baseUnit) {

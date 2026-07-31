@@ -4,6 +4,7 @@ import joinLines from '../../utils/joinLines.js';
 import parsePage from '../helpers/parsePage.js';
 import buildInfoBox from './buildInfoBox.js';
 import buildLaws from './buildLaws.js';
+import buildAbilities from './buildAbilities.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -15,13 +16,14 @@ import buildLaws from './buildLaws.js';
 /**
  *
  */
-function handleOldUnit(info, translations, existingContent) {
+function handleOldUnit(info, translations, context, existingContent) {
     const {lang} = info;
     const cleanedContent = cleanContent(existingContent);
     const parsed = parsePage(cleanedContent);
 
-    // Remove the Laws section because we're rebuilding it completely:
+    // Remove sections that we're rebuilding completely:
     delete parsed.sections[translations.Laws[lang]];
+    delete parsed.sections[translations.Abilities[lang]];
 
     const lines = [];
 
@@ -33,6 +35,9 @@ function handleOldUnit(info, translations, existingContent) {
         lines.push(parsed.header);
     }
 
+    // Abilities
+    lines.push(buildAbilities(info, translations, context, parsed.ids));
+
     // Unrecognized sections:
     for (const key in parsed.sections) {
         const value = parsed.sections[key];
@@ -42,7 +47,7 @@ function handleOldUnit(info, translations, existingContent) {
     }
 
     // Laws
-    lines.push(buildLaws(info, translations, parsed.ids));
+    lines.push(buildLaws(info, translations, context, parsed.ids));
 
     // Footer
     lines.push('');
@@ -56,7 +61,7 @@ function handleOldUnit(info, translations, existingContent) {
 //  P R I V A T E
 // =====================================================================================================================
 function cleanContent(content) {
-    content = content.replaceAll(/<!--[\s\S]*?-->/g, ''); // TODO: remove this
+    // content = content.replaceAll(/<!--[\s\S]*?-->/g, ''); // TODO: remove this
 
     content = content.replaceAll(/\{\{loc.*?}}/gi, '');
     content = content.replaceAll(/\{\{Unit.?Infobox[\s\S]*?}}/gi, '');

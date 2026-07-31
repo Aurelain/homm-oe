@@ -1,4 +1,22 @@
 const WORDS = {
+    Abilities: {
+        pt_br: '',
+        cs: '',
+        en: 'Abilities',
+        fr: 'Capacités',
+        de: '',
+        hu: '',
+        it: '',
+        ja: 'Abilities',
+        ko: '',
+        pl: 'Umiejętności',
+        ru: 'Способности',
+        es: '',
+        tr: '',
+        uk: '',
+        ['zh-hans']: '能力',
+        ['zh-hant']: '',
+    },
     Category_Units: {
         pt_br: '',
         cs: '',

@@ -24,13 +24,12 @@ function generatePayloads({items, fileNames, languages, translations, handleFres
                 id: item['target_id'],
                 fileNameX,
                 fileNameXRobotic,
-                context,
             };
             payloads.push({
                 path: pathX,
                 content: fs.existsSync(pathX)
-                    ? overwrite(handleOld, pathX, info, translations)
-                    : handleFresh(info, translations),
+                    ? overwrite(handleOld, pathX, info, translations, context)
+                    : handleFresh(info, translations, context),
             });
             if (lang !== 'en' && fileNameX !== fileNameXRobotic) {
                 const url = convertFileNameToWikiUrl(fileNameX);
@@ -50,9 +49,9 @@ function generatePayloads({items, fileNames, languages, translations, handleFres
 /**
  *
  */
-function overwrite(handleOld, path, info, translations) {
+function overwrite(handleOld, path, info, translations, context) {
     const content = fs.readFileSync(path, 'utf8');
-    return handleOld(info, translations, content);
+    return handleOld(info, translations, context, content);
 }
 
 // =====================================================================================================================

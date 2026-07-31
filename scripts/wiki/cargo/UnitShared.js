@@ -1,6 +1,8 @@
 import filterHub from '../../helpers/filterHub.js';
 import add from './add.js';
 import translate from './translate.js';
+import checkSharedAbility from './helpers/checkSharedAbility.js';
+import checkInterestingAbility from './helpers/checkInterestingAbility.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -71,40 +73,6 @@ function collectSharedFromUnit(logic, view) {
         }
     }
     return output;
-}
-
-/**
- *
- */
-function checkSharedAbility(name, id) {
-    if (name.startsWith('base_') || name.startsWith('common_')) {
-        return true;
-    }
-    const first = name.split('_').shift();
-    if (id.startsWith(first)) {
-        return false; // unfrozen_cultist
-    }
-    return FACTIONS.has(first);
-}
-
-/**
- *
- */
-function checkInterestingAbility(name) {
-    if (name.startsWith('common_')) {
-        return false;
-    }
-    if (name.startsWith('base_class_')) {
-        return false;
-    }
-    if (name.startsWith('base_passive_flyer_') || name.startsWith('base_passive_blink_')) {
-        return false;
-    }
-    if (name.match(/base_passive_[a-z]+_attack_/)) {
-        return false;
-    }
-    // This is interesting...
-    return true;
 }
 
 /**

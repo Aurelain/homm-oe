@@ -2,6 +2,7 @@ import filterHub from '../../helpers/filterHub.js';
 import assume from '../../utils/assume.js';
 import add from './add.js';
 import translate, {checkExists} from './translate.js';
+import checkSharedAbility from './helpers/checkSharedAbility.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -535,20 +536,6 @@ function getIsArmed(tags) {
             return true;
         }
     }
-}
-
-/**
- *
- */
-function checkSharedAbility(name, id) {
-    if (name.startsWith('base_') || name.startsWith('common_')) {
-        return true;
-    }
-    const first = name.split('_').shift();
-    if (id.startsWith(first)) {
-        return false; // unfrozen_cultist
-    }
-    return FACTIONS.has(first);
 }
 
 /**
