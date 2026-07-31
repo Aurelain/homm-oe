@@ -1,7 +1,7 @@
 import filterHub from '../../helpers/filterHub.js';
 import assume from '../../utils/assume.js';
-import add from './add.js';
-import translate, {checkExists} from './translate.js';
+import add from './helpers/add.js';
+import translate, {checkExists} from './helpers/translate.js';
 import checkSharedAbility from './helpers/checkSharedAbility.js';
 
 // =====================================================================================================================

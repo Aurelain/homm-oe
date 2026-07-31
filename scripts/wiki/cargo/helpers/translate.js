@@ -1,10 +1,10 @@
 import add from './add.js';
-import filterHub from '../../helpers/filterHub.js';
-import assume from '../../utils/assume.js';
+import filterHub from '../../../helpers/filterHub.js';
+import assume from '../../../utils/assume.js';
 import compile from './compile.js';
 import evaluate from './evaluate.js';
-import objectify from '../../utils/objectify.js';
-import mergeDeep from '../../utils/mergeDeep.js';
+import objectify from '../../../utils/objectify.js';
+import mergeDeep from '../../../utils/mergeDeep.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S

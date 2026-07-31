@@ -1,6 +1,6 @@
-import assume from '../../utils/assume.js';
-import fishValue from '../../utils/fishValue.js';
-import checkNumber from '../../utils/checkNumber.js';
+import assume from '../../../utils/assume.js';
+import fishValue from '../../../utils/fishValue.js';
+import checkNumber from '../../../utils/checkNumber.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S

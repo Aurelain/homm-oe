@@ -1,6 +1,6 @@
 import filterHub from '../../helpers/filterHub.js';
-import add from './add.js';
-import translate from './translate.js';
+import add from './helpers/add.js';
+import translate from './helpers/translate.js';
 import checkSharedAbility from './helpers/checkSharedAbility.js';
 import checkInterestingAbility from './helpers/checkInterestingAbility.js';
 
