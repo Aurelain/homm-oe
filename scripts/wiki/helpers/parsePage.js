@@ -60,7 +60,7 @@ function parseSection(text) {
  *
  */
 function parseIds(text) {
-    const found = match(text, /\|\s*id\s*=\s*(\w+)[\s\S]*?}}([^{]*)/g);
+    const found = match(text, /\|\s*id\s*=\s*(\w+)[\s\S]*?}}([^{=]*)/g);
     const output = {};
     for (const pair of found) {
         const id = pair[1].trim();

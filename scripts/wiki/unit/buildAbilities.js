@@ -3,6 +3,8 @@ import buildHeading from '../helpers/buildHeading.js';
 import assume from '../../utils/assume.js';
 import filterHub from '../../helpers/filterHub.js';
 import pushValid from '../../utils/pushValid.js';
+import checkSharedAbility from '../cargo/helpers/checkSharedAbility.js';
+import checkInterestingAbility from '../cargo/helpers/checkInterestingAbility.js';
 
 // =====================================================================================================================
 //  P U B L I C
@@ -53,7 +55,6 @@ function enumerateAbilities(info, context, ids) {
  */
 function collectUnitAbilities(info, zipHub) {
     const {id, creature_type, shared_abilities, move_type} = info;
-    console.log('info:', info);
 
     const output = [];
     pushValid(output, creature_type);
@@ -88,8 +89,15 @@ function getAbilitiesFromZip(id, zipHub) {
     const viewsHub = filterHub(zipHub, `units_views.*${id}_v.json`);
     const values = Object.values(viewsHub);
     assume(values.length === 1, id, values.length, 'Unexpected views count!');
-    const [view] = values;
-    return [];
+
+    const ids = [];
+    const {passives = []} = values[0][0];
+    for (const {name} of passives) {
+        if (checkSharedAbility(name, id) && checkInterestingAbility(name)) {
+            ids.push(name.replace('_name', ''));
+        }
+    }
+    return ids;
 }
 
 // =====================================================================================================================

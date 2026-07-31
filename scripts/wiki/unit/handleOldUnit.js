@@ -35,9 +35,6 @@ function handleOldUnit(info, translations, context, existingContent) {
         lines.push(parsed.header);
     }
 
-    // Abilities
-    lines.push(buildAbilities(info, translations, context, parsed.ids));
-
     // Unrecognized sections:
     for (const key in parsed.sections) {
         const value = parsed.sections[key];
@@ -45,6 +42,9 @@ function handleOldUnit(info, translations, context, existingContent) {
         lines.push(`==${key}==`);
         lines.push(value);
     }
+
+    // Abilities
+    lines.push(buildAbilities(info, translations, context, parsed.ids));
 
     // Laws
     lines.push(buildLaws(info, translations, context, parsed.ids));
