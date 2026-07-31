@@ -1,7 +1,8 @@
 node_modules/
 .idea/
-/Core/
+/Core
 **/volatile/*.js
 /scripts/editWiki/wiki/Files
 purge.json
 poke.json
+/scripts/editWiki/upload/*

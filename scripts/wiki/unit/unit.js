@@ -34,7 +34,7 @@ const TARGET_LANGUAGES = new Set([
 
 const FACTIONS = new Set([
     // -- Note: if all items are disabled, all factions are allowed
-    'human',
+    // 'human',
     // 'undead',
     // 'nature',
     // 'demon',
