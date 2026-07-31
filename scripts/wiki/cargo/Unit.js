@@ -254,8 +254,8 @@ function spawnUnitAbilityActiveDef(logic, view, translations) {
         add(def, 'ordinal', ordinal);
         add(def, 'name_sid', viewItem.name);
         add(def, 'desc_sid', viewItem.description);
-        // add(def, 'active_type', viewItem.abilityType); // BONUS!
-        // add(def, 'info_description', viewItem.infoDescription); // BONUS!
+        add(def, 'active_type', viewItem.abilityType); // BONUS!
+        add(def, 'info_description', viewItem.infoDescription); // BONUS!
         add(def, 'attack_type', logicItem.attackType_);
         add(def, 'rank', logicItem.rank);
         add(def, 'cd', logicItem.cd);

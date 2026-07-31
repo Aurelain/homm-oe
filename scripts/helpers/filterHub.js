@@ -11,7 +11,7 @@ const decoder = new TextDecoder();
 /**
  *
  */
-function filterHub(hub, pattern, exclude) {
+function filterHub(hub, pattern, exclude = null, directResult = false) {
     const output = {};
     for (const key in hub) {
         if (key.match(pattern)) {
@@ -31,6 +31,11 @@ function filterHub(hub, pattern, exclude) {
                 output[key] = content;
             }
         }
+    }
+    if (directResult) {
+        const value = Object.values(output)[0];
+        assume(value, pattern, 'Cannot offer a direct result for this pattern!');
+        return value;
     }
     return output;
 }

@@ -1,18 +1,20 @@
 import unzipCore from '../../helpers/unzipCore.js';
-import Unit from './Unit.js';
 import {WIKI_DIR} from '../SETTINGS.js';
 import {buildCache} from './helpers/translate.js';
 import fs from 'node:fs';
 import assume from '../../utils/assume.js';
+import Unit from './Unit.js';
 import UnitShared from './UnitShared.js';
+import UnitLabels from './UnitLabels.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
 const parsers = [
-    //
-    Unit,
-    UnitShared,
+    // -- Use this to focus on only some parsers:
+    // Unit,
+    // UnitShared,
+    UnitLabels,
 ];
 
 // =====================================================================================================================
