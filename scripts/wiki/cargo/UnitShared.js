@@ -2,6 +2,7 @@ import filterHub from '../../helpers/filterHub.js';
 import add from './helpers/add.js';
 import translate from './helpers/translate.js';
 import checkSharedAbility from './helpers/checkSharedAbility.js';
+import assume from '../../utils/assume.js';
 import checkInterestingAbility from './helpers/checkInterestingAbility.js';
 
 // =====================================================================================================================
@@ -12,8 +13,6 @@ const IDS = new Set([
     // 'black_dragon',
     // 'olgoi_upg_alt',
 ]);
-
-const FACTIONS = new Set(['human', 'undead', 'nature', 'demon', 'unfrozen', 'dungeon', 'neutral']);
 
 // =====================================================================================================================
 //  P U B L I C
@@ -64,12 +63,17 @@ function collectAllShared(zipHub) {
  */
 function collectSharedFromUnit(logic, view) {
     const output = {};
-    const {id, passives = []} = view;
-    for (const ability of passives) {
-        const {name, description} = ability;
+    const {id, passives = [], alternativeAttacks = [], abilities = []} = view;
+    const allAbilities = [...alternativeAttacks, ...abilities, ...passives];
+    for (const ability of allAbilities) {
+        const {name, description, abilityType: type} = ability;
         if (checkSharedAbility(name, id) && checkInterestingAbility(name)) {
+            if (type) {
+                const isAltOrMod = type === 'Ability_type_attack_alt' || type === 'Ability_type_attack_mod';
+                assume(isAltOrMod, view, ability, 'Unexpected ability!');
+            }
             const abilityId = name.replace(/_name$/, '');
-            output[abilityId] = {name, description, logic};
+            output[abilityId] = {name, description, type, logic};
         }
     }
     return output;
@@ -78,13 +82,16 @@ function collectSharedFromUnit(logic, view) {
 /**
  *
  */
-function generateDefs(id, {name, description, logic}) {
+function generateDefs(id, {name, description, type, logic}) {
+    const isAlt = !!type;
     const defs = [];
 
-    const def = {_type: 'UnitAbilityPassiveDef'};
+    const def = {_type: isAlt ? 'UnitAbilityActiveDef' : 'UnitAbilityPassiveDef'};
     add(def, 'ability_id', id);
+    isAlt && add(def, 'active_type', type);
     add(def, 'name_sid', name);
     add(def, 'desc_sid', description);
+    isAlt && add(def, 'cd', -1);
     defs.push(def);
 
     const translationDefs = translate([

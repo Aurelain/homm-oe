@@ -36,7 +36,7 @@ async function uploadFiles() {
         const fileName = files[i];
         const localPath = path.join(UPLOAD_SRC_DIR, fileName);
         let wikiFilename = fileName.replace(/_/g, ' ');
-        wikiFilename = fileName.replace(/_name\.png/, '.png');
+        wikiFilename = fileName.replace('_name.png', '.png').replace('_name_', '_');
         wikiFilename = wikiFilename.substring(0, 1).toUpperCase() + wikiFilename.substring(1);
 
         const action = DRY_RUN ? 'Testing' : 'Uploading';
@@ -91,7 +91,7 @@ async function uploadFiles() {
  */
 function getCategories(fileName) {
     const categories = [];
-    categories.push('Passive Ability Icons');
+    categories.push('Active Ability Icons');
     const clothed = categories.map((category) => `[[Category:${category}]]`);
     return clothed.join(' ');
 }

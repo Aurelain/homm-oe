@@ -183,10 +183,11 @@ function getAbilitiesFromZip(id, zipHub) {
     ordinal = 0;
     for (const {name} of actives) {
         if (checkSharedAbility(name, id)) {
-            continue;
+            ids.push(name.replace('_name', ''));
+        } else {
+            ordinal++;
+            ids.push(id + '_' + ordinal);
         }
-        ordinal++;
-        ids.push(id + '_' + ordinal);
     }
 
     return ids;

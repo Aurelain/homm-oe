@@ -5,9 +5,6 @@
  *
  */
 function checkInterestingAbility(name) {
-    if (name.startsWith('common_')) {
-        return false;
-    }
     if (name.startsWith('base_class_')) {
         return false;
     }

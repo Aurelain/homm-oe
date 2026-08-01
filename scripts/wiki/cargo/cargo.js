@@ -13,8 +13,8 @@ import UnitLabels from './UnitLabels.js';
 const parsers = [
     // -- Use this to focus on only some parsers:
     // Unit,
-    // UnitShared,
-    UnitLabels,
+    UnitShared,
+    // UnitLabels,
 ];
 
 // =====================================================================================================================

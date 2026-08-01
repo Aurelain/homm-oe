@@ -43,16 +43,19 @@ const FACTIONS = new Set([
     // 'neutral',
 ]);
 
-const IDS = [
+const IDS = new Set([
     // -- Note: if all items are disabled, all ids are allowed
     // 'esquire',
-    // 'angel'
+    // 'angel',
     // 'frostworm_rider',
     // 'frostworm_rider_upg',
     // 'assassin',
     // 'assassin_upg_alt',
     // 'lava_larva',
-];
+    // 'frostworm_rider',
+    // 'frostworm_rider_upg',
+    // 'frostworm_rider_upg_alt',
+]);
 
 const SWITCHEROOS = {
     Stinger: {
