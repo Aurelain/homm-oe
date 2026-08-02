@@ -61,12 +61,12 @@ function handleOldUnit(info, translations, context, existingContent) {
 //  P R I V A T E
 // =====================================================================================================================
 function cleanContent(content) {
-    // content = content.replaceAll(/<!--[\s\S]*?-->/g, ''); // TODO: remove this
+    content = content.replaceAll(/<!--[\s\S]*?-->/g, ''); // TODO: remove this
 
     content = content.replaceAll(/\{\{loc.*?}}/gi, '');
     content = content.replaceAll(/\{\{Unit.?Infobox[\s\S]*?}}/gi, '');
     // content = content.replaceAll(/\{\{UnitsNavbox[\s\S]*?}}/gi, '');
-    // content = content.replaceAll(/\{\{#invoke:LocUnitData\|navBox[\s\S]*?}}/gi, '');
+    // content = content.replaceAll(/\{\{#invoke:LocUnitData[\s\S]*?}}/gi, '');
     // content = content.replaceAll(/\[\[Category.*?]]/gi, '');
     // content = content.replaceAll('__NOTOC__', '');
     // content = content.replaceAll(/\{\{clear}}/gi, '');

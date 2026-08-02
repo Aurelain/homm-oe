@@ -19,10 +19,10 @@ function handleFreshUnit(info, translations, context) {
     lines.push(buildInfoBox(info));
 
     // Abilities
-    buildAbilities(info, translations, context);
+    lines.push(buildAbilities(info, translations, context));
 
     // Laws
-    buildLaws(info, translations, context);
+    lines.push(buildLaws(info, translations, context));
 
     // Footer
     lines.push('');

@@ -12,8 +12,13 @@ import match from '../../utils/match.js';
  */
 function parsePage(content) {
     content = content.trim();
-    let [, header] = match(content, /^([\s\S]*?)==/);
-    header = header === undefined ? content : header;
+    let header = match(content, /^([\s\S]*?)==/)[1];
+    if (header === undefined) {
+        header = match(content, /^([\s\S]*?)\n\n/)[1];
+        if (header === undefined) {
+            header = '';
+        }
+    }
     let rest = content.substring(header.length);
 
     let footer = '';
