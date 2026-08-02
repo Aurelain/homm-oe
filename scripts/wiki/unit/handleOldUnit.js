@@ -1,10 +1,9 @@
-import buildLoc from '../helpers/buildLoc.js';
 import buildFooter from './buildFooter.js';
 import joinLines from '../../utils/joinLines.js';
 import parsePage from '../helpers/parsePage.js';
-import buildInfoBox from './buildInfoBox.js';
 import buildLaws from './buildLaws.js';
 import buildAbilities from './buildAbilities.js';
+import buildHeader from './buildHeader.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -28,12 +27,7 @@ function handleOldUnit(info, translations, context, existingContent) {
     const lines = [];
 
     // Header
-    lines.push(buildLoc(info));
-    lines.push(buildInfoBox(info));
-    if (parsed.header) {
-        lines.push('');
-        lines.push(parsed.header);
-    }
+    lines.push(buildHeader(info, translations, context, parsed.header));
 
     // Unrecognized sections:
     for (const key in parsed.sections) {
