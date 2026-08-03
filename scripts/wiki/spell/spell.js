@@ -12,9 +12,9 @@ import fs from 'fs';
 
 const TARGET_LANGUAGES = new Set([
     // 'en',
-    // 'zh-hans',
+    'zh-hans',
     // 'es',
-    'fr',
+    // 'fr',
     // 'pt_br',
     // 'ru',
     // 'de',
@@ -126,7 +126,7 @@ async function spell() {
     let spells = getSpells();
 
     // Uncomment the following line to just purge the wiki pages:
-    // return purge(units, TARGET_LANGUAGES, SWITCHEROOS);
+    // return purge(units, TARGET_LANGUAGES);
 
     const fileNames = suggestFileNames(spells);
 

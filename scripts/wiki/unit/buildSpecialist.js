@@ -8,10 +8,10 @@ import joinLines from '../../utils/joinLines.js';
  *
  */
 function buildSpecialist({lang, id}, translations) {
+    return [];
     const lines = [];
     lines.push(buildHeading('Specialist', translations, lang));
     lines.push(`{{Specialist | lang=${lang} | id=${id}}}`);
-    lines.push('');
     return joinLines(lines);
 }
 

@@ -29,11 +29,11 @@ function buildSpell(info, translations, context, parsed) {
     // Specialist
     if (masterfulFragment) {
         const specialist = `{{SpellSpecialist|lang=${lang}|spell_id=${id}}}`;
-        lines.push(...buildSection('Specialist_hero', specialist, parsed, info, translations, context));
+        lines.push(...buildSection('Specialist_hero', specialist, info, translations, context, parsed));
     }
 
     // Strategy
-    lines.push(...buildStrategy(info, translations, parsed));
+    lines.push(...buildStrategy(info, translations, context, parsed));
 
     // Leftovers:
     lines.push(...buildLeftovers(parsed));

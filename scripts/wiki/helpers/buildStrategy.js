@@ -1,5 +1,4 @@
 import getWords from './getWords.js';
-import pushValid from '../../utils/pushValid.js';
 import buildSection from './buildSection.js';
 
 // =====================================================================================================================
@@ -8,15 +7,15 @@ import buildSection from './buildSection.js';
 /**
  *
  */
-function buildStrategy(info, translations, parsed) {
+function buildStrategy(info, translations, context, parsed) {
     const {lang} = info;
     const title = getWords('Strategy', translations, lang);
     const existingContent = parsed.sections[title];
     if (existingContent) {
-        return buildSection('Strategy', existingContent, parsed, info, translations);
+        return buildSection('Strategy', existingContent, info, translations, context, parsed);
     } else {
-        const text = getWords('Strategy_text', translations, lang);
-        return buildSection('Strategy', text, parsed, info, translations);
+        const text = "''" + getWords('Strategy_text', translations, lang) + "''";
+        return buildSection('Strategy', text, info, translations, context, parsed);
     }
 }
 

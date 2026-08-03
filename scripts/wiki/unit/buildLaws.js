@@ -1,5 +1,3 @@
-import joinLines from '../../utils/joinLines.js';
-import buildHeading from '../helpers/buildHeading.js';
 import getWords from '../helpers/getWords.js';
 import assume from '../../utils/assume.js';
 
@@ -18,20 +16,12 @@ const FACTION_ORDER = {
 /**
  *
  */
-function buildLaws(info, translations, context, ids = {}) {
-    const enumeration = enumerateLawsFor(info, context, ids);
-    if (!enumeration) {
-        return '';
+function buildLaws(info, translations, context, parsed) {
+    const enumeration = enumerateLawsFor(info, context, parsed.ids);
+    if (enumeration.length) {
+        enumeration.unshift(getWords('Laws_text', translations, info.lang));
     }
-
-    const {lang} = info;
-    const lines = [];
-    lines.push('');
-    lines.push(buildHeading('Laws', translations, lang));
-    lines.push(getWords('Laws_text', translations, lang));
-    lines.push(enumeration);
-    lines.push('');
-    return joinLines(lines);
+    return enumeration;
 }
 // =====================================================================================================================
 //  P R I V A T E
@@ -86,7 +76,7 @@ function enumerateLawsFor(info, context, ids) {
 
     templates.sort(compare);
 
-    return templates.join('\n');
+    return templates;
 }
 
 /**

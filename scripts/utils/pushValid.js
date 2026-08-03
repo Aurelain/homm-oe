@@ -7,7 +7,11 @@
 function pushValid(list, ...rest) {
     for (const item of rest) {
         if (item) {
-            list.push(item);
+            if (Array.isArray(item)) {
+                list.push(...item);
+            } else {
+                list.push(item);
+            }
         }
     }
 }

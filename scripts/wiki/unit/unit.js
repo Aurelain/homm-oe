@@ -1,21 +1,19 @@
-import fs from 'node:fs';
 import suggestFileNames from '../helpers/suggestFileNames.js';
-import handleFreshUnit from './handleFreshUnit.js';
-import handleOldUnit from './handleOldUnit.js';
 import generatePayloads from '../helpers/generatePayloads.js';
 import fattenUnits from './fattenUnits.js';
 import getUnits from './getUnits.js';
 import WORDS from './WORDS.js';
-import purge from '../helpers/purge.js';
 import getTranslations from '../helpers/getTranslations.js';
 import unzipCore from '../../helpers/unzipCore.js';
+import prepareUnit from './prepareUnit.js';
+import fs from 'fs';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
 const TARGET_LANGUAGES = new Set([
-    // 'en',
-    'zh-hans',
+    'en',
+    // 'zh-hans',
     // 'es',
     // 'fr',
     // 'pt_br',
@@ -46,7 +44,7 @@ const FACTIONS = new Set([
 const IDS = new Set([
     // -- Note: if all items are disabled, all ids are allowed
     // 'esquire',
-    // 'angel',
+    'angel',
     // 'frostworm_rider',
     // 'frostworm_rider_upg',
     // 'assassin',
@@ -93,8 +91,7 @@ async function unit() {
         fileNames,
         languages: TARGET_LANGUAGES,
         translations: WORDS,
-        handleFresh: handleFreshUnit,
-        handleOld: handleOldUnit,
+        builder: prepareUnit,
         context: {laws, units, zipHub},
     });
 

@@ -80,45 +80,21 @@ const RANKS = {
 /**
  *
  */
-function buildAbilities(info, translations, context, ids = {}) {
-    const enumeration = enumerateAbilities(info, context, ids);
-    if (!enumeration) {
-        return '';
-    }
-
+function buildAbilities(info, translations, context, parsed) {
     const {lang} = info;
+    const abilities = collectUnitAbilities(info, context.zipHub);
     const lines = [];
-    lines.push('');
-    lines.push(buildHeading('Abilities', translations, lang));
-    lines.push(enumeration);
-    lines.push('');
-    return joinLines(lines);
+    for (const abilityId of abilities) {
+        const rank = abilityId in RANKS ? `|rank=${RANKS[abilityId]}` : '';
+        lines.push(`{{UnitAbility|lang=${lang}|id=${abilityId}${rank}}}`);
+        pushValid(lines, parsed.ids[abilityId]);
+    }
+    return lines;
 }
 
 // =====================================================================================================================
 //  P R I V A T E
 // =====================================================================================================================
-/**
- *
- */
-function enumerateAbilities(info, context, ids) {
-    const {lang} = info;
-    const abilities = collectUnitAbilities(info, context.zipHub);
-    const templates = [];
-    for (const abilityId of abilities) {
-        const rank = abilityId in RANKS ? `|rank=${RANKS[abilityId]}` : '';
-        templates.push(`{{UnitAbility|lang=${lang}|id=${abilityId}${rank}}}`);
-        const extraText = ids[abilityId];
-        if (extraText) {
-            templates.push(extraText);
-        }
-    }
-
-    // assume(templates.length >= 4, id, templates, 'Unexpected abilities count!');
-
-    return templates.join('\n');
-}
-
 /**
  *
  */
