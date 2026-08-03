@@ -8,6 +8,29 @@ import filter from '../../utils/filter.js';
 import parseTranslationFile from '../helpers/parseTranslationFile.js';
 
 // =====================================================================================================================
+//  D E C L A R A T I O N S
+// =====================================================================================================================
+const MASTERFUL_FALLBACK = {
+    'Unnatural Calm': {
+        pt_br: '',
+        cs: '',
+        en: 'Additionally, enemy always deals minimum Damage.',
+        fr: 'Additionally, enemy always deals minimum Damage.',
+        de: '',
+        hu: '',
+        it: '',
+        ja: 'Additionally, enemy always deals minimum Damage.',
+        ko: '',
+        pl: 'Additionally, enemy always deals minimum Damage.',
+        ru: 'Additionally, enemy always deals minimum Damage.',
+        es: '',
+        tr: '',
+        uk: '',
+        ['zh-hans']: 'Additionally, enemy always deals minimum Damage.',
+        ['zh-hant']: '',
+    },
+};
+// =====================================================================================================================
 //  P U B L I C
 // =====================================================================================================================
 /**
@@ -59,8 +82,12 @@ function findMasterful(name) {
             return {hero, fragment};
         }
     }
+    const fallback = MASTERFUL_FALLBACK[name];
+    if (fallback) {
+        return {hero: null, fragment: fallback};
+    }
     console.log(`Warning: Could not find masterful version of "${name}"!`);
-    return {hero: '', fragment: {}};
+    return {hero: null, fragment: null};
 }
 
 /**

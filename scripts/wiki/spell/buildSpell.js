@@ -12,12 +12,13 @@ import buildHeading from '../helpers/buildHeading.js';
  *
  */
 function buildSpell(info, translations, context, parsed) {
-    const {id, lang, school, masterfulHero} = info;
+    const {id, lang, school, masterfulHero, masterfulFragment} = info;
     const lines = [];
 
     // Header
     lines.push(buildLoc(info));
-    lines.push(`{{SpellInfobox|lang=${lang}|id=${id}}}`);
+    const masterfulOverride = masterfulFragment && !masterfulHero ? `|masterful=${masterfulFragment[lang]}` : '';
+    lines.push(`{{SpellInfobox|lang=${lang}|id=${id}${masterfulOverride}}}`);
     lines.push('');
     lines.push(`{{SpellStinger|lang=${lang}|id=${id}}}`);
     if (parsed.header) {
@@ -26,7 +27,7 @@ function buildSpell(info, translations, context, parsed) {
     }
 
     // Specialist
-    if (masterfulHero) {
+    if (masterfulFragment) {
         const specialist = `{{SpellSpecialist|lang=${lang}|spell_id=${id}}}`;
         lines.push(...buildSection('Specialist_hero', specialist, parsed, info, translations, context));
     }
