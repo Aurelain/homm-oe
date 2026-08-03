@@ -10,9 +10,9 @@ const TEMPLATE = 1;
 const VERBOSE = 2;
 const METHOD = {
     en: EXISTING,
-    'zh-hans': EXISTING,
+    'zh-hans': TEMPLATE, // 1
     es: EXISTING,
-    fr: EXISTING,
+    fr: TEMPLATE, //        1
     pt_br: EXISTING,
     ru: TEMPLATE, //        1
     de: EXISTING,

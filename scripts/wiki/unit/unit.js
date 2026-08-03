@@ -15,7 +15,7 @@ import unzipCore from '../../helpers/unzipCore.js';
 // =====================================================================================================================
 const TARGET_LANGUAGES = new Set([
     // 'en',
-    // 'zh-hans',
+    'zh-hans',
     // 'es',
     // 'fr',
     // 'pt_br',
@@ -26,7 +26,7 @@ const TARGET_LANGUAGES = new Set([
     // 'ko',
     // 'it',
     // 'zh-hant',
-    'pl',
+    // 'pl',
     // 'uk',
     // 'hu',
     // 'cs',
@@ -46,7 +46,7 @@ const FACTIONS = new Set([
 const IDS = new Set([
     // -- Note: if all items are disabled, all ids are allowed
     // 'esquire',
-    'angel',
+    // 'angel',
     // 'frostworm_rider',
     // 'frostworm_rider_upg',
     // 'assassin',

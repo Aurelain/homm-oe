@@ -153,7 +153,7 @@ const WORDS = {
         it: '',
         ja: '',
         ko: '',
-        pl: '#1 to ulepszona jednostka tieru #2 frakcji #3.',
+        pl: '#1 to ulepszona [[Units/pl|jednostka]] tieru #2 frakcji #3.',
         ru: '',
         es: '',
         tr: '',
