@@ -5,7 +5,6 @@ import buildSection from '../helpers/buildSection.js';
 import buildLeftovers from '../helpers/buildLeftovers.js';
 import buildHeading from '../helpers/buildHeading.js';
 import buildStinger from './buildStinger.js';
-import buildSpecialist from './buildSpecialist.js';
 import buildLaws from './buildLaws.js';
 import buildAbilities from './buildAbilities.js';
 
@@ -16,7 +15,7 @@ import buildAbilities from './buildAbilities.js';
  *
  */
 function buildUnit(info, translations, context, parsed) {
-    const {id, lang, faction} = info;
+    const {id, lang, faction, specialist} = info;
     const lines = [];
 
     // Header
@@ -29,23 +28,24 @@ function buildUnit(info, translations, context, parsed) {
     }
 
     // Description
-    const description = `{{UnitDescription|lang=${lang}|id=${id}}}`;
+    const description = `{{Description|lang=${lang}|id=${id}}}`;
     lines.push(...buildSection('Description', description, info, translations, context, parsed));
 
     // Abilities
     lines.push(...buildSection('Abilities', buildAbilities, info, translations, context, parsed));
 
     // Specialist
-    lines.push(...buildSection('Specialist_hero', buildSpecialist, info, translations, context, parsed));
+    const specialistTemplate = specialist && `{{UnitSpecialist|lang=${lang}|id=${id}}}`;
+    lines.push(...buildSection('Specialist_hero', specialistTemplate, info, translations, context, parsed));
 
     // Related Laws
     lines.push(...buildSection('Laws', buildLaws, info, translations, context, parsed));
 
-    // Leftovers:
-    lines.push(...buildLeftovers(parsed));
-
     // Strategy
     lines.push(...buildStrategy(info, translations, context, parsed));
+
+    // Leftovers:
+    lines.push(...buildLeftovers(parsed));
 
     // Footer
     lines.push('');

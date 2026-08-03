@@ -1,11 +1,7 @@
 import fs from 'node:fs';
 import match from '../../utils/match.js';
-import assume from '../../utils/assume.js';
 import parseDefinition from '../helpers/parseDefinition.js';
-import walk from '../../utils/walk.js';
-import {WIKI_DIR} from '../SETTINGS.js';
-import filter from '../../utils/filter.js';
-import parseTranslationFile from '../helpers/parseTranslationFile.js';
+import filterHub from '../../helpers/filterHub.js';
 
 // =====================================================================================================================
 //  P U B L I C
@@ -13,7 +9,11 @@ import parseTranslationFile from '../helpers/parseTranslationFile.js';
 /**
  *
  */
-function fattenUnits(units) {
+function fattenUnits(units, zipHub) {
+    const heroInfo = filterHub(zipHub, 'english/texts/heroInfo', null, true);
+    const unitsAbility = filterHub(zipHub, 'english/texts/unitsAbility', null, true);
+    const idToSpecialist = linkIdToSpecialist(heroInfo, unitsAbility);
+
     const output = [];
     for (const unit of units) {
         const {path} = unit;
@@ -22,12 +22,9 @@ function fattenUnits(units) {
         const [unitDef] = match(content, /\{\{UnitDef[\s\S]*?}}/);
         const definition = parseDefinition(unitDef);
 
-        const extra = {};
-        // if (fs.existsSync(path.replace('.wiki', '_special.wiki'))) {
-        // const {hero, fragment} = findMasterful(unit.name.en);
-        // extra.masterfulHero = hero;
-        // extra.masterfulFragment = fragment;
-        // }
+        const extra = {
+            specialist: idToSpecialist[unit.target_id],
+        };
 
         output.push({
             ...definition,
@@ -44,35 +41,23 @@ function fattenUnits(units) {
 /**
  *
  */
-function findMasterful(name) {
-    name = name.replaceAll("'", '’'); // undo the fix by Ketura
-    const dataPaths = walk(WIKI_DIR + '/Data');
-    let paths = filter(dataPaths, '/HeroSpecialization~');
-    paths = filter(paths, (path) => !path.match(/tutorial|campaign|cm_fun/));
-    for (const path of paths) {
-        const heroContent = fs.readFileSync(path, 'utf8');
-        if (heroContent.includes(`starts with the “Masterful ${name}”`)) {
-            const [, hero] = match(path, /~(.*?)_specialization/);
-            const fragment = collectMasterfulFragments(path);
-            return {hero, fragment};
+function linkIdToSpecialist(heroInfo, unitsAbility) {
+    const output = {};
+
+    for (const hero of heroInfo) {
+        const [, found] = match(hero.text, '(.*?) growth in your cities increases by');
+        if (found) {
+            for (const ability of unitsAbility) {
+                if (ability.text === found) {
+                    const id = ability.sid.replace('_name', '');
+                    output[id] = hero.sid;
+                    output[id + '_upg'] = hero.sid;
+                    output[id + '_upg_alt'] = hero.sid;
+                }
+            }
         }
     }
-    console.log(`Warning: Could not find masterful version of "${name}"!`);
-    return {hero: '', fragment: {}};
-}
-
-/**
- *
- */
-function collectMasterfulFragments(path) {
-    const [heroSpec] = parseTranslationFile(path);
-    const fragment = {};
-    for (const lang in heroSpec.description) {
-        const text = heroSpec.description[lang];
-        const [, secondSentence] = match(text, /[.,。]\s*([^.。]+[.。])/);
-        fragment[lang] = secondSentence;
-    }
-    return fragment;
+    return output;
 }
 
 // =====================================================================================================================

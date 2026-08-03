@@ -24,7 +24,7 @@ function prepareUnit(info, translations, context, existingContent) {
     const parsed = parsePage(cleaned);
 
     // Temporary mutation:
-    delete parsed.sections.Laws;
+    // delete parsed.sections.Laws;
 
     const lines = buildUnit(info, translations, context, parsed);
     const output = joinLines(lines);

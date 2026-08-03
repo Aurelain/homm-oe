@@ -19,12 +19,12 @@ const FIX_LANGUAGE_CODE = {
 function parseTranslationFile(path) {
     const content = fs.readFileSync(path, 'utf8');
     if (content.match(/^[^}]*unused = yes/)) {
-        console.log(`Unused item at "${path}"! Skipping it.`);
+        // console.log(`Unused item at "${path}"! Skipping it.`);
         return;
     }
     const definitionsFound = match(content, /\{\{TranslationDef[\s\S]*?}}/g);
     if (!definitionsFound.length) {
-        console.log(`No translations in "${path}"! Skipping it.`);
+        // console.log(`No translations in "${path}"! Skipping it.`);
         return;
     }
     const hub = {};

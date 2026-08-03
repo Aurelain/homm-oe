@@ -44,7 +44,7 @@ const FACTIONS = new Set([
 const IDS = new Set([
     // -- Note: if all items are disabled, all ids are allowed
     // 'esquire',
-    'angel',
+    // 'angel',
     // 'frostworm_rider',
     // 'frostworm_rider_upg',
     // 'assassin',
@@ -80,11 +80,11 @@ async function unit() {
     const fileNames = suggestFileNames(units, SWITCHEROOS);
 
     units = IDS.size ? units.filter((item) => IDS.has(item.target_id)) : units;
-    units = fattenUnits(units);
+    const zipHub = unzipCore();
+    units = fattenUnits(units, zipHub);
     units = FACTIONS.size ? units.filter((item) => FACTIONS.has(item.faction)) : units;
 
     const laws = getTranslations('/Law~', {type: 'law_level', variant: '1'}, '~test_');
-    const zipHub = unzipCore();
 
     const payloads = generatePayloads({
         items: units,
