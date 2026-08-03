@@ -35,7 +35,7 @@ function buildUnit(info, translations, context, parsed) {
     lines.push(...buildSection('Abilities', buildAbilities, info, translations, context, parsed));
 
     // Specialist
-    const specialistTemplate = specialist && `{{UnitSpecialist|lang=${lang}|id=${id}}}`;
+    const specialistTemplate = specialist && `{{UnitSpecialist|lang=${lang}|unit_id=${id}}}`;
     lines.push(...buildSection('Specialist_hero', specialistTemplate, info, translations, context, parsed));
 
     // Related Laws

@@ -43,7 +43,7 @@ function buildStinger(info, translations, context) {
         default:
         // nothing
     }
-    return joinLines(lines);
+    return lines;
 }
 
 // =====================================================================================================================
