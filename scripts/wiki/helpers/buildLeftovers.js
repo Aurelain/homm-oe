@@ -1,23 +1,20 @@
-import joinLines from '../../utils/joinLines.js';
-import buildHeading from '../helpers/buildHeading.js';
-import getWords from '../helpers/getWords.js';
-
 // =====================================================================================================================
 //  P U B L I C
 // =====================================================================================================================
 /**
  *
  */
-function buildStrategy({lang, id}, translations) {
+function buildLeftovers(parsed) {
     const lines = [];
-    lines.push('');
-    lines.push(buildHeading('Interactions', translations, lang));
-    lines.push(`''${getWords('Interactions_text', translations, lang)}''`);
-    lines.push('');
-    return joinLines(lines);
+    for (const key in parsed.sections) {
+        lines.push('');
+        lines.push(`==${key}==`);
+        lines.push(parsed.sections[key]);
+    }
+    return lines;
 }
 
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default buildStrategy;
+export default buildLeftovers;

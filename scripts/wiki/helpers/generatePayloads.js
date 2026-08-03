@@ -8,7 +8,7 @@ import convertFileNameToWikiUrl from './convertFileNameToWikiUrl.js';
 /**
  *
  */
-function generatePayloads({items, fileNames, languages, translations, handleFresh, handleOld, context}) {
+function generatePayloads({items, fileNames, languages, translations, builder, context}) {
     const payloads = [];
     for (const item of items) {
         for (const lang of languages) {
@@ -25,11 +25,10 @@ function generatePayloads({items, fileNames, languages, translations, handleFres
                 fileNameX,
                 fileNameXRobotic,
             };
+            const content = fs.existsSync(pathX) ? fs.readFileSync(pathX, 'utf8') : '';
             payloads.push({
                 path: pathX,
-                content: fs.existsSync(pathX)
-                    ? overwrite(handleOld, pathX, info, translations, context)
-                    : handleFresh(info, translations, context),
+                content: builder(info, translations, context, content),
             });
             if (lang !== 'en' && fileNameX !== fileNameXRobotic) {
                 const url = convertFileNameToWikiUrl(fileNameX);
@@ -41,17 +40,6 @@ function generatePayloads({items, fileNames, languages, translations, handleFres
         }
     }
     return payloads;
-}
-
-// =====================================================================================================================
-//  P R I V A T E
-// =====================================================================================================================
-/**
- *
- */
-function overwrite(handleOld, path, info, translations, context) {
-    const content = fs.readFileSync(path, 'utf8');
-    return handleOld(info, translations, context, content);
 }
 
 // =====================================================================================================================

@@ -125,7 +125,7 @@ const WORDS = {
         ['zh-hans']: '',
         ['zh-hant']: '',
     },
-    Related: {
+    Related_pages: {
         pt_br: '',
         cs: '',
         en: 'Related pages',

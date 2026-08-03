@@ -1,124 +1,14 @@
-import fs from 'node:fs';
 import suggestFileNames from '../helpers/suggestFileNames.js';
-import handleFreshSpell from './handleFreshSpell.js';
-import handleOldSpell from './handleOldSpell.js';
 import generatePayloads from '../helpers/generatePayloads.js';
 import fattenSpells from './fattenSpells.js';
 import getSpells from './getSpells.js';
+import WORDS from './WORDS.js';
+import prepareSpell from './prepareSpell.js';
+import fs from 'fs';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
-const TRANSLATIONS = {
-    Spells: {
-        pt_br: 'Feitiços',
-        cs: 'Kouzla',
-        en: 'Spells',
-        fr: 'Sorts',
-        de: 'Zaubersprüche',
-        hu: 'Varázslatok',
-        it: 'Incantesimi',
-        ja: '呪文',
-        ko: '주문',
-        pl: 'Zaklęcia',
-        ru: 'Заклинания',
-        es: 'Hechizos',
-        tr: 'Büyüler',
-        uk: 'Чари',
-        ['zh-hans']: '法术',
-        ['zh-hant']: '法術',
-    },
-    Strategy: {
-        pt_br: '',
-        cs: '',
-        en: 'Strategy',
-        fr: 'Stratégie',
-        de: '',
-        hu: '',
-        it: '',
-        ja: '',
-        ko: '',
-        pl: 'Strategia',
-        ru: 'Стратегия',
-        es: '',
-        tr: '',
-        uk: '',
-        ['zh-hans']: '',
-        ['zh-hant']: '',
-    },
-    Strategy_text: {
-        pt_br: '',
-        cs: '',
-        en: 'Nothing yet. Maybe you can add it...?',
-        fr: '',
-        de: '',
-        hu: '',
-        it: '',
-        ja: '',
-        ko: '',
-        pl: 'Jeszcze nic. Może możesz to dodać...?',
-        ru: 'Здесь пока ничего нет. Возможно, вы сможете это исправить?',
-        es: '',
-        tr: '',
-        uk: '',
-        ['zh-hans']: '',
-        ['zh-hant']: '',
-    },
-    Interactions: {
-        pt_br: '',
-        cs: '',
-        en: 'Interactions and synergies',
-        fr: '',
-        de: '',
-        hu: '',
-        it: '',
-        ja: '',
-        ko: '',
-        pl: '',
-        ru: '',
-        es: '',
-        tr: '',
-        uk: '',
-        ['zh-hans']: '',
-        ['zh-hant']: '',
-    },
-    Interactions_text: {
-        pt_br: '',
-        cs: '',
-        en: 'Nothing yet. Maybe you can add some...?',
-        fr: '',
-        de: '',
-        hu: '',
-        it: '',
-        ja: '',
-        ko: '',
-        pl: 'Jeszcze nic. Może możesz to dodać...?',
-        ru: 'Здесь пока ничего нет. Возможно, вы сможете это исправить?',
-        es: '',
-        tr: '',
-        uk: '',
-        ['zh-hans']: '',
-        ['zh-hant']: '',
-    },
-    Specialist: {
-        pt_br: '',
-        cs: '',
-        en: 'Specialist hero',
-        fr: '',
-        de: '',
-        hu: '',
-        it: '',
-        ja: '',
-        ko: '',
-        pl: '',
-        ru: '',
-        es: '',
-        tr: '',
-        uk: '',
-        ['zh-hans']: '',
-        ['zh-hant']: '',
-    },
-};
 
 const TARGET_LANGUAGES = new Set([
     'en',
@@ -139,7 +29,7 @@ const TARGET_LANGUAGES = new Set([
     // 'cs',
 ]);
 
-const IDS = [
+const IDS = new Set([
     //'bonus_magic_astral_summon_1',
     // 'bonus_magic_pure_bolt',
     // 'change_use_necromancy',
@@ -224,7 +114,7 @@ const IDS = [
     // 'space_7_magic_shackles',
     // 'space_8_magic_carapace',
     // 'space_9_magic_impending_fate',
-];
+]);
 
 // =====================================================================================================================
 //  P U B L I C
@@ -234,24 +124,25 @@ const IDS = [
  */
 async function spell() {
     let spells = getSpells();
+
+    // Uncomment the following line to just purge the wiki pages:
+    // return purge(units, TARGET_LANGUAGES, SWITCHEROOS);
+
     const fileNames = suggestFileNames(spells);
-    // const ids = spells.map((item) => item.target_id);
 
-    // spells = spells.filter((item) => IDS.includes(item.target_id));
-
-    const fatSpells = fattenSpells(spells);
+    spells = IDS.size ? spells.filter((item) => IDS.has(item.target_id)) : spells;
+    spells = fattenSpells(spells);
 
     const payloads = generatePayloads({
-        items: fatSpells,
+        items: spells,
         fileNames,
         languages: TARGET_LANGUAGES,
-        translations: TRANSLATIONS,
-        handleFresh: handleFreshSpell,
-        handleOld: handleOldSpell,
+        translations: WORDS,
+        builder: prepareSpell,
     });
-    // console.log('payloads:', payloads);
 
     for (const {path, content} of payloads) {
+        // console.log('========\n' + path + '\n' + content);
         content && fs.writeFileSync(path, content);
     }
 }

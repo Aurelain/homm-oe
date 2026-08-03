@@ -6,7 +6,7 @@
  */
 function pushValid(list, ...rest) {
     for (const item of rest) {
-        if (item !== undefined) {
+        if (item) {
             list.push(item);
         }
     }
