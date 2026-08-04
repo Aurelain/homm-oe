@@ -18,7 +18,7 @@ function prepareUnit(info, translations, context, existingContent) {
     cleaned = cleaned.replaceAll(/\{\{Unitdesc.*?}}/g, '');
 
     // Temporary:
-    cleaned = cleaned.replaceAll(/\{\{F\|.*?}}/g, '');
+    // cleaned = cleaned.replaceAll(/\{\{F\|.*?}}/g, '');
     // cleaned = cleaned.replaceAll(/===/g, '==');
     // cleaned = cleaned.replaceAll(/\{\{Specialist.*?}}/gi, '');
 

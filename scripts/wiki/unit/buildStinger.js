@@ -12,7 +12,7 @@ const METHOD = {
     // pt_br: null,
     ru: TEMPLATE,
     // de: null,
-    // ja: null,
+    ja: TEMPLATE,
     // tr: null,
     // ko: null,
     // it: null,

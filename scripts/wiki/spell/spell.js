@@ -2,7 +2,7 @@ import suggestFileNames from '../helpers/suggestFileNames.js';
 import generatePayloads from '../helpers/generatePayloads.js';
 import fattenSpells from './fattenSpells.js';
 import getSpells from './getSpells.js';
-import WORDS from './WORDS.js';
+import WORDS from '../WORDS.js';
 import prepareSpell from './prepareSpell.js';
 import fs from 'fs';
 

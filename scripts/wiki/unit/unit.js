@@ -2,7 +2,7 @@ import suggestFileNames from '../helpers/suggestFileNames.js';
 import generatePayloads from '../helpers/generatePayloads.js';
 import fattenUnits from './fattenUnits.js';
 import getUnits from './getUnits.js';
-import WORDS from './WORDS.js';
+import WORDS from '../WORDS.js';
 import getTranslations from '../helpers/getTranslations.js';
 import unzipCore from '../../helpers/unzipCore.js';
 import prepareUnit from './prepareUnit.js';
@@ -17,7 +17,7 @@ const TARGET_LANGUAGES = new Set([
     // 'es',
     // 'fr',
     // 'pt_br',
-    'ru',
+    // 'ru',
     // 'de',
     'ja',
     // 'tr',
