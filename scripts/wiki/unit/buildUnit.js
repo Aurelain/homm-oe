@@ -7,6 +7,7 @@ import buildHeading from '../helpers/buildHeading.js';
 import buildStinger from './buildStinger.js';
 import buildLaws from './buildLaws.js';
 import buildAbilities from './buildAbilities.js';
+import upgradeLinks from '../helpers/upgradeLinks.js';
 
 // =====================================================================================================================
 //  P U B L I C
@@ -24,8 +25,7 @@ function buildUnit(info, translations, context, parsed) {
     lines.push(...buildStinger(info, translations, context));
     if (parsed.header) {
         lines.push('');
-        // parsed.header =
-        lines.push(parsed.header);
+        lines.push(upgradeLinks(parsed.header, lang, context));
     }
 
     // Description

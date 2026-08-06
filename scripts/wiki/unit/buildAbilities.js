@@ -1,5 +1,3 @@
-import joinLines from '../../utils/joinLines.js';
-import buildHeading from '../helpers/buildHeading.js';
 import assume from '../../utils/assume.js';
 import filterHub from '../../helpers/filterHub.js';
 import pushValid from '../../utils/pushValid.js';

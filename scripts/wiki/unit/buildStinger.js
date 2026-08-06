@@ -1,4 +1,3 @@
-import joinLines from '../../utils/joinLines.js';
 import romanize from '../../utils/romanize.js';
 import filterHub from '../../helpers/filterHub.js';
 
@@ -79,14 +78,14 @@ function buildVerbose(info, translations, context) {
         lines.push('');
         if (id === baseId) {
             let text = translations.Stinger_is_base[lang];
-            text = text.replace('#1', `{{UnitLinkIcon|${upgradeA}|${lang}}}`);
-            text = text.replace('#2', `{{UnitLinkIcon|${upgradeB}|${lang}}}`);
+            text = text.replace('#1', `{{Unit|${upgradeA}|${lang}}}`);
+            text = text.replace('#2', `{{Unit|${upgradeB}|${lang}}}`);
             lines.push(text);
         } else {
             let text = translations.Stinger_is_upgraded[lang];
-            text = text.replace('#1', `{{UnitLinkIcon|${baseId}|${lang}}}`);
+            text = text.replace('#1', `{{Unit|${baseId}|${lang}}}`);
             const uid = id === upgradeA ? upgradeB : upgradeA;
-            text = text.replace('#2', `{{UnitLinkIcon|${uid}|${lang}}}`);
+            text = text.replace('#2', `{{Unit|${uid}|${lang}}}`);
             lines.push(text);
         }
     }
