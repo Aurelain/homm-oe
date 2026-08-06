@@ -1,4 +1,5 @@
 import match from '../../utils/match.js';
+import assume from '../../utils/assume.js';
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
@@ -65,14 +66,17 @@ function parseSection(text) {
  *
  */
 function parseIds(text) {
-    const found = match(text, /\|\s*id\s*=\s*(\w+)[\s\S]*?}}([^{=]*)/g);
     const output = {};
-    for (const pair of found) {
-        const id = pair[1].trim();
-        const extra = pair[2].trim();
-        if (id && extra) {
-            output[id] = extra;
+    const templatesFound = match(text, /\{\{(\w+)[^}]*\|\s*id\s*=\s*(\w+)/g);
+    for (const [, name, id] of templatesFound) {
+        const prefix = '\\{\\{' + name;
+        const middle = '.*?' + id + '\\b.*?}}([\\s\\S]*?)';
+        let extra = match(text, new RegExp(prefix + middle + prefix))[1];
+        if (!extra) {
+            extra = match(text, new RegExp(prefix + middle + '=='))[1];
         }
+        assume(extra, text, id, 'No extra found!');
+        output[id.trim()] = extra.trim();
     }
     return output;
 }

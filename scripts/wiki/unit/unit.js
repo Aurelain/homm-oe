@@ -12,14 +12,14 @@ import fs from 'fs';
 //  D E C L A R A T I O N S
 // =====================================================================================================================
 const TARGET_LANGUAGES = new Set([
-    // 'en',
+    'en',
     // 'zh-hans',
     // 'es',
     // 'fr',
     // 'pt_br',
     // 'ru',
     // 'de',
-    'ja',
+    // 'ja',
     // 'tr',
     // 'ko',
     // 'it',
@@ -54,6 +54,7 @@ const IDS = new Set([
     // 'frostworm_rider_upg',
     // 'frostworm_rider_upg_alt',
     // 'unicorn',
+    // 'lava_larva',
 ]);
 
 const SWITCHEROOS = {

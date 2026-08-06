@@ -24,6 +24,7 @@ function buildUnit(info, translations, context, parsed) {
     lines.push(...buildStinger(info, translations, context));
     if (parsed.header) {
         lines.push('');
+        // parsed.header =
         lines.push(parsed.header);
     }
 
