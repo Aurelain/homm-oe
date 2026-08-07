@@ -1,4 +1,6 @@
 import joinLines from '../../utils/joinLines.js';
+import parsePage from '../helpers/parsePage.js';
+import generate from './generate.js';
 
 // =====================================================================================================================
 //  P U B L I C
@@ -6,15 +8,24 @@ import joinLines from '../../utils/joinLines.js';
 /**
  *
  */
-function buildFooterHeroClass({lang}, translations) {
-    const lines = [];
-    lines.push(`{{HeroClassNavbox|lang=${lang}}}`);
-    const category = translations.category_HeroClasses[lang] || translations.category_HeroClasses[lang] + '/' + lang;
-    lines.push(`[[Category:${category}]]`);
-    return joinLines(lines);
+function prepare(info, translations, context, existingContent) {
+    let cleaned = existingContent;
+
+    // Clean header:
+    cleaned = cleaned.replaceAll(/\{\{Loc.*?}}/gi, '');
+
+    // Temporary cleaning:
+
+    const parsed = parsePage(cleaned);
+
+    // Temporary deletions of sections:
+
+    const lines = generate(info, translations, context, parsed);
+    const output = joinLines(lines);
+    return output;
 }
 
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default buildFooterHeroClass;
+export default prepare;
