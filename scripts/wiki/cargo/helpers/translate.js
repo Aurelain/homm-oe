@@ -92,10 +92,7 @@ let buffs;
  *
  */
 function translate(translationRequests) {
-    if (!words) {
-        console.log('Please first build the cache!');
-        return;
-    }
+    assume(words, 'Please first build the cache!');
 
     const defs = [];
     for (const request of translationRequests) {
