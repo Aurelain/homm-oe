@@ -3,6 +3,10 @@ import getWords from '../helpers/getWords.js';
 import buildStrategy from '../helpers/buildStrategy.js';
 import buildLeftovers from '../helpers/buildLeftovers.js';
 import buildHeading from '../helpers/buildHeading.js';
+import buildSection from '../helpers/buildSection.js';
+import buildElites from './buildElites.js';
+import buildSkills from './buildSkills.js';
+import buildIntro from './buildIntro.js';
 
 // =====================================================================================================================
 //  P U B L I C
@@ -16,11 +20,19 @@ function generate(info, translations, context, parsed) {
 
     // Header
     lines.push(buildLoc(info));
-    lines.push(`{{FooInfobox|lang=${lang}|id=${id}}}`);
-    if (parsed.header) {
-        lines.push('');
-        lines.push(parsed.header);
-    }
+    lines.push(`{{HeroClassInfobox|lang=${lang}|id=${id}}}`);
+    lines.push('');
+    lines.push(...buildIntro(info, translations));
+
+    // Skills
+    lines.push(...buildSection('Skills', buildSkills, info, translations, context, parsed));
+
+    // Elite classes
+    lines.push(...buildSection('Elite_classes', buildElites, info, translations, context, parsed));
+
+    // Heroes
+    const heroes = `{{#invoke:HeroesOverview|display|lang=${lang}|class=${id}}}`;
+    lines.push(...buildSection('Heroes', heroes, info, translations, context, parsed));
 
     // Strategy
     lines.push(...buildStrategy(info, translations, context, parsed));

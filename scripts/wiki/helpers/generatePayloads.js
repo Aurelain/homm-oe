@@ -21,7 +21,7 @@ function generatePayloads({items, fileNames, languages, translations, builder, c
                 ...item,
                 lang,
                 // name: titleX,
-                id: item['target_id'],
+                id: item.target_id || item.id,
                 fileNameX,
                 fileNameXRobotic,
             };
