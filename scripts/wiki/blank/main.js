@@ -1,11 +1,10 @@
 import suggestFileNames from '../helpers/suggestFileNames.js';
 import generatePayloads from '../helpers/generatePayloads.js';
 import WORDS from '../WORDS.js';
-import getTranslations from '../helpers/getTranslations.js';
 import unzipCore from '../../helpers/unzipCore.js';
 import prepare from './prepare.js';
 import fs from 'fs';
-import generate from './generate.js';
+import collect from './collect.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -41,7 +40,7 @@ const IDS = new Set([
  */
 async function main() {
     const zipHub = unzipCore();
-    let foo = generate(zipHub);
+    let foo = collect(zipHub);
 
     // Uncomment the following line to just purge the wiki pages:
     // return purge(foo, TARGET_LANGUAGES);

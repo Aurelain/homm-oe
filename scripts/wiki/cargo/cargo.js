@@ -6,6 +6,7 @@ import assume from '../../utils/assume.js';
 import Unit from './Unit.js';
 import UnitShared from './UnitShared.js';
 import UnitLabels from './UnitLabels.js';
+import HeroClass from './HeroClass.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -13,8 +14,9 @@ import UnitLabels from './UnitLabels.js';
 const parsers = [
     // -- Use this to focus on only some parsers:
     // Unit,
-    UnitShared,
+    // UnitShared,
     // UnitLabels,
+    HeroClass,
 ];
 
 // =====================================================================================================================
