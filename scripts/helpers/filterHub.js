@@ -20,7 +20,7 @@ function filterHub(hub, pattern, exclude = null, directResult = false) {
             }
             const fileData = hub[key];
             const content = decoder.decode(fileData);
-            if (content.match(/^[{[]/)) {
+            if (content.match(/^\s*[{[]/)) {
                 const json = JSON.parse(content);
                 const topKeys = Object.keys(json);
                 assume(topKeys.length === 1, Object.keys(json), 'Unexpected keys!');

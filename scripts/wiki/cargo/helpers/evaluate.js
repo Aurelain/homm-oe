@@ -15,10 +15,10 @@ const ACTIONS = {
     CurrentMagicBattleRoot: [CurrentMagicBattleRoot, 1],
     CurrentMagicBattle: [CurrentMagicBattle, 1],
     CurrentMagicWorld: [CurrentMagicWorld, 1],
+    CurrentSkillParameter: [CurrentSkillParameter, 1],
+    CurrentSubSkill: [CurrentSubSkill, 1],
     SpellpowerForCurrentMagic: [SpellpowerForCurrentMagic, 0],
     CurrentMagicLevel: [CurrentMagicLevel, 0],
-    DbObstacle: [DbObstacle, 2],
-    DbTrap: [DbTrap, 2],
     Add: [Add, 2],
     Sub: [Sub, 2],
     Mul: [Mul, 2],
@@ -27,6 +27,9 @@ const ACTIONS = {
     Floor: [Floor, 1],
     Text: [Text, 1],
     DbBuff: [DbBuff, 2],
+    DbSideBuff: [DbSideBuff, 2],
+    DbObstacle: [DbObstacle, 2],
+    DbTrap: [DbTrap, 2],
     Invoke: [Invoke, 1],
 };
 
@@ -195,6 +198,26 @@ function CurrentMagicWorld(path, context) {
 /**
  *
  */
+function CurrentSkillParameter(path, context) {
+    const json = context.data.currentSkillParameter;
+    assume(json, context.about, 'Missing "currentSkillParameter"!');
+    const value = resolveValue(json, path, context);
+    return value;
+}
+
+/**
+ *
+ */
+function CurrentSubSkill(path, context) {
+    const json = context.data.currentSubSkill;
+    assume(json, context.about, 'Missing "currentSubSkill"!');
+    const value = resolveValue(json, path, context);
+    return value;
+}
+
+/**
+ *
+ */
 function SpellpowerForCurrentMagic() {
     return 1; // TODO: what should we use here?
 }
@@ -204,34 +227,6 @@ function SpellpowerForCurrentMagic() {
  */
 function CurrentMagicLevel(context) {
     return context.data.currentMagicLevel;
-}
-
-/**
- *
- */
-function DbObstacle(summonSid, path, context) {
-    const {obstacles} = context.data;
-    assume(obstacles, context.about, 'Missing "obstacles"!');
-
-    const obstacle = obstacles[summonSid];
-    assume(obstacle, context.about, summonSid, 'No such obstacle!');
-
-    const value = resolveValue(obstacle, path, context);
-    return value;
-}
-
-/**
- *
- */
-function DbTrap(summonSid, path, context) {
-    const {traps} = context.data;
-    assume(traps, context.about, 'Missing "traps"!');
-
-    const trap = traps[summonSid];
-    assume(trap, context.about, summonSid, 'No such trap!');
-
-    const value = resolveValue(trap, path, context);
-    return value;
 }
 
 /**
@@ -316,12 +311,52 @@ function Text(payload) {
  */
 function DbBuff(buffSid, path, context) {
     const {buffs} = context.data;
-    assume(buffs, context.about, 'Missing "buffs"!');
-
     const buff = buffs[buffSid];
     assume(buff, context.about, buffSid, 'No such buff!');
 
     const value = resolveValue(buff, path, context);
+    return value;
+}
+
+/**
+ *
+ */
+function DbSideBuff(sideBuffSid, path, context) {
+    const {buffs, sideBuffs} = context.data;
+    const sideBuff = sideBuffs[sideBuffSid];
+    assume(sideBuff, context.about, sideBuffSid, 'No such sideBuff!');
+    const buff = buffs[sideBuff.sid];
+    assume(buff, context.about, sideBuff.sid, 'No such buff!');
+
+    const value = resolveValue(buff, path, context);
+    return value;
+}
+
+/**
+ *
+ */
+function DbObstacle(summonSid, path, context) {
+    const {obstacles} = context.data;
+    assume(obstacles, context.about, 'Missing "obstacles"!');
+
+    const obstacle = obstacles[summonSid];
+    assume(obstacle, context.about, summonSid, 'No such obstacle!');
+
+    const value = resolveValue(obstacle, path, context);
+    return value;
+}
+
+/**
+ *
+ */
+function DbTrap(summonSid, path, context) {
+    const {traps} = context.data;
+    assume(traps, context.about, 'Missing "traps"!');
+
+    const trap = traps[summonSid];
+    assume(trap, context.about, summonSid, 'No such trap!');
+
+    const value = resolveValue(trap, path, context);
     return value;
 }
 

@@ -8,6 +8,7 @@ import UnitShared from './UnitShared.js';
 import UnitLabels from './UnitLabels.js';
 import HeroClass from './HeroClass.js';
 import Spell from './Spell.js';
+import Skill from './Skill.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -18,7 +19,8 @@ const parsers = [
     // UnitShared,
     // UnitLabels,
     // HeroClass,
-    Spell,
+    // Spell,
+    Skill,
 ];
 
 // =====================================================================================================================

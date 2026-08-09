@@ -5,6 +5,7 @@ import compile from './compile.js';
 import evaluate from './evaluate.js';
 import objectify from '../../../utils/objectify.js';
 import mergeDeep from '../../../utils/mergeDeep.js';
+import patch from './patch.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -81,6 +82,7 @@ let words;
 let args;
 let scripts;
 let buffs;
+let sideBuffs;
 let obstacles;
 let traps;
 
@@ -158,6 +160,7 @@ function buildCache(zipHub) {
     buildArgs(zipHub);
     buildScripts(zipHub);
     buildBuffs(zipHub);
+    buildSideBuffs(zipHub);
     buildObstacles(zipHub);
     buildTraps(zipHub);
 }
@@ -203,12 +206,17 @@ function buildScripts(zipHub) {
 function buildBuffs(zipHub) {
     const buffsHub = filterHub(zipHub, 'DB/buffs');
     const list = Object.values(buffsHub).flat();
+    list.map((buff) => patch(buff));
     buffs = objectify(list, 'id');
-    // TODO:
-    buffs.skill_summon_1_bonus.data.stats.hp = 0;
-    buffs.skill_summon_2_bonus.data.stats.hp = 0;
-    buffs.skill_summon_3_bonus.data.stats.hp = 0;
-    buffs.magic_shade_cloak_effect_0.data.stats.outAllDmgMod = 1;
+}
+
+/**
+ *
+ */
+function buildSideBuffs(zipHub) {
+    const sideBuffsHub = filterHub(zipHub, 'DB/side_buffs');
+    const list = Object.values(sideBuffsHub).flat();
+    sideBuffs = objectify(list, 'id');
 }
 
 /**
@@ -235,7 +243,7 @@ function buildTraps(zipHub) {
 function generateData(request) {
     let output = {};
     output = mergeDeep(output, DEFAULT_DATA);
-    output = mergeDeep(output, {buffs, obstacles, traps});
+    output = mergeDeep(output, {buffs, sideBuffs, obstacles, traps});
     output = mergeDeep(output, request._data);
     return output;
 }
