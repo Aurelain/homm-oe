@@ -60,7 +60,7 @@ function enumerateLawsFor(info, context, ids) {
     }
 
     let expectedLength = faction === 'neutral' ? 1 : 3;
-    if (tier === '8') {
+    if (tier === 8) {
         expectedLength = 0;
     }
     if (faction === 'nature') {

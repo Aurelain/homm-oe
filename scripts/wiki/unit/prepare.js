@@ -1,6 +1,6 @@
 import joinLines from '../../utils/joinLines.js';
 import parsePage from '../helpers/parsePage.js';
-import buildUnit from './buildUnit.js';
+import generate from './generate.js';
 
 // =====================================================================================================================
 //  P U B L I C
@@ -8,7 +8,7 @@ import buildUnit from './buildUnit.js';
 /**
  *
  */
-function prepareUnit(info, translations, context, existingContent) {
+function prepare(info, translations, context, existingContent) {
     let cleaned = existingContent;
 
     // Clean header:
@@ -27,7 +27,7 @@ function prepareUnit(info, translations, context, existingContent) {
     // Temporary mutation:
     // delete parsed.sections.Laws;
 
-    const lines = buildUnit(info, translations, context, parsed);
+    const lines = generate(info, translations, context, parsed);
     const output = joinLines(lines);
     return output;
 }
@@ -35,4 +35,4 @@ function prepareUnit(info, translations, context, existingContent) {
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default prepareUnit;
+export default prepare;

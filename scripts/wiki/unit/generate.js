@@ -15,7 +15,7 @@ import upgradeLinks from '../helpers/upgradeLinks.js';
 /**
  *
  */
-function buildUnit(info, translations, context, parsed) {
+function generate(info, translations, context, parsed) {
     const {id, lang, faction, specialist} = info;
     const lines = [];
 
@@ -63,4 +63,4 @@ function buildUnit(info, translations, context, parsed) {
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default buildUnit;
+export default generate;

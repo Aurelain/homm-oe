@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import {WIKI_DIR} from '../SETTINGS.js';
 import convertFileNameToWikiUrl from './convertFileNameToWikiUrl.js';
+import assume from '../../utils/assume.js';
 
 // =====================================================================================================================
 //  P U B L I C
@@ -17,6 +18,7 @@ function generatePayloads({items, fileNames, languages, translations, builder, c
 
             const pathX = WIKI_DIR + '/Main/' + fileNameX;
             const fileNameXRobotic = fileNames[item.name.en + '@en'].replace('.wiki', '~' + lang + '.wiki');
+            assume(!fileNameXRobotic.includes('undefined'), item, 'Undefined in file name!');
             const info = {
                 ...item,
                 lang,

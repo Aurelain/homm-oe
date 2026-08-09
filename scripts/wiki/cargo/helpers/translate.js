@@ -127,6 +127,9 @@ function translate(translationRequests) {
  *
  */
 function buildCache(zipHub) {
+    if (words) {
+        return;
+    }
     words = {};
     for (const key in LANGUAGES) {
         const langHub = filterHub(zipHub, new RegExp('Lang/' + LANGUAGES[key] + '/'));

@@ -112,8 +112,7 @@ function collectUnitAbilities(info, zipHub) {
  *
  */
 function getAttackTypeId(sharedAbilities) {
-    const ids = sharedAbilities.split(',');
-    const attackId = ids.find((id) => id.match(/^base_passive_[a-z]+_attack/));
+    const attackId = sharedAbilities.find((id) => id.match(/^base_passive_[a-z]+_attack/));
     assume(attackId, sharedAbilities, 'Cannot find attack type!');
     return attackId.replace(/^base_passive_/, '').replace(/_name$/, '');
 }

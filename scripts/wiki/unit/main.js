@@ -1,12 +1,11 @@
 import suggestFileNames from '../helpers/suggestFileNames.js';
 import generatePayloads from '../helpers/generatePayloads.js';
-import fattenUnits from './fattenUnits.js';
-import getUnits from './getUnits.js';
 import WORDS from '../WORDS.js';
 import getTranslations from '../helpers/getTranslations.js';
 import unzipCore from '../../helpers/unzipCore.js';
-import prepareUnit from './prepareUnit.js';
+import prepare from './prepare.js';
 import fs from 'fs';
+import collect from './collect.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -55,6 +54,7 @@ const IDS = new Set([
     // 'frostworm_rider_upg_alt',
     // 'unicorn',
     // 'lava_larva',
+    // 'dragon',
 ]);
 
 const SWITCHEROOS = {
@@ -72,17 +72,16 @@ const SWITCHEROOS = {
 /**
  *
  */
-async function unit() {
-    let units = getUnits();
+async function main() {
+    const zipHub = unzipCore();
+    let units = collect(zipHub);
 
     // Uncomment the following line to just purge the wiki pages:
     // return purge(units, TARGET_LANGUAGES, SWITCHEROOS);
 
     const fileNames = suggestFileNames(units, SWITCHEROOS);
 
-    units = IDS.size ? units.filter((item) => IDS.has(item.target_id)) : units;
-    const zipHub = unzipCore();
-    units = fattenUnits(units, zipHub);
+    units = IDS.size ? units.filter((item) => IDS.has(item.id)) : units;
     units = FACTIONS.size ? units.filter((item) => FACTIONS.has(item.faction)) : units;
 
     const laws = getTranslations('/Law~', {type: 'law_level', variant: '1'}, '~test_');
@@ -92,7 +91,7 @@ async function unit() {
         fileNames,
         languages: TARGET_LANGUAGES,
         translations: WORDS,
-        builder: prepareUnit,
+        builder: prepare,
         context: {laws, units, zipHub},
     });
 
@@ -105,4 +104,4 @@ async function unit() {
 // =====================================================================================================================
 //  R U N
 // =====================================================================================================================
-await unit();
+await main();

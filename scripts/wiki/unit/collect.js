@@ -1,6 +1,6 @@
-import fs from 'node:fs';
+import Unit from '../cargo/Unit.js';
+import collectMain from '../helpers/collectMain.js';
 import match from '../../utils/match.js';
-import parseDefinition from '../helpers/parseDefinition.js';
 import filterHub from '../../helpers/filterHub.js';
 
 // =====================================================================================================================
@@ -9,30 +9,18 @@ import filterHub from '../../helpers/filterHub.js';
 /**
  *
  */
-function fattenUnits(units, zipHub) {
+function collect(zipHub) {
+    const list = collectMain(zipHub, Unit);
+
     const heroInfo = filterHub(zipHub, 'english/texts/heroInfo', null, true);
     const unitsAbility = filterHub(zipHub, 'english/texts/unitsAbility', null, true);
     const idToSpecialist = linkIdToSpecialist(heroInfo, unitsAbility);
 
-    const output = [];
-    for (const unit of units) {
-        const {path} = unit;
-
-        const content = fs.readFileSync(path, 'utf8');
-        const [unitDef] = match(content, /\{\{UnitDef[\s\S]*?}}/);
-        const definition = parseDefinition(unitDef);
-
-        const extra = {
-            specialist: idToSpecialist[unit.target_id],
-        };
-
-        output.push({
-            ...definition,
-            ...unit,
-            ...extra,
-        });
+    for (const unit of list) {
+        unit.specialist = idToSpecialist[unit.id];
     }
-    return output;
+
+    return list;
 }
 
 // =====================================================================================================================
@@ -63,4 +51,4 @@ function linkIdToSpecialist(heroInfo, unitsAbility) {
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default fattenUnits;
+export default collect;
