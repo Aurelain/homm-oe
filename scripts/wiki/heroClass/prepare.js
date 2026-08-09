@@ -23,6 +23,7 @@ function prepare(info, translations, context, existingContent) {
     // Temporary cleaning:
 
     const parsed = parsePage(cleaned);
+    // console.log('parsed:', parsed);
 
     // Temporary deletions of sections:
 

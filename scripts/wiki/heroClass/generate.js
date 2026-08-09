@@ -7,6 +7,7 @@ import buildSection from '../helpers/buildSection.js';
 import buildElites from './buildElites.js';
 import buildSkills from './buildSkills.js';
 import buildIntro from './buildIntro.js';
+import buildHeroes from './buildHeroes.js';
 
 // =====================================================================================================================
 //  P U B L I C
@@ -31,8 +32,7 @@ function generate(info, translations, context, parsed) {
     lines.push(...buildSection('Elite_classes', buildElites, info, translations, context, parsed));
 
     // Heroes
-    const heroes = `{{#invoke:HeroesOverview|display|lang=${lang}|class=${id}}}`;
-    lines.push(...buildSection('Heroes', heroes, info, translations, context, parsed));
+    lines.push(...buildSection('Heroes', buildHeroes, info, translations, context, parsed));
 
     // Strategy
     lines.push(...buildStrategy(info, translations, context, parsed));
