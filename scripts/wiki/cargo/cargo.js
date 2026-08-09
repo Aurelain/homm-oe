@@ -7,6 +7,7 @@ import Unit from './Unit.js';
 import UnitShared from './UnitShared.js';
 import UnitLabels from './UnitLabels.js';
 import HeroClass from './HeroClass.js';
+import Spell from './Spell.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -16,7 +17,8 @@ const parsers = [
     // Unit,
     // UnitShared,
     // UnitLabels,
-    HeroClass,
+    // HeroClass,
+    Spell,
 ];
 
 // =====================================================================================================================
@@ -78,7 +80,7 @@ function convertValue(value) {
         case 'boolean':
             return value ? 'yes' : 'no';
         case 'string':
-            return value.trim();
+            return value; // value.trim(); // TODO: restore trim
         case 'number':
             return value.toString();
         default:

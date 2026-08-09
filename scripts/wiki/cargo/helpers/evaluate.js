@@ -12,6 +12,13 @@ const ACTIONS = {
     CurrentUnitStats: [CurrentUnitStats, 1],
     CurrentAbility: [CurrentAbility, 1],
     CurrentHero: [CurrentHero, 1],
+    CurrentMagicBattleRoot: [CurrentMagicBattleRoot, 1],
+    CurrentMagicBattle: [CurrentMagicBattle, 1],
+    CurrentMagicWorld: [CurrentMagicWorld, 1],
+    SpellpowerForCurrentMagic: [SpellpowerForCurrentMagic, 0],
+    CurrentMagicLevel: [CurrentMagicLevel, 0],
+    DbObstacle: [DbObstacle, 2],
+    DbTrap: [DbTrap, 2],
     Add: [Add, 2],
     Sub: [Sub, 2],
     Mul: [Mul, 2],
@@ -94,6 +101,8 @@ function formatValue(value, type) {
             return Math.abs(Math.round(value));
         case 'modPercentNumeric':
             return Math.round(Math.abs(value * 100));
+        case 'modFloatPercentF1Numeric':
+            return Math.abs(value * 100).toFixed(1);
         case 'string':
             return String(value);
         default:
@@ -149,6 +158,78 @@ function CurrentHero(path, context) {
     const json = context.data.currentHero;
     assume(json, context.about, 'Missing "currentHero"!');
     const value = resolveValue(json, path, context);
+    return value;
+}
+
+/**
+ *
+ */
+function CurrentMagicBattleRoot(path, context) {
+    const json = context.data.currentMagicBattleRoot;
+    assume(json, context.about, 'Missing "currentMagicBattleRoot"!');
+    const value = resolveValue(json, path, context);
+    return value;
+}
+
+/**
+ *
+ */
+function CurrentMagicBattle(path, context) {
+    const json = context.data.currentMagicBattle;
+    assume(json, context.about, 'Missing "currentMagicBattle"!');
+    const value = resolveValue(json, path, context);
+    return value;
+}
+
+/**
+ *
+ */
+function CurrentMagicWorld(path, context) {
+    const json = context.data.currentMagicWorld;
+    assume(json, context.about, 'Missing "currentMagicWorld"!');
+    const value = resolveValue(json, path, context);
+    return value;
+}
+
+/**
+ *
+ */
+function SpellpowerForCurrentMagic() {
+    return 1; // TODO: what should we use here?
+}
+
+/**
+ *
+ */
+function CurrentMagicLevel(context) {
+    return context.data.currentMagicLevel;
+}
+
+/**
+ *
+ */
+function DbObstacle(summonSid, path, context) {
+    const {obstacles} = context.data;
+    assume(obstacles, context.about, 'Missing "obstacles"!');
+
+    const obstacle = obstacles[summonSid];
+    assume(obstacle, context.about, summonSid, 'No such obstacle!');
+
+    const value = resolveValue(obstacle, path, context);
+    return value;
+}
+
+/**
+ *
+ */
+function DbTrap(summonSid, path, context) {
+    const {traps} = context.data;
+    assume(traps, context.about, 'Missing "traps"!');
+
+    const trap = traps[summonSid];
+    assume(trap, context.about, summonSid, 'No such trap!');
+
+    const value = resolveValue(trap, path, context);
     return value;
 }
 

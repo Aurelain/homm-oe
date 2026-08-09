@@ -77,6 +77,9 @@ const DEFAULT_DATA = {
     },
     currentHero: {
         level: 1,
+        heroStat: {
+            viewRadius: 6,
+        },
     },
 };
 
@@ -84,6 +87,8 @@ let words;
 let args;
 let scripts;
 let buffs;
+let obstacles;
+let traps;
 
 // =====================================================================================================================
 //  P U B L I C
@@ -93,6 +98,9 @@ let buffs;
  */
 function translate(translationRequests) {
     assume(words, 'Please first build the cache!');
+    if (!Array.isArray(translationRequests)) {
+        translationRequests = [translationRequests];
+    }
 
     const defs = [];
     for (const request of translationRequests) {
@@ -106,17 +114,22 @@ function translate(translationRequests) {
             add(def, 'variant', request.variant);
             add(def, 'language', lang);
 
-            if (!langMap.has(request.name)) {
-                continue;
+            if (langMap.has(request.name)) {
+                const name = adaptTranslation(request.name, request, langMap, data);
+                add(def, 'name', normalizeName(name, lang));
             }
 
-            const name = adaptTranslation(request.name, request, langMap, data);
-            add(def, 'name', normalizeName(name, lang));
-            add(def, 'description', adaptTranslation(request.description, request, langMap, data));
-            add(def, 'bonus_description', adaptTranslation(request.bonus_description, request, langMap, data));
+            if (langMap.has(request.description)) {
+                add(def, 'description', adaptTranslation(request.description, request, langMap, data));
+            }
 
-            // if (def.name || def.description || def.bonus_description) {
-            defs.push(def);
+            if (langMap.has(request.bonus_description)) {
+                add(def, 'bonus_description', adaptTranslation(request.bonus_description, request, langMap, data));
+            }
+
+            if (def.name || def.description || def.bonus_description) {
+                defs.push(def);
+            }
         }
     }
 
@@ -148,6 +161,8 @@ function buildCache(zipHub) {
     buildArgs(zipHub);
     buildScripts(zipHub);
     buildBuffs(zipHub);
+    buildObstacles(zipHub);
+    buildTraps(zipHub);
 }
 
 /**
@@ -192,6 +207,29 @@ function buildBuffs(zipHub) {
     const buffsHub = filterHub(zipHub, 'DB/buffs');
     const list = Object.values(buffsHub).flat();
     buffs = objectify(list, 'id');
+    // TODO:
+    buffs.skill_summon_1_bonus.data.stats.hp = 1;
+    buffs.skill_summon_2_bonus.data.stats.hp = 1;
+    buffs.skill_summon_3_bonus.data.stats.hp = 1;
+    buffs.magic_shade_cloak_effect_0.data.stats.outAllDmgMod = 1;
+}
+
+/**
+ *
+ */
+function buildObstacles(zipHub) {
+    const hub = filterHub(zipHub, 'DB/field_objects/obstacles');
+    const list = Object.values(hub).flat();
+    obstacles = objectify(list, 'id');
+}
+
+/**
+ *
+ */
+function buildTraps(zipHub) {
+    const hub = filterHub(zipHub, 'DB/field_objects/traps');
+    const list = Object.values(hub).flat();
+    traps = objectify(list, 'id');
 }
 
 /**
@@ -200,7 +238,7 @@ function buildBuffs(zipHub) {
 function generateData(request) {
     let output = {};
     output = mergeDeep(output, DEFAULT_DATA);
-    output = mergeDeep(output, {buffs});
+    output = mergeDeep(output, {buffs, obstacles, traps});
     output = mergeDeep(output, request._data);
     return output;
 }
