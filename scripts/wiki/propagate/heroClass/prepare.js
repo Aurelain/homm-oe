@@ -1,5 +1,5 @@
-import joinLines from '../../utils/joinLines.js';
-import parsePage from '../helpers/parsePage.js';
+import joinLines from '../../../utils/joinLines.js';
+import parsePage from '../../helpers/parsePage.js';
 import generate from './generate.js';
 
 // =====================================================================================================================

@@ -1,4 +1,4 @@
-import getWords from '../helpers/getWords.js';
+import getWords from '../../helpers/getWords.js';
 
 // =====================================================================================================================
 //  P U B L I C
@@ -6,22 +6,16 @@ import getWords from '../helpers/getWords.js';
 /**
  *
  */
-function buildSkills(info, translations) {
-    const {id, lang, class_type} = info;
+function buildIntro(info, translations) {
+    const {lang, faction, class_type} = info;
     const lines = [];
 
-    let words = getWords('HeroClass_Skills_' + class_type, translations, lang);
+    let words = getWords('HeroClass_intro_' + class_type, translations, lang);
     words = words.replace('@name', '<b>' + info.name[lang] + '</b>');
-    const skill = class_type === 'magic' ? 'wisdom' : 'battle_artistry';
-    words = words.replace('@skill', `{{Skill|${skill}|${lang}}}`);
+    words = words.replace('@faction', `{{F|${faction}|${lang}}}`);
+    const other = class_type === 'magic' ? 'might' : 'magic';
+    words = words.replace('@other', `{{Class|${other}_${faction}|${lang}}}`);
     lines.push(words);
-
-    let generic = getWords('HeroClass_Skills_generic', translations, lang);
-    generic = generic.replace('@name', '<b>' + info.name[lang] + '</b>');
-    lines.push('');
-    lines.push(generic);
-
-    lines.push(`{{HeroClassSkills|lang=${lang}|id=${id}}}`);
 
     return lines;
 }
@@ -29,4 +23,4 @@ function buildSkills(info, translations) {
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default buildSkills;
+export default buildIntro;

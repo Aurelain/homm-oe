@@ -1,6 +1,6 @@
-import HeroClass from '../cargo/HeroClass.js';
-import {buildCache} from '../cargo/helpers/translate.js';
-import assume from '../../utils/assume.js';
+import HeroClass from '../../cargo/HeroClass.js';
+import {buildCache} from '../../cargo/helpers/translate.js';
+import assume from '../../../utils/assume.js';
 
 // =====================================================================================================================
 //  P U B L I C

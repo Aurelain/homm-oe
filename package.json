@@ -15,7 +15,7 @@
         "hero": "node scripts/wiki/hero/hero",
         "spell": "node scripts/wiki/spell/spell",
         "unit": "node scripts/wiki/unit/unit",
-        "heroClass": "node scripts/wiki/heroClass/main",
+        "heroClass": "node scripts/wiki/propagate/heroClass/main",
         "redirect": "node scripts/wiki/redirect/redirect",
         "obelisk": "node scripts/wiki/obelisk/obelisk",
         "translations": "node scripts/wiki/translations/translations",

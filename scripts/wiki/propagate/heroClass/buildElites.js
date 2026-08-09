@@ -1,4 +1,4 @@
-import getWords from '../helpers/getWords.js';
+import getWords from '../../helpers/getWords.js';
 
 const SUBCLASS_FACTIONS = {
     human: 'human',
