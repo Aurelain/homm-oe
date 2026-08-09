@@ -1,5 +1,5 @@
-import getWords from '../helpers/getWords.js';
-import assume from '../../utils/assume.js';
+import getWords from '../../helpers/getWords.js';
+import assume from '../../../utils/assume.js';
 
 const FACTION_ORDER = {
     human: 1,

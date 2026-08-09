@@ -5,7 +5,7 @@ import suggestFileNames from '../helpers/suggestFileNames.js';
 import buildLoc from '../helpers/buildLoc.js';
 import convertFileNameToWikiUrl from '../helpers/convertFileNameToWikiUrl.js';
 import getTranslations from '../helpers/getTranslations.js';
-import getUnits from '../unit/getUnits.js';
+import getUnits from '../propagate/unit/getUnits.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S

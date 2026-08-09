@@ -1,5 +1,5 @@
-import romanize from '../../utils/romanize.js';
-import filterHub from '../../helpers/filterHub.js';
+import romanize from '../../../utils/romanize.js';
+import filterHub from '../../../helpers/filterHub.js';
 
 const TEMPLATE = 1;
 const VERBOSE = 2;

@@ -1,13 +1,13 @@
-import buildLoc from '../helpers/buildLoc.js';
-import getWords from '../helpers/getWords.js';
-import buildStrategy from '../helpers/buildStrategy.js';
-import buildSection from '../helpers/buildSection.js';
-import buildLeftovers from '../helpers/buildLeftovers.js';
-import buildHeading from '../helpers/buildHeading.js';
+import buildLoc from '../../helpers/buildLoc.js';
+import getWords from '../../helpers/getWords.js';
+import buildStrategy from '../../helpers/buildStrategy.js';
+import buildSection from '../../helpers/buildSection.js';
+import buildLeftovers from '../../helpers/buildLeftovers.js';
+import buildHeading from '../../helpers/buildHeading.js';
 import buildStinger from './buildStinger.js';
 import buildLaws from './buildLaws.js';
 import buildAbilities from './buildAbilities.js';
-import upgradeLinks from '../helpers/upgradeLinks.js';
+import upgradeLinks from '../../helpers/upgradeLinks.js';
 
 // =====================================================================================================================
 //  P U B L I C
