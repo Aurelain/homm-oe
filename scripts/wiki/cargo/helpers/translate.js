@@ -12,13 +12,7 @@ import mergeDeep from '../../../utils/mergeDeep.js';
 const DEBUG = new Set([
     // -- Uncomment any target_id you want to focus on:
     // 'black_dragon_upg_alt_3',
-    // 'hive_queen_upg_3',
-    // 'lava_larva_1',
-    // 'inquisitor_upg_alt_2',
-    // 'druid_upg_3',
-    // 'frostworm_rider_upg_alt_1',
-    // 'gorilla_2',
-    // 'demon_passive_2',
+    // 'night_18_magic_nairas_veil',
 ]);
 
 const LANGUAGES = {
@@ -78,7 +72,7 @@ const DEFAULT_DATA = {
     currentHero: {
         level: 1,
         heroStat: {
-            viewRadius: 6,
+            viewRadius: 3, // TODO: with this value it satisfies `neutral_1_magic_mana_transfer`, but why?
         },
     },
 };
@@ -106,6 +100,9 @@ function translate(translationRequests) {
     for (const request of translationRequests) {
         const data = generateData(request);
         for (const lang in LANGUAGES) {
+            if (DEBUG.size && lang !== 'en') {
+                // continue;
+            }
             const langMap = words[lang];
             const def = {_type: 'TranslationDef'};
             add(def, 'target_id', request.target_id);
@@ -208,9 +205,9 @@ function buildBuffs(zipHub) {
     const list = Object.values(buffsHub).flat();
     buffs = objectify(list, 'id');
     // TODO:
-    buffs.skill_summon_1_bonus.data.stats.hp = 1;
-    buffs.skill_summon_2_bonus.data.stats.hp = 1;
-    buffs.skill_summon_3_bonus.data.stats.hp = 1;
+    buffs.skill_summon_1_bonus.data.stats.hp = 0;
+    buffs.skill_summon_2_bonus.data.stats.hp = 0;
+    buffs.skill_summon_3_bonus.data.stats.hp = 0;
     buffs.magic_shade_cloak_effect_0.data.stats.outAllDmgMod = 1;
 }
 

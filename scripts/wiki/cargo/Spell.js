@@ -8,8 +8,7 @@ import translate from './helpers/translate.js';
 const IDS = new Set([
     // -- Test ids:
     // 'day_1_magic_healing_water',
-    // 'primal_5_magic_crystal_crown',
-    // 'day_3_magic_haste',
+    // 'night_18_magic_nairas_veil',
 ]);
 
 // =====================================================================================================================
@@ -28,7 +27,6 @@ function Spell(zipHub) {
             if (IDS.size && !IDS.has(id)) {
                 continue;
             }
-            console.log('id:', id);
             output['Spell~' + id] = buildDefinitions(spell, path);
         }
     }
@@ -63,11 +61,14 @@ function buildSpellDef(spell, path) {
     add(def, 'magic_type_description', spell.magicTypeDescription);
     add(def, 'is_special_magic', Boolean(spell.isSpecialMagic));
     add(def, 'is_unique_magic', Boolean(spell.isUniqueMagic));
+    add(def, 'normal_magic_sid', spell.normalMagicSid);
+    add(def, 'learn_cost_star_dust', spell.learnCost?.find((item) => item.name === 'starDust')?.cost);
     add(def, 'learn_cost_gemstones', spell.learnCost?.find((item) => item.name === 'gemstones')?.cost);
     add(def, 'learn_cost_crystals', spell.learnCost?.find((item) => item.name === 'crystals')?.cost);
     add(def, 'learn_cost_mercury', spell.learnCost?.find((item) => item.name === 'mercury')?.cost);
-    add(def, 'up_effect_description_sid', spell.upEffectDescription);
     add(def, 'excaption_in_tooltip_sid', spell.excaptionInTooltip);
+    add(def, 'up_effect_description_sid', spell.upEffectDescription);
+    add(def, 'energy_type', spell.energyType);
     add(def, 'source_path', path);
 
     const translationDefs = translate({
@@ -112,16 +113,30 @@ function buildSpellRankDef(spell, level) {
  *
  */
 function getCurrentMagicBattle(spell, level) {
-    const {magicDealers = [{}]} = spell.battleMagic || {};
-    return magicDealers[level - 1] || magicDealers[0];
+    const magicDealers = spell.battleMagic?.magicDealers || [{}];
+    const dealersPerLevels = spell.battleMagic?.dealersPerLevels || [];
+    for (let i = 0; i < 4; i++) {
+        if (!dealersPerLevels[i]) {
+            dealersPerLevels[i] = 0;
+        }
+    }
+    const index = dealersPerLevels[level - 1];
+    return magicDealers[index];
 }
 
 /**
  *
  */
 function getCurrentMagicWorld(spell, level) {
-    const {magicSettings = [{}]} = spell.worldMagic || {};
-    return magicSettings[level - 1] || magicSettings[0];
+    const magicSettings = spell.worldMagic?.magicSettings || [{}];
+    const settingPerLevels = spell.worldMagic?.settingPerLevels || [];
+    for (let i = 0; i < 4; i++) {
+        if (!settingPerLevels[i]) {
+            settingPerLevels[i] = 0;
+        }
+    }
+    const index = settingPerLevels[level - 1];
+    return magicSettings[index];
 }
 
 // =====================================================================================================================

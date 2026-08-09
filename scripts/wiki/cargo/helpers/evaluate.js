@@ -102,7 +102,8 @@ function formatValue(value, type) {
         case 'modPercentNumeric':
             return Math.round(Math.abs(value * 100));
         case 'modFloatPercentF1Numeric':
-            return Math.abs(value * 100).toFixed(1);
+            const s = Math.abs(value * 100).toFixed(1);
+            return s.includes('.') ? s.replace(/\.0$/, '') : s;
         case 'string':
             return String(value);
         default:
@@ -236,43 +237,34 @@ function DbTrap(summonSid, path, context) {
 /**
  *
  */
-function Add(...members) {
-    const {about} = members.pop(); // context
-    let result = 0;
-    for (const member of members) {
-        const nr = Number(member);
-        assume(checkNumber(nr), about, member, 'Expecting number!');
-        result += nr;
-    }
-    return result;
+function Add(a, b, context) {
+    a = Number(a);
+    b = Number(b);
+    assume(checkNumber(a), context.about, a, 'Expecting number!');
+    assume(checkNumber(b), context.about, b, 'Expecting number!');
+    return a + b;
 }
 
 /**
  *
  */
-function Sub(...members) {
-    const {about} = members.pop(); // context
-    let result = 0;
-    for (const member of members) {
-        const nr = Number(member);
-        assume(checkNumber(nr), about, member, 'Expecting number!');
-        result -= nr;
-    }
-    return result;
+function Sub(a, b, context) {
+    a = Number(a);
+    b = Number(b);
+    assume(checkNumber(a), context.about, a, 'Expecting number!');
+    assume(checkNumber(b), context.about, b, 'Expecting number!');
+    return a - b;
 }
 
 /**
  *
  */
-function Mul(...members) {
-    const {about} = members.pop(); // context
-    let result = 1;
-    for (const member of members) {
-        const nr = Number(member);
-        assume(checkNumber(nr), about, member, 'Expecting number!');
-        result *= nr;
-    }
-    return result;
+function Mul(a, b, context) {
+    a = Number(a);
+    b = Number(b);
+    assume(checkNumber(a), context.about, a, 'Expecting number!');
+    assume(checkNumber(b), context.about, b, 'Expecting number!');
+    return a * b;
 }
 
 /**
