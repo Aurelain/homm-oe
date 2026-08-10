@@ -1,14 +1,16 @@
 import filterHub from '../../helpers/filterHub.js';
 import add from './helpers/add.js';
 import translate from './helpers/translate.js';
+import match from '../../utils/match.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
-const IDS = new Set([
-    // -- Test ids:
-    // 'foo',
-]);
+const TYPES = {
+    melee: 'melee',
+    remote: 'reach',
+    ranged: 'ranged',
+};
 
 // =====================================================================================================================
 //  P U B L I C
@@ -16,19 +18,21 @@ const IDS = new Set([
 /**
  *
  */
-function Foo(zipHub) {
+function AttackArchetype(zipHub) {
     const output = {};
 
-    const files = filterHub(zipHub, 'DB/foo/.*?json');
-    for (const path in files) {
-        const fileContent = files[path];
-        for (const item of fileContent) {
-            const {id} = item;
-            if (IDS.size && !IDS.has(id)) {
-                continue;
+    const entries = filterHub(zipHub, 'Lang/english/texts/unitsAbility.json', null, true);
+
+    for (const type in TYPES) {
+        const fileName = TYPES[type];
+        output['AttackArchetype~' + fileName] = buildDefinitions(fileName, `base_passive_${type}_attack`);
+        for (const {sid} of entries) {
+            const re = new RegExp(`^base_passive_${type}_attack(.*?)_name$`);
+            const [, subtype] = match(sid, re);
+            if (subtype !== undefined) {
+                const long = type + '_attack' + subtype;
+                output['AttackArchetype~' + long] = buildDefinitions(long, `base_passive_${long}`);
             }
-            // console.log('id:', id);
-            output['Foo~' + id] = buildDefinitions(item, path);
         }
     }
 
@@ -40,19 +44,19 @@ function Foo(zipHub) {
 /**
  *
  */
-function buildDefinitions(item, path) {
-    const def = {_type: 'FooDef'};
-    add(def, 'id', item.id);
-    add(def, 'name_sid', item.name);
-    add(def, 'description_sid', item.description);
-    add(def, 'source_path', path);
+function buildDefinitions(subtype, key) {
+    const def = {_type: 'EntryDef'};
+    add(def, 'type', 'attack_archetype');
+    add(def, 'subtype', subtype);
+    add(def, 'name_sid', key + '_name');
+    add(def, 'desc_sid', key + '_description');
 
     const translationDefs = translate({
-        target_id: def.id,
-        type: 'foo',
+        target_id: subtype,
+        type: 'attack_archetype',
+        subtype: subtype,
         name: def.name_sid,
-        description: def.description_sid,
-        _data: {},
+        description: def.desc_sid,
     });
 
     return [def, ...translationDefs];
@@ -61,4 +65,4 @@ function buildDefinitions(item, path) {
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default Foo;
+export default AttackArchetype;
