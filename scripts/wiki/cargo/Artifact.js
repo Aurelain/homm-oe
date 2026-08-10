@@ -1,6 +1,7 @@
 import filterHub from '../../helpers/filterHub.js';
 import add from './helpers/add.js';
 import translate from './helpers/translate.js';
+import parseBonuses from './helpers/parseBonuses.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -59,7 +60,7 @@ function buildArtifactDefinitions(artifact, path) {
     add(def, 'cost_base', artifact.costBase);
     add(def, 'cost_per_level', artifact.costPerLevel);
     add(def, 'reward_for_destroy', artifact.rewardForDestroy);
-    add(def, 'is_special_item', artifact.isSpecialItem, false);
+    add(def, 'is_special_item', !!artifact.isSpecialItem);
     add(def, 'source_path', path);
 
     const currentItem = {
@@ -94,14 +95,9 @@ function buildArtifactDefinitions(artifact, path) {
         },
     ]);
 
-    // const bonusDefs = [];
-    // for (let i = 0; i < subskill.bonuses.length; i++) {
-    //     const bonus = subskill.bonuses[i];
-    //     const bonusDef = buildBonusDef(bonus, 'sub_skill', subskill.id, i);
-    //     bonusDefs.push(bonusDef);
-    // }
+    const bonusDefs = parseBonuses(artifact, 'artifact');
 
-    return [def, ...translationDefs];
+    return [def, ...translationDefs, ...bonusDefs];
 }
 
 /**

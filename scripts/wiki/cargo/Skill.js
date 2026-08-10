@@ -3,6 +3,7 @@ import add from './helpers/add.js';
 import translate from './helpers/translate.js';
 import patch from './helpers/patch.js';
 import assume from '../../utils/assume.js';
+import parseBonuses from './helpers/parseBonuses.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -106,33 +107,9 @@ function buildSubskillDefs(subskill, path) {
         },
     });
 
-    const bonusDefs = [];
-    for (let i = 0; i < subskill.bonuses.length; i++) {
-        const bonus = subskill.bonuses[i];
-        const bonusDef = buildBonusDef(bonus, 'sub_skill', subskill.id, i);
-        bonusDefs.push(bonusDef);
-    }
+    const bonusDefs = parseBonuses(subskill, 'sub_skill');
 
     return [def, ...translationDefs, ...bonusDefs];
-}
-
-/**
- *
- */
-function buildBonusDef(bonus, parentType, parentId, bonusIndex) {
-    const def = {_type: 'BonusDef'};
-    add(def, 'parent_type', parentType);
-    add(def, 'parent_id', parentId);
-    add(def, 'ordinal', bonusIndex);
-    add(def, 'type', bonus.type);
-    add(def, 'parameters', bonus.parameters);
-    add(def, 'battle_type', bonus.battleType);
-    add(def, 'receivers', bonus.receivers);
-    add(def, 'receiver_allegiance', bonus.receiverAllegiance);
-    add(def, 'receiver_role', bonus.receiverRole);
-    add(def, 'fraction', bonus.fraction);
-    add(def, 'action_area', bonus.actionArea);
-    return def;
 }
 
 /**
@@ -215,11 +192,9 @@ function buildSkillRankDef(skill, parameter, level) {
     });
     output.push(...translationDefs);
 
-    for (let i = 0; i < parameter.bonuses.length; i++) {
-        const bonus = parameter.bonuses[i];
-        const bonusDef = buildBonusDef(bonus, 'skill_level', skill.id + '_L' + level, i);
-        output.push(bonusDef);
-    }
+    parameter.id = skill.id + '_L' + level; // for the benefit of `parseBonuses()`
+    const bonusDefs = parseBonuses(parameter, 'skill_level');
+    output.push(...bonusDefs);
 
     return output;
 }
