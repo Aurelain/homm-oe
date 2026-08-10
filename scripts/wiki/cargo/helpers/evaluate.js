@@ -17,6 +17,7 @@ const ACTIONS = {
     CurrentMagicWorld: [CurrentMagicWorld, 1],
     CurrentSkillParameter: [CurrentSkillParameter, 1],
     CurrentSubSkill: [CurrentSubSkill, 1],
+    CurrentItem: [CurrentItem, 1],
     SpellpowerForCurrentMagic: [SpellpowerForCurrentMagic, 0],
     CurrentMagicLevel: [CurrentMagicLevel, 0],
     CurrentSkillLevel: [CurrentSkillLevel, 0],
@@ -215,6 +216,16 @@ function CurrentSkillParameter(path, context) {
 function CurrentSubSkill(path, context) {
     const json = context.data.currentSubSkill;
     assume(json, context.about, 'Missing "currentSubSkill"!');
+    const value = resolveValue(json, path, context);
+    return value;
+}
+
+/**
+ *
+ */
+function CurrentItem(path, context) {
+    const json = context.data.currentItem;
+    assume(json, context.about, 'Missing "currentItem"!');
     const value = resolveValue(json, path, context);
     return value;
 }

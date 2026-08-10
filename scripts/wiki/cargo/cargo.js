@@ -9,18 +9,20 @@ import UnitLabels from './UnitLabels.js';
 import HeroClass from './HeroClass.js';
 import Spell from './Spell.js';
 import Skill from './Skill.js';
+import Artifact from './Artifact.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
 const parsers = [
     // -- Use this to focus on only some parsers:
-    Unit,
-    UnitShared,
-    UnitLabels,
+    Artifact,
     HeroClass,
-    Spell,
     Skill,
+    Spell,
+    Unit,
+    UnitLabels,
+    UnitShared,
 ];
 
 // =====================================================================================================================
