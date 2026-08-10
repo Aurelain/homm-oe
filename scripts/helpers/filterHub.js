@@ -23,10 +23,13 @@ function filterHub(hub, pattern, exclude = null, directResult = false) {
             if (content.match(/^\s*[{[]/)) {
                 const json = JSON.parse(content);
                 const topKeys = Object.keys(json);
-                assume(topKeys.length === 1, Object.keys(json), 'Unexpected keys!');
-                const list = json[topKeys[0]];
-                assume(Array.isArray(list), key, 'Array required!');
-                output[key] = list;
+                if (topKeys.length === 1) {
+                    const list = json[topKeys[0]];
+                    assume(Array.isArray(list), key, 'Array required!');
+                    output[key] = list;
+                } else {
+                    output[key] = json;
+                }
             } else {
                 output[key] = content;
             }
