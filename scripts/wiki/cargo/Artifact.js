@@ -2,13 +2,14 @@ import filterHub from '../../helpers/filterHub.js';
 import add from './helpers/add.js';
 import translate from './helpers/translate.js';
 import parseBonuses from './helpers/parseBonuses.js';
+import cloneDeep from '../../utils/cloneDeep.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
 const IDS = new Set([
     // -- Test ids:
-    'ambassadors_word_ambassadors_sash_artifact',
+    // 'enchanted_magic_scroll_artifact_day_1_magic_healing_water',
 ]);
 
 // =====================================================================================================================
@@ -42,9 +43,6 @@ function Artifact(zipHub) {
  *
  */
 function buildArtifactDefinitions(artifact, path) {
-    // patch(artifact);
-    addUpgradeIncrement(artifact);
-
     const def = {_type: 'ArtifactDef'};
     add(def, 'id', artifact.id);
     add(def, 'name_sid', artifact.name);
@@ -61,12 +59,16 @@ function buildArtifactDefinitions(artifact, path) {
     add(def, 'cost_per_level', artifact.costPerLevel);
     add(def, 'reward_for_destroy', artifact.rewardForDestroy);
     add(def, 'is_special_item', !!artifact.isSpecialItem);
+    add(def, 'use_expand_tooltip', getExpandTooltip(artifact));
+    add(def, 'can_destroy', artifact.canDestroy);
+    add(def, 'can_apply_bonus_always', artifact.canApplyBonusAlways);
     add(def, 'source_path', path);
 
     const currentItem = {
         level: 1,
-        config: artifact,
+        config: cloneConfig(artifact),
     };
+
     const translationDefs = translate([
         {
             target_id: def.id,
@@ -103,27 +105,39 @@ function buildArtifactDefinitions(artifact, path) {
 /**
  *
  */
-function addUpgradeIncrement(artifact) {
-    if (!artifact.bonuses) {
-        artifact.bonuses = [];
+function cloneConfig(config) {
+    const clone = cloneDeep(config);
+    if (!clone.bonuses) {
+        clone.bonuses = [];
     }
-    if (!artifact.bonuses[0]) {
-        artifact.bonuses.push({});
+    if (!clone.bonuses[0]) {
+        clone.bonuses.push({});
     }
-    if (!artifact.bonuses[0].upgrade) {
-        artifact.bonuses[0].upgrade = {};
+    if (!clone.bonuses[0].upgrade) {
+        clone.bonuses[0].upgrade = {};
     }
-    if (!artifact.bonuses[0].upgrade.hasOwnProperty('increment')) {
-        artifact.bonuses[0].upgrade.increment = 1;
+    if (!clone.bonuses[0].upgrade.hasOwnProperty('increment')) {
+        clone.bonuses[0].upgrade.increment = 1;
     }
-    if (!artifact.bonuses[1]) {
-        artifact.bonuses.push({});
+    if (!clone.bonuses[1]) {
+        clone.bonuses.push({});
     }
-    if (!artifact.bonuses[1].upgrade) {
-        artifact.bonuses[1].upgrade = {};
+    if (!clone.bonuses[1].upgrade) {
+        clone.bonuses[1].upgrade = {};
     }
-    if (!artifact.bonuses[1].upgrade.hasOwnProperty('increment')) {
-        artifact.bonuses[1].upgrade.increment = 1;
+    if (!clone.bonuses[1].upgrade.hasOwnProperty('increment')) {
+        clone.bonuses[1].upgrade.increment = 1;
+    }
+    return clone;
+}
+
+/**
+ *
+ */
+function getExpandTooltip(artifact) {
+    const {useExpandTooltip} = artifact;
+    if (useExpandTooltip) {
+        return useExpandTooltip === 'true';
     }
 }
 

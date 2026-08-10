@@ -17,12 +17,12 @@ import Artifact from './Artifact.js';
 const parsers = [
     // -- Use this to focus on only some parsers:
     Artifact,
-    // HeroClass,
-    // Skill,
-    // Spell,
-    // Unit,
-    // UnitLabels,
-    // UnitShared,
+    HeroClass,
+    Skill,
+    Spell,
+    Unit,
+    UnitLabels,
+    UnitShared,
 ];
 
 // =====================================================================================================================
