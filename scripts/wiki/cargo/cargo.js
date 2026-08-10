@@ -15,11 +15,11 @@ import Skill from './Skill.js';
 // =====================================================================================================================
 const parsers = [
     // -- Use this to focus on only some parsers:
-    // Unit,
-    // UnitShared,
-    // UnitLabels,
-    // HeroClass,
-    // Spell,
+    Unit,
+    UnitShared,
+    UnitLabels,
+    HeroClass,
+    Spell,
     Skill,
 ];
 
@@ -53,6 +53,7 @@ function cargo() {
 function prepareContent(parsingResult) {
     const parts = [];
     parts.push(`<!-- Bot-managed page. Edit the source in obelisk-bot, not here. -->`);
+    parsingResult.comment && parts.push(parsingResult.comment);
     for (const def of parsingResult) {
         parts.push(convertDefinitionToTemplate(def));
     }

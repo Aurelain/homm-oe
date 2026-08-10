@@ -19,6 +19,7 @@ const ACTIONS = {
     CurrentSubSkill: [CurrentSubSkill, 1],
     SpellpowerForCurrentMagic: [SpellpowerForCurrentMagic, 0],
     CurrentMagicLevel: [CurrentMagicLevel, 0],
+    CurrentSkillLevel: [CurrentSkillLevel, 0],
     Add: [Add, 2],
     Sub: [Sub, 2],
     Mul: [Mul, 2],
@@ -30,6 +31,7 @@ const ACTIONS = {
     DbSideBuff: [DbSideBuff, 2],
     DbObstacle: [DbObstacle, 2],
     DbTrap: [DbTrap, 2],
+    DbAbility: [DbAbility, 3],
     Invoke: [Invoke, 1],
 };
 
@@ -103,7 +105,9 @@ function formatValue(value, type) {
         case 'modInt':
             return Math.abs(Math.round(value));
         case 'modPercentNumeric':
-            return Math.round(Math.abs(value * 100));
+            let modPercentNumeric = Math.round(Math.abs(value * 100));
+            modPercentNumeric = isNaN(modPercentNumeric) ? value : modPercentNumeric; // for parity with Obelisk
+            return modPercentNumeric;
         case 'modFloatPercentF1Numeric':
             const s = Math.abs(value * 100).toFixed(1);
             return s.includes('.') ? s.replace(/\.0$/, '') : s;
@@ -232,6 +236,13 @@ function CurrentMagicLevel(context) {
 /**
  *
  */
+function CurrentSkillLevel(context) {
+    return context.data.currentSkillLevel;
+}
+
+/**
+ *
+ */
 function Add(a, b, context) {
     a = Number(a);
     b = Number(b);
@@ -337,8 +348,6 @@ function DbSideBuff(sideBuffSid, path, context) {
  */
 function DbObstacle(summonSid, path, context) {
     const {obstacles} = context.data;
-    assume(obstacles, context.about, 'Missing "obstacles"!');
-
     const obstacle = obstacles[summonSid];
     assume(obstacle, context.about, summonSid, 'No such obstacle!');
 
@@ -351,12 +360,23 @@ function DbObstacle(summonSid, path, context) {
  */
 function DbTrap(summonSid, path, context) {
     const {traps} = context.data;
-    assume(traps, context.about, 'Missing "traps"!');
-
     const trap = traps[summonSid];
     assume(trap, context.about, summonSid, 'No such trap!');
 
     const value = resolveValue(trap, path, context);
+    return value;
+}
+
+/**
+ *
+ */
+function DbAbility(abilitySid, abilityLevel, path, context) {
+    const {abilities} = context.data;
+    const ability = abilities[abilitySid];
+    assume(ability, context.about, abilitySid, abilityLevel, 'No such ability!');
+    const level = ability.levels[abilityLevel];
+    assume(level, context.about, abilitySid, abilityLevel, 'No such level!');
+    const value = resolveValue(level, path, context);
     return value;
 }
 

@@ -9,7 +9,8 @@ import assume from '../../utils/assume.js';
 // =====================================================================================================================
 const IDS = new Set([
     // -- Test ids:
-    'skill_assault',
+    // 'skill_assault',
+    // 'skill_faction_dungeon',
 ]);
 const VARIANTS = {
     'pseudo_skills.json': 'pseudo',
@@ -21,6 +22,12 @@ const VARIANTS = {
     'sub_skills_campaign.json': 'campaign',
     'sub_skills_test.json': 'test',
 };
+const ORPHANS_ORDER = [
+    'DB/heroes_skills/sub_skills/sub_skills_arena.json',
+    'DB/heroes_skills/sub_skills/sub_skills_campaign.json',
+    'DB/heroes_skills/sub_skills/sub_skills.json',
+    'DB/heroes_skills/sub_skills/sub_skills_test.json',
+];
 
 // =====================================================================================================================
 //  P U B L I C
@@ -41,12 +48,12 @@ function Skill(zipHub) {
             if (IDS.size && !IDS.has(id)) {
                 continue;
             }
+            // console.log('id:', id);
             output['Skill~' + id] = buildMainDefinitions(skill, path, preparedSubskills);
         }
     }
 
-    // TODO
-    // <!-- Catch-all page for sub-skills not referenced by any skill's subSkills[] list (test entries + legacy arena variants). -->
+    output['Skill~_orphan_sub_skills'] = buildOrphans(output, preparedSubskills);
 
     return output;
 }
@@ -74,10 +81,16 @@ function prepareSubskills(zipHub) {
  */
 function buildSubskillDefs(subskill, path) {
     patch(subskill);
+
+    let parentId = subskill.id.replace(/sub_/, '');
+    parentId = parentId.replace(/_\d/, '');
+    parentId = parentId.replace(/_old/, '');
+    parentId = parentId.replace(/_new/, '');
+
     const def = {_type: 'SubSkillDef'};
     add(def, 'id', subskill.id);
     add(def, 'variant', VARIANTS[path.split('/').pop()]);
-    add(def, 'parent_skill_id', subskill.id.replace(/^sub_/, '').replace(/_\d$/, ''));
+    add(def, 'parent_skill_id', parentId);
     add(def, 'name_sid', subskill.name);
     add(def, 'desc_sid', subskill.desc);
     add(def, 'icon', subskill.icon);
@@ -113,7 +126,12 @@ function buildBonusDef(bonus, parentType, parentId, bonusIndex) {
     add(def, 'ordinal', bonusIndex);
     add(def, 'type', bonus.type);
     add(def, 'parameters', bonus.parameters);
+    add(def, 'battle_type', bonus.battleType);
+    add(def, 'receivers', bonus.receivers);
     add(def, 'receiver_allegiance', bonus.receiverAllegiance);
+    add(def, 'receiver_role', bonus.receiverRole);
+    add(def, 'fraction', bonus.fraction);
+    add(def, 'action_area', bonus.actionArea);
     return def;
 }
 
@@ -129,7 +147,7 @@ function buildMainDefinitions(skill, path, preparedSubskills) {
     }
     const usedSubskills = new Set();
     for (let i = 0; i < skill.parametersPerLevel.length; i++) {
-        const {subSkills} = skill.parametersPerLevel[i];
+        const {subSkills = []} = skill.parametersPerLevel[i];
         for (const subSkillName of subSkills) {
             assume(subSkillName in preparedSubskills, subSkillName, 'Not found in prepared subskills!');
             usedSubskills.add(subSkillName);
@@ -162,6 +180,7 @@ function buildSkillDef(skill, path) {
         description: def.desc_sid,
         _data: {
             currentSkillParameter: skill.parametersPerLevel[0],
+            currentSkillLevel: 1,
         },
     });
 
@@ -191,6 +210,7 @@ function buildSkillRankDef(skill, parameter, level) {
         description: def.desc_sid,
         _data: {
             currentSkillParameter: parameter,
+            currentSkillLevel: level,
         },
     });
     output.push(...translationDefs);
@@ -202,6 +222,45 @@ function buildSkillRankDef(skill, parameter, level) {
     }
 
     return output;
+}
+
+/**
+ *
+ */
+function buildOrphans(cargoSkills, preparedSubskills) {
+    for (const path in cargoSkills) {
+        const defs = cargoSkills[path];
+        for (const def of defs) {
+            if (def._type === 'SubSkillDef') {
+                delete preparedSubskills[def.id];
+            }
+        }
+    }
+    const sorted = Object.values(preparedSubskills).sort(compareOrphans);
+    const output = [];
+    for (const defs of sorted) {
+        delete defs[0].parent_skill_id;
+        output.push(...defs);
+    }
+
+    output.comment =
+        "<!-- Catch-all page for sub-skills not referenced by any skill's subSkills[] list " +
+        '(test entries + legacy arena variants). -->';
+
+    return output;
+}
+
+/**
+ *
+ */
+function compareOrphans(a, b) {
+    const aOrder = ORPHANS_ORDER.indexOf(a[0].source_path);
+    const bOrder = ORPHANS_ORDER.indexOf(b[0].source_path);
+
+    if (aOrder !== bOrder) {
+        return aOrder - bOrder;
+    }
+    return a[0].id.localeCompare(b[0].id);
 }
 
 // =====================================================================================================================

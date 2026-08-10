@@ -14,6 +14,8 @@ const DEBUG = new Set([
     // -- Uncomment any target_id you want to focus on:
     // 'black_dragon_upg_alt_3',
     // 'night_18_magic_nairas_veil',
+    // 'skill_faction_dungeon',
+    // 'sub_skill_summoner_1_old_var',
 ]);
 
 const LANGUAGES = {
@@ -85,6 +87,7 @@ let buffs;
 let sideBuffs;
 let obstacles;
 let traps;
+let abilities;
 
 // =====================================================================================================================
 //  P U B L I C
@@ -163,6 +166,7 @@ function buildCache(zipHub) {
     buildSideBuffs(zipHub);
     buildObstacles(zipHub);
     buildTraps(zipHub);
+    buildAbilities(zipHub);
 }
 
 /**
@@ -240,10 +244,19 @@ function buildTraps(zipHub) {
 /**
  *
  */
+function buildAbilities(zipHub) {
+    const hub = filterHub(zipHub, 'DB/heroes_abilities/heroes_abilities_base');
+    const list = Object.values(hub).flat();
+    abilities = objectify(list, 'id');
+}
+
+/**
+ *
+ */
 function generateData(request) {
     let output = {};
     output = mergeDeep(output, DEFAULT_DATA);
-    output = mergeDeep(output, {buffs, sideBuffs, obstacles, traps});
+    output = mergeDeep(output, {buffs, sideBuffs, obstacles, traps, abilities});
     output = mergeDeep(output, request._data);
     return output;
 }
@@ -259,7 +272,8 @@ function adaptTranslation(textId, request, langMap, data, isDebug = false) {
         console.log(`Cannot find "${textId}" in translation cache!`);
         return;
     }
-    isDebug = isDebug || (DEBUG.size && DEBUG.has(request.target_id) && langMap._lang === 'en');
+    const {target_id} = request;
+    isDebug = isDebug || (DEBUG.size && DEBUG.has(target_id) && langMap._lang === 'en');
 
     const text = langMap.get(textId);
     isDebug && console.log('===========' + textId);
@@ -274,6 +288,7 @@ function adaptTranslation(textId, request, langMap, data, isDebug = false) {
     }
 
     isDebug && console.log('After:', output);
+    assume(!output.includes('NaN') && !output.includes('undefined'), target_id, textId, 'Something went wrong!');
     return output;
 }
 
