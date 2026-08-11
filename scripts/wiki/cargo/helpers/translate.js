@@ -316,6 +316,7 @@ function resolveArg(textId, nr, langMap, request, data, isDebug) {
  *
  */
 function normalizeText(text) {
+    text = text.replace(/\r/g, '');
     text = text.replace(/\n/g, '<br/>');
     text = text.replace(/ /g, ' '); // TODO: remove this
     text = text.replace(/‑/g, '-'); // TODO: remove this
@@ -324,6 +325,7 @@ function normalizeText(text) {
     text = text.replace(/<i>/g, "''"); // TODO: remove this
     text = text.replace(/<\/i>/g, "''"); // TODO: remove this
     text = text.replace(/​/g, ''); // TODO: remove this
+    text = text.replace(/­/g, ''); // TODO: remove this
     return text;
 }
 

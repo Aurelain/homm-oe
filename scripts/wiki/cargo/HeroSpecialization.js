@@ -1,13 +1,14 @@
 import filterHub from '../../helpers/filterHub.js';
 import add from './helpers/add.js';
 import translate from './helpers/translate.js';
+import parseBonuses from './helpers/parseBonuses.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
 const IDS = new Set([
     // -- Test ids:
-    // 'foo',
+    // 'demon_hero_1_specialization',
 ]);
 
 // =====================================================================================================================
@@ -16,10 +17,10 @@ const IDS = new Set([
 /**
  *
  */
-function Foo(zipHub) {
+function HeroSpecialization(zipHub) {
     const output = {};
 
-    const files = filterHub(zipHub, 'DB/foo/.*?json');
+    const files = filterHub(zipHub, 'DB/heroes_specializations/');
     for (const path in files) {
         const fileContent = files[path];
         for (const item of fileContent) {
@@ -28,7 +29,7 @@ function Foo(zipHub) {
                 continue;
             }
             // console.log('id:', id);
-            output['Foo~' + id] = buildDefinitions(item, path);
+            output['HeroSpecialization~' + id] = buildDefinitions(item, path);
         }
     }
 
@@ -41,24 +42,29 @@ function Foo(zipHub) {
  *
  */
 function buildDefinitions(item, path) {
-    const def = {_type: 'FooDef'};
+    const def = {_type: 'HeroSpecializationDef'};
     add(def, 'id', item.id);
     add(def, 'name_sid', item.name);
-    add(def, 'description_sid', item.description);
+    add(def, 'desc_sid', item.desc);
+    add(def, 'icon', item.icon);
     add(def, 'source_path', path);
 
     const translationDefs = translate({
         target_id: def.id,
-        type: 'foo',
+        type: 'hero_specialization',
         name: def.name_sid,
-        description: def.description_sid,
-        _data: {},
+        description: def.desc_sid,
+        _data: {
+            CurrentHeroSpecializationConfig: item,
+        },
     });
 
-    return [def, ...translationDefs];
+    const bonusDefs = parseBonuses(item, 'hero_specialization');
+
+    return [def, ...translationDefs, ...bonusDefs];
 }
 
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default Foo;
+export default HeroSpecialization;
