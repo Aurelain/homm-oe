@@ -1,10 +1,9 @@
-import add from './helpers/add.js';
-import translate from './helpers/translate.js';
+import parseEntries from './helpers/parseEntries.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
-const TYPES = {
+const ENTRIES = {
     construct: true,
     demon: true,
     dragon: true,
@@ -21,37 +20,12 @@ const TYPES = {
  *
  */
 function CreatureType() {
-    const output = {};
-
-    for (const type in TYPES) {
-        output['CreatureType~' + type] = buildDefinitions(type);
-    }
-
-    return output;
-}
-// =====================================================================================================================
-//  P R I V A T E
-// =====================================================================================================================
-/**
- *
- */
-function buildDefinitions(type) {
-    const def = {_type: 'EntryDef'};
-    add(def, 'type', 'creature_type');
-    add(def, 'subtype', type);
-    add(def, 'name_sid', `base_class_${type}`);
-    add(def, 'desc_sid', `base_class_${type}_description`);
-
-    const translationDefs = translate({
-        target_id: type,
+    return parseEntries(ENTRIES, {
+        domain: 'CreatureType',
         type: 'creature_type',
-        subtype: type,
-        name: def.name_sid,
-        description: def.desc_sid,
-        _data: {},
+        prefix: 'base_class_',
+        name_suffix: '',
     });
-
-    return [def, ...translationDefs];
 }
 
 // =====================================================================================================================
