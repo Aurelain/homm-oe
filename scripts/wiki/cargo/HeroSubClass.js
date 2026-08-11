@@ -1,13 +1,14 @@
 import filterHub from '../../helpers/filterHub.js';
 import add from './helpers/add.js';
 import translate from './helpers/translate.js';
+import parseBonuses from './helpers/parseBonuses.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
 const IDS = new Set([
     // -- Test ids:
-    // 'foo',
+    // 'sub_class_demons_magic_1',
 ]);
 
 // =====================================================================================================================
@@ -16,10 +17,10 @@ const IDS = new Set([
 /**
  *
  */
-function Foo(zipHub) {
+function HeroSubClass(zipHub) {
     const output = {};
 
-    const files = filterHub(zipHub, 'DB/foo/.*?json');
+    const files = filterHub(zipHub, 'DB/heroes_sub_classes/.*?json');
     for (const path in files) {
         const fileContent = files[path];
         for (const item of fileContent) {
@@ -28,7 +29,7 @@ function Foo(zipHub) {
                 continue;
             }
             // console.log('id:', id);
-            output['Foo~' + id] = buildDefinitions(item, path);
+            output['HeroSubClass~' + id] = buildDefinitions(item, path);
         }
     }
 
@@ -41,24 +42,39 @@ function Foo(zipHub) {
  *
  */
 function buildDefinitions(item, path) {
-    const def = {_type: 'FooDef'};
+    const def = {_type: 'HeroSubClassDef'};
     add(def, 'id', item.id);
     add(def, 'name_sid', item.name);
-    add(def, 'description_sid', item.description);
+    add(def, 'desc_sid', item.desc);
+    add(def, 'icon', item.icon);
+    add(def, 'faction', item.faction);
+    add(def, 'class_type', item.classType);
+    add(def, 'activation_skill_1_sid', item.activationConditions[0].skillSid);
+    add(def, 'activation_skill_1_level', item.activationConditions[0].skillLevel);
+    add(def, 'activation_skill_2_sid', item.activationConditions[1].skillSid);
+    add(def, 'activation_skill_2_level', item.activationConditions[1].skillLevel);
+    add(def, 'activation_skill_3_sid', item.activationConditions[2].skillSid);
+    add(def, 'activation_skill_3_level', item.activationConditions[2].skillLevel);
+    add(def, 'activation_skill_4_sid', item.activationConditions[3].skillSid);
+    add(def, 'activation_skill_4_level', item.activationConditions[3].skillLevel);
+    add(def, 'activation_skill_5_sid', item.activationConditions[4].skillSid);
+    add(def, 'activation_skill_5_level', item.activationConditions[4].skillLevel);
     add(def, 'source_path', path);
 
     const translationDefs = translate({
         target_id: def.id,
-        type: 'foo',
+        type: 'hero_sub_class',
         name: def.name_sid,
-        description: def.description_sid,
+        description: def.desc_sid,
         _data: {},
     });
 
-    return [def, ...translationDefs];
+    const bonusDefs = parseBonuses(item, 'hero_sub_class');
+
+    return [def, ...translationDefs, ...bonusDefs];
 }
 
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default Foo;
+export default HeroSubClass;

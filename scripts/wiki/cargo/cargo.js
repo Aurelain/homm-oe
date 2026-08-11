@@ -40,8 +40,7 @@ import UnitStat from './UnitStat.js';
 // =====================================================================================================================
 const DEBUG = new Set([
     // -- Use this to focus on only some parsers:
-    CreatureType,
-    // HeroStat,
+    HeroSubClass,
 ]);
 
 const PARSERS = [
