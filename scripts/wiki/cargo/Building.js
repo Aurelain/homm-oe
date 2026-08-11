@@ -34,7 +34,7 @@ function Building(zipHub) {
                     if (!sid || (IDS.size && !IDS.has(id))) {
                         continue;
                     }
-                    console.log('id:', id);
+                    // console.log('id:', id);
                     if (category === 'hires') {
                         const groupId = city.fraction + '_Build_creature_dwellings';
                         output['Building~' + groupId] = output['Building~' + groupId] || [];

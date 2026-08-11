@@ -103,7 +103,7 @@ function buildSubskillDefs(subskill, path) {
         name: def.name_sid,
         description: def.desc_sid,
         _data: {
-            currentSubSkill: subskill,
+            CurrentSubSkill: subskill,
         },
     });
 
@@ -156,8 +156,8 @@ function buildSkillDef(skill, path) {
         name: def.name_sid,
         description: def.desc_sid,
         _data: {
-            currentSkillParameter: skill.parametersPerLevel[0],
-            currentSkillLevel: 1,
+            CurrentSkillParameter: skill.parametersPerLevel[0],
+            CurrentSkillLevel: 1,
         },
     });
 
@@ -186,8 +186,8 @@ function buildSkillRankDef(skill, parameter, level) {
         name: def.name_sid,
         description: def.desc_sid,
         _data: {
-            currentSkillParameter: parameter,
-            currentSkillLevel: level,
+            CurrentSkillParameter: parameter,
+            CurrentSkillLevel: level,
         },
     });
     output.push(...translationDefs);

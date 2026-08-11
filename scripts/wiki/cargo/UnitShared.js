@@ -101,7 +101,8 @@ function generateDefs(id, {name, description, type, logic}) {
             name,
             description,
             _data: {
-                currentUnitConfig: logic,
+                CurrentUnitConfig: logic,
+                CurrentUnitStats: logic.stats,
             },
         },
     ]);

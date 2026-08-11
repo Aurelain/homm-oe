@@ -7,17 +7,18 @@ import checkNumber from '../../../utils/checkNumber.js';
 // =====================================================================================================================
 const ACTIONS = {
     // key: [function, how many parameters it expects]
-    CurrentUnitData: [CurrentUnitData, 1],
-    CurrentUnitConfig: [CurrentUnitConfig, 1],
-    CurrentUnitStats: [CurrentUnitStats, 1],
-    CurrentAbility: [CurrentAbility, 1],
-    CurrentHero: [CurrentHero, 1],
-    CurrentMagicBattleRoot: [CurrentMagicBattleRoot, 1],
-    CurrentMagicBattle: [CurrentMagicBattle, 1],
-    CurrentMagicWorld: [CurrentMagicWorld, 1],
-    CurrentSkillParameter: [CurrentSkillParameter, 1],
-    CurrentSubSkill: [CurrentSubSkill, 1],
-    CurrentItem: [CurrentItem, 1],
+    CurrentUnitData: [handleHomonymousAction, 1],
+    CurrentUnitConfig: [handleHomonymousAction, 1],
+    CurrentUnitStats: [handleHomonymousAction, 1],
+    CurrentAbility: [handleHomonymousAction, 1],
+    CurrentHero: [handleHomonymousAction, 1],
+    CurrentMagicBattleRoot: [handleHomonymousAction, 1],
+    CurrentMagicBattle: [handleHomonymousAction, 1],
+    CurrentMagicWorld: [handleHomonymousAction, 1],
+    CurrentSkillParameter: [handleHomonymousAction, 1],
+    CurrentSubSkill: [handleHomonymousAction, 1],
+    CurrentItem: [handleHomonymousAction, 1],
+    CurrentHeroSpecializationConfig: [handleHomonymousAction, 1],
     SpellpowerForCurrentMagic: [SpellpowerForCurrentMagic, 0],
     CurrentMagicLevel: [CurrentMagicLevel, 0],
     CurrentSkillLevel: [CurrentSkillLevel, 0],
@@ -51,6 +52,7 @@ function evaluate(functionName, repository, data, isDebug = false) {
     for (const step of compiled.body) {
         const action = step.action;
         const context = {
+            action,
             data,
             about: action,
             repository,
@@ -119,117 +121,18 @@ function formatValue(value, type) {
     }
 }
 
+/**
+ *
+ */
+function handleHomonymousAction(path, context) {
+    const {action} = context;
+    const json = context.data[action];
+    assume(json, context.about, `Missing "${action}" from data!`);
+    const value = resolveValue(json, path, context);
+    return value;
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
-/**
- *
- */
-function CurrentUnitData(path, context) {
-    const json = context.data.currentUnitData;
-    assume(json, context.about, 'Missing "currentUnitData"!');
-    const value = resolveValue(json, path, context);
-    return value;
-}
-
-/**
- *
- */
-function CurrentUnitConfig(path, context) {
-    const json = context.data.currentUnitConfig;
-    assume(json, context.about, 'Missing "currentUnitConfig"!');
-    const value = resolveValue(json, path, context);
-    return value;
-}
-
-/**
- *
- */
-function CurrentUnitStats(prop, context) {
-    const json = context.data.currentUnitConfig;
-    assume(json, context.about, 'Missing "currentUnitConfig"!');
-    const value = resolveValue(json, 'stats.' + prop, context);
-    return value;
-}
-
-/**
- *
- */
-function CurrentAbility(path, context) {
-    const json = context.data.currentAbility;
-    assume(json, context.about, 'Missing "currentAbility"!');
-    const value = resolveValue(json, path, context);
-    return value;
-}
-
-/**
- *
- */
-function CurrentHero(path, context) {
-    const json = context.data.currentHero;
-    assume(json, context.about, 'Missing "currentHero"!');
-    const value = resolveValue(json, path, context);
-    return value;
-}
-
-/**
- *
- */
-function CurrentMagicBattleRoot(path, context) {
-    const json = context.data.currentMagicBattleRoot;
-    assume(json, context.about, 'Missing "currentMagicBattleRoot"!');
-    const value = resolveValue(json, path, context);
-    return value;
-}
-
-/**
- *
- */
-function CurrentMagicBattle(path, context) {
-    const json = context.data.currentMagicBattle;
-    assume(json, context.about, 'Missing "currentMagicBattle"!');
-    const value = resolveValue(json, path, context);
-    return value;
-}
-
-/**
- *
- */
-function CurrentMagicWorld(path, context) {
-    const json = context.data.currentMagicWorld;
-    assume(json, context.about, 'Missing "currentMagicWorld"!');
-    const value = resolveValue(json, path, context);
-    return value;
-}
-
-/**
- *
- */
-function CurrentSkillParameter(path, context) {
-    const json = context.data.currentSkillParameter;
-    assume(json, context.about, 'Missing "currentSkillParameter"!');
-    const value = resolveValue(json, path, context);
-    return value;
-}
-
-/**
- *
- */
-function CurrentSubSkill(path, context) {
-    const json = context.data.currentSubSkill;
-    assume(json, context.about, 'Missing "currentSubSkill"!');
-    const value = resolveValue(json, path, context);
-    return value;
-}
-
-/**
- *
- */
-function CurrentItem(path, context) {
-    const json = context.data.currentItem;
-    assume(json, context.about, 'Missing "currentItem"!');
-    const value = resolveValue(json, path, context);
-    return value;
-}
-
 /**
  *
  */
@@ -241,14 +144,14 @@ function SpellpowerForCurrentMagic() {
  *
  */
 function CurrentMagicLevel(context) {
-    return context.data.currentMagicLevel;
+    return context.data.CurrentMagicLevel;
 }
 
 /**
  *
  */
 function CurrentSkillLevel(context) {
-    return context.data.currentSkillLevel;
+    return context.data.CurrentSkillLevel;
 }
 
 /**

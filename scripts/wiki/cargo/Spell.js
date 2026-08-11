@@ -99,10 +99,10 @@ function buildSpellRankDef(spell, level) {
         description: spell.description[level - 1],
         bonus_description: spell.bonusDescriptions?.[level - 2]?.description,
         _data: {
-            currentMagicBattleRoot: spell,
-            currentMagicBattle: getCurrentMagicBattle(spell, level),
-            currentMagicWorld: getCurrentMagicWorld(spell, level),
-            currentMagicLevel: level,
+            CurrentMagicBattleRoot: spell,
+            CurrentMagicBattle: getCurrentMagicBattle(spell, level),
+            CurrentMagicWorld: getCurrentMagicWorld(spell, level),
+            CurrentMagicLevel: level,
         },
     });
 

@@ -313,8 +313,9 @@ function spawnUnitAbilityActiveDef(logic, view, translations) {
             name: def.name_sid,
             description: def.desc_sid,
             _data: {
-                currentAbility: logicItem,
-                currentUnitConfig: logic,
+                CurrentAbility: logicItem,
+                CurrentUnitConfig: logic,
+                CurrentUnitStats: logic.stats,
             },
         });
     }
@@ -454,7 +455,8 @@ function spawnUnitAbilityPassiveDef(logic, view, translations) {
             name: def.name_sid,
             description: def.desc_sid,
             _data: {
-                currentUnitConfig: logic,
+                CurrentUnitConfig: logic,
+                CurrentUnitStats: logic.stats,
             },
         });
     }

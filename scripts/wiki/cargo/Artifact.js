@@ -64,7 +64,7 @@ function buildArtifactDefinitions(artifact, path) {
     add(def, 'can_apply_bonus_always', artifact.canApplyBonusAlways);
     add(def, 'source_path', path);
 
-    const currentItem = {
+    const CurrentItem = {
         level: 1,
         config: cloneConfig(artifact),
     };
@@ -76,7 +76,7 @@ function buildArtifactDefinitions(artifact, path) {
             name: def.name_sid,
             description: def.description_sid,
             _data: {
-                currentItem,
+                CurrentItem,
             },
         },
         {
@@ -84,7 +84,7 @@ function buildArtifactDefinitions(artifact, path) {
             type: 'artifact_upgrade',
             description: def.upgrade_description_sid,
             _data: {
-                currentItem,
+                CurrentItem,
             },
         },
         {
@@ -92,7 +92,7 @@ function buildArtifactDefinitions(artifact, path) {
             type: 'artifact_narrative',
             description: def.narrative_description_sid,
             _data: {
-                currentItem,
+                CurrentItem,
             },
         },
     ]);

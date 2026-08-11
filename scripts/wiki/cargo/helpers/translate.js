@@ -38,7 +38,7 @@ const LANGUAGES = {
 };
 
 const DEFAULT_DATA = {
-    currentUnitData: {
+    CurrentUnitData: {
         fullStacks: 0,
         tempFullStacks: 0,
         startBattleFullStacks: 0,
@@ -50,7 +50,7 @@ const DEFAULT_DATA = {
             },
         },
     },
-    currentUnitConfig: {
+    CurrentUnitConfig: {
         passives: [
             {
                 actions: [
@@ -64,7 +64,7 @@ const DEFAULT_DATA = {
             },
         ],
     },
-    currentAbility: {
+    CurrentAbility: {
         damageDealer: {
             statDmgMult: 1,
             buff: {
@@ -72,7 +72,7 @@ const DEFAULT_DATA = {
             },
         },
     },
-    currentHero: {
+    CurrentHero: {
         level: 1,
         heroStat: {
             viewRadius: 3, // TODO: with this value it satisfies `neutral_1_magic_mana_transfer`, but why?
