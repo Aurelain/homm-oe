@@ -1,6 +1,7 @@
 import filterHub from '../../helpers/filterHub.js';
 import add from './helpers/add.js';
 import translate from './helpers/translate.js';
+import objectify from '../../utils/objectify.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
@@ -16,10 +17,12 @@ const IDS = new Set([
 /**
  *
  */
-function Foo(zipHub) {
+function StatBonusRoll(zipHub) {
     const output = {};
 
-    const files = filterHub(zipHub, 'DB/foo/.*?json');
+    const statHub = getStatHub(zipHub);
+
+    const files = filterHub(zipHub, 'DB/heroes_skills/skills/pseudo_skills.json');
     for (const path in files) {
         const fileContent = files[path];
         for (const item of fileContent) {
@@ -28,7 +31,7 @@ function Foo(zipHub) {
                 continue;
             }
             // console.log('id:', id);
-            output['Foo~' + id] = buildDefinitions(item, path);
+            output['StatBonusRoll~' + id] = buildDefinitions(item, statHub);
         }
     }
 
@@ -40,18 +43,29 @@ function Foo(zipHub) {
 /**
  *
  */
-function buildDefinitions(item, path) {
-    const def = {_type: 'FooDef'};
+function getStatHub(zipHub) {
+    const table = filterHub(zipHub, '/humans_might_skills_table.json', null, true);
+    const roll = table[0].defaultList.find((item) => item.levels[0] === -2).rollChances;
+    return objectify(roll, 'sid');
+}
+
+/**
+ *
+ */
+function buildDefinitions(item, statHub) {
+    const def = {_type: 'StatBonusRollDef'};
     add(def, 'id', item.id);
+    add(def, 'stat', item.parametersPerLevel[0].bonuses[0].parameters[0]);
+    add(def, 'magnitude', item.parametersPerLevel[0].bonuses[0].parameters[1]);
+    add(def, 'weight', statHub[item.id].chance);
     add(def, 'name_sid', item.name);
-    add(def, 'description_sid', item.description);
-    add(def, 'source_path', path);
+    add(def, 'desc_sid', item.desc);
 
     const translationDefs = translate({
         target_id: def.id,
-        type: 'foo',
+        type: 'stat_bonus_roll',
         name: def.name_sid,
-        description: def.description_sid,
+        description: def.desc_sid,
         _data: {},
     });
 
@@ -61,4 +75,4 @@ function buildDefinitions(item, path) {
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default Foo;
+export default StatBonusRoll;
