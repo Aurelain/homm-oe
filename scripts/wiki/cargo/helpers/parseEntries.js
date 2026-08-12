@@ -13,7 +13,8 @@ function parseEntries(entries, config) {
     const output = {};
 
     for (const entry in entries) {
-        output[domain + '~' + entry] = buildDefinitions(entry, config);
+        const idCore = entries[entry] === true ? entry : entries[entry];
+        output[domain + '~' + entry] = buildDefinitions(entry, idCore, config);
     }
 
     return output;
@@ -22,12 +23,12 @@ function parseEntries(entries, config) {
 /**
  *
  */
-function buildDefinitions(entry, config) {
+function buildDefinitions(entry, idCore, config) {
     const def = {_type: 'EntryDef'};
     add(def, 'type', config.type);
     add(def, 'subtype', entry);
-    add(def, 'name_sid', config.prefix + entry + config.name_suffix);
-    add(def, 'desc_sid', config.prefix + entry + config.desc_suffix);
+    add(def, 'name_sid', config.prefix + idCore + config.name_suffix);
+    add(def, 'desc_sid', config.prefix + idCore + config.desc_suffix);
     add(def, 'source_path', config.path);
 
     const translationDefs = translate({
