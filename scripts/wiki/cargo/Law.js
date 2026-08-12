@@ -1,13 +1,16 @@
 import filterHub from '../../helpers/filterHub.js';
 import add from './helpers/add.js';
 import translate from './helpers/translate.js';
+import match from '../../utils/match.js';
+import Faction from './Faction.js';
+import parseBonuses from './helpers/parseBonuses.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
 const IDS = new Set([
     // -- Test ids:
-    // 'foo',
+    // 'fraction_law_demon_1',
 ]);
 
 // =====================================================================================================================
@@ -16,10 +19,12 @@ const IDS = new Set([
 /**
  *
  */
-function Foo(zipHub) {
+function Law(zipHub) {
     const output = {};
 
-    const files = filterHub(zipHub, 'DB/foo/.*?json');
+    const extra = collectExtra(zipHub);
+
+    const files = filterHub(zipHub, 'DB/fractions_laws/');
     for (const path in files) {
         const fileContent = files[path];
         for (const item of fileContent) {
@@ -28,7 +33,7 @@ function Foo(zipHub) {
                 continue;
             }
             // console.log('id:', id);
-            output['Foo~' + id] = buildDefinitions(item, path);
+            output['Law~' + id] = buildDefinitions(item, path, extra);
         }
     }
 
@@ -40,25 +45,79 @@ function Foo(zipHub) {
 /**
  *
  */
-function buildDefinitions(item, path) {
-    const def = {_type: 'FooDef'};
+function collectExtra(zipHub) {
+    const output = {};
+    const factionsCargo = Faction(zipHub);
+    for (const key in factionsCargo) {
+        const defs = factionsCargo[key];
+        for (const def of defs) {
+            if (def.law_id) {
+                output[def.law_id] = def;
+            }
+        }
+    }
+    return output;
+}
+
+/**
+ *
+ */
+function buildDefinitions(item, path, extra) {
+    const [, ordinal] = match(item.id, /_(\d+)$/);
+    const {parametersPerLevel = []} = item;
+
+    const def = {_type: 'LawDef'};
     add(def, 'id', item.id);
+    add(def, 'faction', extra[item.id]?.faction);
+    add(def, 'ordinal', ordinal);
+    add(def, 'tier', extra[item.id]?.tier);
     add(def, 'name_sid', item.name);
-    add(def, 'description_sid', item.description);
+    add(def, 'desc_sid', item.desc);
+    add(def, 'icon', item.icon);
+    add(def, 'max_level', parametersPerLevel.length);
+    add(def, 'test', path.includes('test'));
     add(def, 'source_path', path);
 
     const translationDefs = translate({
         target_id: def.id,
-        type: 'foo',
+        type: 'law',
         name: def.name_sid,
-        description: def.description_sid,
-        _data: {},
     });
 
-    return [def, ...translationDefs];
+    const levelDefs = [];
+    for (const [i, levelData] of parametersPerLevel.entries()) {
+        levelDefs.push(...buildLevelDef(levelData, i + 1, item));
+    }
+
+    return [def, ...translationDefs, ...levelDefs];
+}
+
+/**
+ *
+ */
+function buildLevelDef(levelData, level, law) {
+    const def = {_type: 'LawLevelDef'};
+    add(def, 'law_id', law.id);
+    add(def, 'level', level);
+    add(def, 'cost', levelData.cost);
+
+    const translationDefs = translate({
+        target_id: law.id,
+        type: 'law_level',
+        variant: level,
+        description: law.desc,
+        _data: {
+            CurrentFractionLawConfig: levelData,
+        },
+    });
+
+    const virtualData = {...levelData, id: law.id + '_L' + level};
+    const bonusDefs = parseBonuses(virtualData, 'law_level');
+
+    return [def, ...translationDefs, ...bonusDefs];
 }
 
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default Foo;
+export default Law;

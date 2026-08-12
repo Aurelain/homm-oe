@@ -16,12 +16,12 @@ function parseBonuses(target, parentType) {
         add(def, 'battle_type', bonus.battleType);
         add(def, 'activation_level', bonus.activationLevel);
         add(def, 'receiver_role', bonus.receiverRole);
-        add(def, 'fraction', bonus.fraction);
-        add(def, 'action_area', bonus.actionArea);
         add(def, 'upgrade_increment', bonus.upgrade?.increment);
         add(def, 'upgrade_level_step', bonus.upgrade?.levelStep);
         add(def, 'receivers', bonus.receivers);
         add(def, 'receiver_allegiance', bonus.receiverAllegiance);
+        add(def, 'action_area', bonus.actionArea);
+        add(def, 'fraction', bonus.fraction);
         if ('upgrade_increment' in def) {
             if (!String(def.upgrade_increment).includes('.')) {
                 def.upgrade_increment += '.0';

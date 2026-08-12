@@ -19,6 +19,8 @@ const ACTIONS = {
     CurrentSubSkill: [handleHomonymousAction, 1],
     CurrentItem: [handleHomonymousAction, 1],
     CurrentHeroSpecializationConfig: [handleHomonymousAction, 1],
+    CurrentItemSet: [handleHomonymousAction, 1],
+    CurrentFractionLawConfig: [handleHomonymousAction, 1],
     SpellpowerForCurrentMagic: [SpellpowerForCurrentMagic, 0],
     CurrentMagicLevel: [CurrentMagicLevel, 0],
     CurrentSkillLevel: [CurrentSkillLevel, 0],
