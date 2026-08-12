@@ -16,10 +16,10 @@ const IDS = new Set([
 /**
  *
  */
-function Foo(zipHub) {
+function Resource(zipHub) {
     const output = {};
 
-    const files = filterHub(zipHub, 'DB/foo/.*?json');
+    const files = filterHub(zipHub, 'DB/res/');
     for (const path in files) {
         const fileContent = files[path];
         for (const item of fileContent) {
@@ -28,7 +28,7 @@ function Foo(zipHub) {
                 continue;
             }
             // console.log('id:', id);
-            output['Foo~' + id] = buildDefinitions(item, path);
+            output['Resource~' + id] = buildDefinitions(item, path);
         }
     }
 
@@ -41,17 +41,21 @@ function Foo(zipHub) {
  *
  */
 function buildDefinitions(item, path) {
-    const def = {_type: 'FooDef'};
-    add(def, 'id', item.id);
+    const def = {_type: 'EntryDef'};
+    add(def, 'type', 'resource');
+    add(def, 'subtype', item.id);
+    add(def, 'icon', item.icon);
     add(def, 'name_sid', item.name);
-    add(def, 'description_sid', item.description);
+    add(def, 'desc_sid', item.desc);
+    add(def, 'narrative_description_sid', item.narrativeDesc);
     add(def, 'source_path', path);
 
     const translationDefs = translate({
-        target_id: def.id,
-        type: 'foo',
+        target_id: def.subtype,
+        type: 'resource',
+        subtype: def.subtype,
         name: def.name_sid,
-        description: def.description_sid,
+        description: def.desc_sid,
         _data: {},
     });
 
@@ -61,4 +65,4 @@ function buildDefinitions(item, path) {
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default Foo;
+export default Resource;
