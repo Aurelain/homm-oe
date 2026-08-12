@@ -284,7 +284,7 @@ function adaptTranslation(textId, request, langMap, data, isDebug = false) {
         output = output.replace(/\{(\d)}/g, (all, nr) => {
             return resolveArg(textId, nr, langMap, request, data, isDebug);
         });
-        assume(!output.includes('{'), request, output, 'Still has braces!');
+        assume(!output.includes('{'), request, text, output, 'Still has braces!');
     }
 
     isDebug && console.log('After:', output);

@@ -1,35 +1,57 @@
 import add from './add.js';
 import translate from './translate.js';
 
+// =====================================================================================================================
+//  P U B L I C
+// =====================================================================================================================
 /**
  *
  */
 function parseEntries(entries, config) {
-    config.prefix = config.prefix || '';
-    config.name_suffix = config.name_suffix === undefined ? '_name' : config.name_suffix;
-    config.desc_suffix = config.desc_suffix === undefined ? '_description' : config.desc_suffix;
-
     const {domain} = config;
     const output = {};
 
     for (const entry in entries) {
-        const idCore = entries[entry] === true ? entry : entries[entry];
-        output[domain + '~' + entry] = buildDefinitions(entry, idCore, config);
+        const adaptedConfig = adaptConfig(config, entry, entries[entry]);
+        output[domain + '~' + entry] = buildDefinitions(entry, adaptedConfig);
     }
 
+    return output;
+}
+
+// =====================================================================================================================
+//  P R I V A T E
+// =====================================================================================================================
+/**
+ *
+ */
+function adaptConfig(config, entryKey, entryData) {
+    const output = {
+        prefix: '',
+        name_suffix: '_name',
+        desc_suffix: '_description',
+    };
+    Object.assign(output, config);
+    if (entryData === true) {
+        entryData = {id: entryKey};
+    } else if (typeof entryData === 'string') {
+        entryData = {id: entryData};
+    }
+    Object.assign(output, entryData);
     return output;
 }
 
 /**
  *
  */
-function buildDefinitions(entry, idCore, config) {
+function buildDefinitions(entry, config) {
+    const {type, id, prefix, name_suffix, desc_suffix, suppressDescription, path, trimColon} = config;
     const def = {_type: 'EntryDef'};
-    add(def, 'type', config.type);
+    add(def, 'type', type);
     add(def, 'subtype', entry);
-    add(def, 'name_sid', config.prefix + idCore + config.name_suffix);
-    add(def, 'desc_sid', config.prefix + idCore + config.desc_suffix);
-    add(def, 'source_path', config.path);
+    add(def, 'name_sid', prefix + id + name_suffix);
+    add(def, 'desc_sid', suppressDescription ? undefined : prefix + id + desc_suffix);
+    add(def, 'source_path', path);
 
     const translationDefs = translate({
         target_id: def.subtype,
@@ -39,7 +61,21 @@ function buildDefinitions(entry, idCore, config) {
         description: def.desc_sid,
     });
 
+    if (trimColon) {
+        for (const def of translationDefs) {
+            if (def.name) {
+                def.name = def.name.replace(/[:：\s]*$/, '');
+            }
+            if (def.description) {
+                def.description = def.description.replace(/[:：\s]*$/, '');
+            }
+        }
+    }
+
     return [def, ...translationDefs];
 }
 
+// =====================================================================================================================
+//  E X P O R T
+// =====================================================================================================================
 export default parseEntries;
