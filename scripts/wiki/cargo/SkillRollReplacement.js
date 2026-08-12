@@ -1,14 +1,18 @@
 import filterHub from '../../helpers/filterHub.js';
 import add from './helpers/add.js';
-import translate from './helpers/translate.js';
+import Hero from './Hero.js';
 
 // =====================================================================================================================
 //  D E C L A R A T I O N S
 // =====================================================================================================================
-const IDS = new Set([
-    // -- Test ids:
-    // 'foo',
-]);
+const FACTIONS = {
+    human: 'humans', // plural!
+    undead: 'necros', // different!
+    nature: 'nature',
+    demon: 'demons', // plural!
+    unfrozen: 'unfrozen',
+    dungeon: 'dungeon',
+};
 
 // =====================================================================================================================
 //  P U B L I C
@@ -16,20 +20,14 @@ const IDS = new Set([
 /**
  *
  */
-function Foo(zipHub) {
+function SkillRollReplacement(zipHub) {
     const output = {};
 
-    const files = filterHub(zipHub, 'DB/foo/.*?json');
-    for (const path in files) {
-        const fileContent = files[path];
-        for (const item of fileContent) {
-            const {id} = item;
-            if (IDS.size && !IDS.has(id)) {
-                continue;
-            }
-            // console.log('id:', id);
-            output['Foo~' + id] = buildDefinitions(item, path);
-        }
+    const heroHub = getHeroHub(zipHub);
+
+    const list = filterHub(zipHub, 'DB/heroes_skills/skills_by_level_replace', null, true);
+    for (const item of list) {
+        output['SkillRollReplacement~' + item.id] = buildDefinitions(item, heroHub);
     }
 
     return output;
@@ -40,25 +38,39 @@ function Foo(zipHub) {
 /**
  *
  */
-function buildDefinitions(item, path) {
-    const def = {_type: 'FooDef'};
-    add(def, 'id', item.id);
-    add(def, 'name_sid', item.name);
-    add(def, 'description_sid', item.description);
-    add(def, 'source_path', path);
+function getHeroHub(zipHub) {
+    const output = {};
+    const cargoHeroes = Hero(zipHub);
+    for (const fileName in cargoHeroes) {
+        const def = cargoHeroes[fileName][0];
+        output[def.id] = def;
+    }
+    return output;
+}
 
-    const translationDefs = translate({
-        target_id: def.id,
-        type: 'foo',
-        name: def.name_sid,
-        description: def.description_sid,
-        _data: {},
-    });
+/**
+ *
+ */
+function buildDefinitions(item, heroHub) {
+    const hero = heroHub[item.id];
+    const faction = FACTIONS[hero.faction];
+    const classType = hero.class_type;
 
-    return [def, ...translationDefs];
+    const output = [];
+    const info = item.defaultList[0].rollChances[0];
+    for (const level of item.defaultList[0].levels) {
+        const def = {_type: 'SkillRollReplacementDef'};
+        add(def, 'hero_id', item.id);
+        add(def, 'arena_table_id', `arenaGame_${faction}_${classType}_skills_table`);
+        add(def, 'level', level);
+        add(def, 'skill_id', info.sid);
+        add(def, 'weight', info.chance);
+        output.push(def);
+    }
+    return output;
 }
 
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default Foo;
+export default SkillRollReplacement;
