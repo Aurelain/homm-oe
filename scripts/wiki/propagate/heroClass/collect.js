@@ -1,4 +1,4 @@
-import HeroClass from '../../cargo/HeroClass.js';
+import HeroClass from '/a/aims/oe-wiki/src/parse/parsers/HeroClass.js';
 import collectMain from '../../helpers/collectMain.js';
 
 // =====================================================================================================================
