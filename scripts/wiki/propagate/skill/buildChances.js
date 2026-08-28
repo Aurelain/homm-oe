@@ -1,19 +1,18 @@
-import Skill from '/a/aims/oe-wiki/src/parse/parsers/Skill.js';
-import collectMain from '../../helpers/collectMain.js';
-
 // =====================================================================================================================
 //  P U B L I C
 // =====================================================================================================================
 /**
  *
  */
-function collect(zipHub) {
-    const allSkills = collectMain(zipHub, Skill);
-    const skirmishSkills = allSkills.filter((skill) => skill.id.startsWith('skill') && !skill.id.includes('pseudo'));
-    return skirmishSkills;
+function buildChances(info) {
+    const {id, lang} = info;
+
+    const lines = [];
+    lines.push(`{{SkillsChances|lang=${lang}|id=${id}}}`);
+    return lines.join('\n');
 }
 
 // =====================================================================================================================
 //  E X P O R T
 // =====================================================================================================================
-export default collect;
+export default buildChances;

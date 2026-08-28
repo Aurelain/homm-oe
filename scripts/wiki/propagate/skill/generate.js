@@ -1,9 +1,12 @@
 import buildLoc from '../../helpers/buildLoc.js';
 import getWords from '../../helpers/getWords.js';
-import buildStrategy from '../../helpers/buildStrategy.js';
 import buildLeftovers from '../../helpers/buildLeftovers.js';
 import buildHeading from '../../helpers/buildHeading.js';
 import buildSection from '../../helpers/buildSection.js';
+import buildLevels from './buildLevels.js';
+import buildChances from './buildChances.js';
+import buildArtifacts from './buildArtifacts.js';
+import buildSynergies from './buildSynergies.js';
 
 // =====================================================================================================================
 //  P U B L I C
@@ -19,22 +22,25 @@ function generate(info, translations, context, parsed) {
     lines.push(buildLoc(info));
     lines.push(`{{SkillInfobox|lang=${lang}|id=${id}}}`);
     lines.push('');
-    // lines.push(...buildIntro(info, translations));
+    if (parsed.header) {
+        lines.push('');
+        lines.push(parsed.header);
+    }
 
-    // Skills
-    // lines.push(...buildSection('Levels', buildSkills, info, translations, context, parsed));
+    // Levels
+    lines.push(...buildSection('Levels', buildLevels, info, translations, context, parsed));
 
-    // Elite classes
-    // lines.push(...buildSection('Elite_classes', buildElites, info, translations, context, parsed));
+    // Chances
+    lines.push(...buildSection('Chances', buildChances, info, translations, context, parsed));
 
-    // Heroes
-    // lines.push(...buildSection('Heroes', buildHeroes, info, translations, context, parsed));
+    // Skill synergies
+    lines.push(...buildSection('Skill_synergies', buildSynergies, info, translations, context, parsed));
 
-    // Strategy
-    // lines.push(...buildStrategy(info, translations, context, parsed));
+    // Artifact effects
+    lines.push(...buildSection('Artifact_effects', buildArtifacts, info, translations, context, parsed));
 
     // Leftovers:
-    // lines.push(...buildLeftovers(parsed));
+    lines.push(...buildLeftovers(parsed));
 
     // Footer
     lines.push('');

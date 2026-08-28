@@ -26,8 +26,10 @@ function collectMain(zipHub, cargoGenerator) {
         const description = {};
         for (const def of defs) {
             if (def._type === 'TranslationDef' && def.target_id === mainDef.id) {
-                name[def.language] = def.name;
-                description[def.language] = def.description;
+                if (!name[def.language]) {
+                    name[def.language] = def.name;
+                    description[def.language] = def.description;
+                }
             }
         }
         list.push({
