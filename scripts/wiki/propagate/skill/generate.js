@@ -33,7 +33,9 @@ function generate(info, translations, context, parsed) {
     lines.push(...buildSection('Chances', buildChances, info, translations, context, parsed));
 
     // Skill synergies
-    lines.push(...buildSection('Skill_synergies', buildSynergies, info, translations, context, parsed));
+    if (!id.includes('faction')) {
+        lines.push(...buildSection('Skill_synergies', buildSynergies, info, translations, context, parsed));
+    }
 
     // Artifact effects
     lines.push(...buildSection('Artifact_effects', buildArtifacts, info, translations, context, parsed));

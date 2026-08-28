@@ -30,7 +30,7 @@ const TARGET_LANGUAGES = new Set([
 
 const IDS = new Set([
     // -- Note: if all items are disabled, all ids are allowed
-    'skill_assault',
+    // 'skill_assault',
     // 'might_dungeon',
 ]);
 
