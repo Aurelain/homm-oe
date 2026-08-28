@@ -1,4 +1,4 @@
-import {buildCache} from '../cargo/helpers/translate.js';
+import {buildCache} from '/a/aims/oe-wiki/src/parse/helpers/translate.js';
 import assume from '../../utils/assume.js';
 
 // =====================================================================================================================
@@ -13,6 +13,9 @@ function collectMain(zipHub, cargoGenerator) {
     buildCache(zipHub);
     const cargoFiles = cargoGenerator(zipHub);
     for (const path in cargoFiles) {
+        if (path.includes('_orphan_sub_skills')) {
+            continue;
+        }
         const defs = cargoFiles[path];
         const mainDef = defs.shift();
         assume(mainDef?._type === cargoGenerator.name + 'Def', path, 'Unexpected main def!');
