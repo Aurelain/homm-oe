@@ -61,8 +61,8 @@ async function main() {
     });
 
     for (const {path, content} of payloads) {
-        console.log('========\n' + path + '\n' + content);
-        // content && fs.writeFileSync(path, content);
+        // console.log('========\n' + path + '\n' + content);
+        content && fs.writeFileSync(path, content);
     }
 }
 

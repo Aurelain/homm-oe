@@ -8,7 +8,7 @@ function buildChances(info) {
     const {id, lang} = info;
 
     const lines = [];
-    lines.push(`{{SkillsChances|lang=${lang}|id=${id}}}`);
+    lines.push(`{{SkillChances|lang=${lang}|id=${id}}}`);
     return lines.join('\n');
 }
 

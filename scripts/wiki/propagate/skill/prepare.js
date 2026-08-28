@@ -11,15 +11,10 @@ import generate from './generate.js';
 function prepare(info, translations, context, existingContent) {
     let cleaned = existingContent;
 
-    // Clean header:
+    // Cleaning:
     cleaned = cleaned.replaceAll(/\{\{Loc.*?}}/gi, '');
     cleaned = cleaned.replaceAll(/\{\{SkillInfobox[\s\S]*?}}/gi, '');
-    cleaned = cleaned.replaceAll(/\{\{SkillsNavbox[\s\S]*?}}/gi, '');
-    cleaned = cleaned.replaceAll(/\{\{SkillChances[\s\S]*?}}/gi, '');
     cleaned = cleaned.replaceAll(/__NOTOC__/gi, '');
-
-    // Other cleanings
-    cleaned = cleaned.replaceAll(/\{\{#invoke:.*?}}/gi, '');
 
     // Temporary cleaning:
     // cleaned = cleaned.replaceAll(/foo/gi, '');
