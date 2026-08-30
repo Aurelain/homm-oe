@@ -13,7 +13,7 @@ const TARGET_LANGUAGES = new Set([
     // 'pt_br',
     // 'cs',
     // 'en',
-    'fr',
+    // 'fr',
     // 'de',
     // 'hu',
     // 'it',
@@ -24,7 +24,7 @@ const TARGET_LANGUAGES = new Set([
     // 'es',
     // 'tr',
     // 'uk',
-    // 'zh-hans',
+    'zh-hans',
     // 'zh-hant',
 ]);
 

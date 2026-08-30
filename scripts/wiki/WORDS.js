@@ -500,7 +500,7 @@ const WORDS = {
         es: '',
         tr: '',
         uk: '',
-        ['zh-hans']: '',
+        ['zh-hans']: '@name 是 @faction 阵营的力量英雄。其对应的魔法英雄是 @other。',
         ['zh-hant']: '',
     },
     HeroClass_intro_magic: {
@@ -518,7 +518,7 @@ const WORDS = {
         es: '',
         tr: '',
         uk: '',
-        ['zh-hans']: '',
+        ['zh-hans']: '@name 是 @faction 阵营的魔法英雄。其对应的力量英雄是 @other。',
         ['zh-hant']: '',
     },
     Elite_classes: {
@@ -536,7 +536,7 @@ const WORDS = {
         es: '',
         tr: '',
         uk: '',
-        ['zh-hans']: '',
+        ['zh-hans']: '精英职业',
         ['zh-hant']: '',
     },
     Elite_text: {
@@ -554,7 +554,7 @@ const WORDS = {
         es: '',
         tr: '',
         uk: '',
-        ['zh-hans']: '',
+        ['zh-hans']: '若 @name 将所有所需技能习至专家级，则可晋升为以下精英职业之一：',
         ['zh-hant']: '',
     },
     Skills: {
@@ -590,7 +590,7 @@ const WORDS = {
         es: '',
         tr: '',
         uk: '',
-        ['zh-hans']: '',
+        ['zh-hans']: '作为力量英雄，@name 学习力量系技能的概率较高，并可习得力量专属技能 @skill。',
         ['zh-hant']: '',
     },
     HeroClass_Skills_magic: {
@@ -608,7 +608,7 @@ const WORDS = {
         es: '',
         tr: '',
         uk: '',
-        ['zh-hans']: '',
+        ['zh-hans']: '作为魔法英雄，@name 学习魔法系技能的概率较高，并可习得魔法专属技能 @skill。',
         ['zh-hant']: '',
     },
     HeroClass_Skills_generic: {
@@ -626,7 +626,7 @@ const WORDS = {
         es: '',
         tr: '',
         uk: '',
-        ['zh-hans']: '',
+        ['zh-hans']: '@name 在升级时获得新的基础级技能的概率如下：',
         ['zh-hant']: '',
     },
     Levels: {
@@ -644,7 +644,7 @@ const WORDS = {
         es: '',
         tr: '',
         uk: '',
-        ['zh-hans']: '',
+        ['zh-hans']: '等级',
         ['zh-hant']: '',
     },
     Chances: {
@@ -675,12 +675,12 @@ const WORDS = {
         it: '',
         ja: '',
         ko: '',
-        pl: '', // needed
+        pl: 'Synergia umiejętności',
         ru: 'Синергия навыков',
         es: '',
         tr: '',
         uk: '',
-        ['zh-hans']: '',
+        ['zh-hans']: '技能协同',
         ['zh-hant']: '',
     },
     synergiesText: {
@@ -711,13 +711,13 @@ const WORDS = {
         it: '',
         ja: '',
         ko: '',
-        pl: '', // needed
+        pl: 'Efekty artefaktów',
         ru: 'Эффекты артефактов',
         es: '',
         tr: '',
         uk: '',
         ['zh-hans']: '',
-        ['zh-hant']: '',
+        ['zh-hant']: '神器效果',
     },
 };
 

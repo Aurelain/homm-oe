@@ -12,7 +12,7 @@ import collect from './collect.js';
 const TARGET_LANGUAGES = new Set([
     // 'pt_br',
     // 'cs',
-    'en',
+    // 'en',
     // 'fr',
     // 'de',
     // 'hu',
@@ -20,7 +20,7 @@ const TARGET_LANGUAGES = new Set([
     // 'ja',
     // 'ko',
     // 'pl',
-    // 'ru',
+    'ru',
     // 'es',
     // 'tr',
     // 'uk',
@@ -30,7 +30,7 @@ const TARGET_LANGUAGES = new Set([
 
 const IDS = new Set([
     // -- Note: if all items are disabled, all ids are allowed
-    // 'skill_assault',
+    'skill_assault',
     // 'might_dungeon',
 ]);
 
