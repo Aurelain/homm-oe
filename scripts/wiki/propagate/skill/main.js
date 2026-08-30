@@ -17,10 +17,10 @@ const TARGET_LANGUAGES = new Set([
     // 'de',
     // 'hu',
     // 'it',
-    // 'ja',
+    'ja',
     // 'ko',
     // 'pl',
-    'ru',
+    // 'ru',
     // 'es',
     // 'tr',
     // 'uk',
@@ -30,9 +30,30 @@ const TARGET_LANGUAGES = new Set([
 
 const IDS = new Set([
     // -- Note: if all items are disabled, all ids are allowed
-    'skill_assault',
-    // 'might_dungeon',
+    // 'skill_assault',
+    // 'skill_protection',
 ]);
+
+const SUFFIXES = {
+    'Summon Avatar': {
+        en: 'Skill',
+        ['zh-hans']: '技能',
+        es: 'Habilidad',
+        fr: 'Compétence',
+        pt_br: 'Habilidade',
+        ru: 'навык',
+        de: 'Fähigkeit',
+        ja: 'スキル',
+        tr: 'Beceri',
+        ko: '스킬',
+        it: 'Abilità',
+        ['zh-hant']: '技能',
+        pl: 'Umiejętność',
+        uk: 'Вміння',
+        hu: 'Képesség',
+        cs: 'Schopnost',
+    },
+};
 
 // =====================================================================================================================
 //  P U B L I C
@@ -47,7 +68,7 @@ async function main() {
     // Uncomment the following line to just purge the wiki pages:
     // return purge(skills, TARGET_LANGUAGES);
 
-    const fileNames = suggestFileNames(skills);
+    const fileNames = suggestFileNames(skills, SUFFIXES);
 
     skills = IDS.size ? skills.filter((item) => IDS.has(item.id)) : skills;
 

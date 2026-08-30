@@ -20,10 +20,15 @@ function buildSection(key, builder, info, translations, context, parsed) {
     pushValid(lines, result);
 
     // Add existing extra content:
-    const extra = parsed.sections[title];
-    if (extra && extra.trim() !== joinLines(lines).trim()) {
-        lines.push('');
-        lines.push(extra);
+    let extra = parsed.sections[title];
+    if (extra) {
+        extra = extra.trim();
+        const currentContent = joinLines(lines).trim();
+        extra = extra.replace(currentContent, '');
+        if (extra) {
+            lines.push('');
+            lines.push(extra);
+        }
     }
 
     // Remove it from parsed so we don't find it when looking for leftovers:

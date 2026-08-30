@@ -6,6 +6,7 @@ import buildLevels from './buildLevels.js';
 import buildChances from './buildChances.js';
 import buildArtifacts from './buildArtifacts.js';
 import buildSynergies from './buildSynergies.js';
+import buildLeftovers from '../../helpers/buildLeftovers.js';
 
 // =====================================================================================================================
 //  P U B L I C
@@ -39,6 +40,9 @@ function generate(info, translations, context, parsed) {
 
     // Artifact effects
     lines.push(...buildSection('Artifact_effects', buildArtifacts, info, translations, context, parsed));
+
+    // Leftovers:
+    lines.push(...buildLeftovers(parsed));
 
     // Footer
     lines.push('');
