@@ -12,12 +12,12 @@ import collect from './collect.js';
 const TARGET_LANGUAGES = new Set([
     // 'pt_br',
     // 'cs',
-    'en',
+    // 'en',
     // 'fr',
     // 'de',
     // 'hu',
     // 'it',
-    // 'ja',
+    'ja',
     // 'ko',
     // 'pl',
     // 'ru',
@@ -30,7 +30,7 @@ const TARGET_LANGUAGES = new Set([
 
 const IDS = new Set([
     // -- Note: if all items are disabled, all ids are allowed
-    'human_hero_1',
+    // 'human_hero_1',
 ]);
 
 // =====================================================================================================================

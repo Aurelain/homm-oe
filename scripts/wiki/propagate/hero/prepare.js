@@ -25,7 +25,8 @@ function prepare(info, translations, context, existingContent) {
     // console.log('parsed:', parsed);
 
     // Temporary deletions of sections:
-    // delete parsed.sections['Artifact effects'];
+    delete parsed.sections['Biography'];
+    delete parsed.sections['Strategy'];
 
     const lines = generate(info, translations, context, parsed);
     const output = joinLines(lines);

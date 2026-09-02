@@ -42,7 +42,7 @@ function generate(info, translations, context, parsed) {
     lines.push('');
     lines.push(`{{Clear}}`);
     lines.push(buildHeading('Related_pages', translations, lang));
-    lines.push(`{{HeroesNavbox|lang=${lang}}}|faction=${faction}}}`);
+    lines.push(`{{HeroesNavbox|lang=${lang}|faction=${faction}}}`);
     lines.push(`[[Category:${getWords('Heroes', translations, lang)}]]`);
     lines.push('__NOTOC__');
 
