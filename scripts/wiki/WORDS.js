@@ -662,7 +662,7 @@ const WORDS = {
         es: '',
         tr: '',
         uk: '',
-        ['zh-hans']: '',
+        ['zh-hans']: '几率',
         ['zh-hant']: '',
     },
     Skill_synergies: {
@@ -698,7 +698,7 @@ const WORDS = {
         es: '',
         tr: '',
         uk: '',
-        ['zh-hans']: '',
+        ['zh-hans']: '掌握“@skillName”将为其他子技能带来以下益处：',
         ['zh-hant']: '',
     },
     Artifact_effects: {
@@ -716,7 +716,7 @@ const WORDS = {
         es: '',
         tr: '',
         uk: '',
-        ['zh-hans']: '',
+        ['zh-hans']: '饰品效果',
         ['zh-hant']: '神器效果',
     },
 };

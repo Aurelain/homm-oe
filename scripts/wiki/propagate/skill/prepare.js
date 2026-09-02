@@ -24,8 +24,9 @@ function prepare(info, translations, context, existingContent) {
     // console.log('parsed:', parsed);
 
     // Temporary deletions of sections:
-    delete parsed.sections['Skill Synergies'];
-    delete parsed.sections['Artifact Effects'];
+    delete parsed.sections['Chances'];
+    delete parsed.sections['技能协同'];
+    delete parsed.sections['Artifact effects'];
 
     const lines = generate(info, translations, context, parsed);
     const output = joinLines(lines);
