@@ -91,7 +91,7 @@ async function uploadFiles() {
  */
 function getCategories(fileName) {
     const categories = [];
-    categories.push('Hero Elite Class Icons');
+    categories.push('Artifact Images');
     const clothed = categories.map((category) => `[[Category:${category}]]`);
     return clothed.join(' ');
 }

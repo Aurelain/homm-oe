@@ -11,7 +11,7 @@ import collect from './collect.js';
 //  D E C L A R A T I O N S
 // =====================================================================================================================
 const TARGET_LANGUAGES = new Set([
-    'en',
+    // 'en',
     // 'zh-hans',
     // 'es',
     // 'fr',
@@ -23,7 +23,7 @@ const TARGET_LANGUAGES = new Set([
     // 'ko',
     // 'it',
     // 'zh-hant',
-    // 'pl',
+    'pl',
     // 'uk',
     // 'hu',
     // 'cs',

@@ -1,4 +1,4 @@
-import Unit from '../../cargo/Unit.js';
+import Unit from '/a/aims/oe-wiki/src/parse/parsers/Unit.js';
 import collectMain from '../../helpers/collectMain.js';
 import match from '../../../utils/match.js';
 import filterHub from '../../../helpers/filterHub.js';
